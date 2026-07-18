@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+
+# Secrets. Keep examples only.
+.env
+.env.*
+!.env.example
+
+# Python
+.python-version
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# JavaScript
+node_modules/
+web/dist/
+web/test-results/
+web/playwright-report/
+
+# Build and runtime caches
+.tools/
+.cache/
+api/.cache/
+api/data/generated/
+targets/candidates/
+targets/rejected/
+
+# Hosting metadata
+.vercel/
+
+# Editors
+.idea/
+.vscode/
+*.swp
