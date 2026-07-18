@@ -13,7 +13,8 @@
         "api/index.py": {
           "memory": 2048,
           "maxDuration": 300,
-          "includeFiles": "{api/data/**,targets/**}"
+          "includeFiles": "{api/data/**,targets/**}",
+          "excludeFiles": "{.cache/**,.env*,.git/**,.github/**,.pytest_cache/**,.vercel/**,api/.pytest_cache/**,api/.ruff_cache/**,api/.venv/**,api/scripts/**,api/tests/**,web/**,targets/candidates/**,*.md,LICENSE,dev.sh}"
         }
       }
     }
