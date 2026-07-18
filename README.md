@@ -20,6 +20,8 @@ Wait for `READY http://localhost:5173`, then open that URL. The script installs 
 
 No microphone is needed for the judging loop. In Tone Lab, use the three **No mic? Try a real sample** buttons for correct `má`, `má` flattened into `ma`, and the signature `Phương` to `phường` mistake. In Echo, run **Play the ghost-at-dinner demo**, then compare the committed learner sentence with Cedar's validated correction.
 
+**Cold-start receipt, 2026-07-18:** a fresh clone on macOS with `OPENAI_API_KEY` unset printed `READY` in about 56 seconds. The check loaded all 19 words, replayed the Phương sample through `/api/analyze`, returned the ghost-at-dinner tone diff, and streamed committed Echo speech.
+
 No OpenAI key is required for local grading, target playback, committed meaning art, deterministic coaching, analyzer demos, or cached Echo shadowing. With a key, server-only AI coaching and live Echo features turn on automatically:
 
 ```bash
