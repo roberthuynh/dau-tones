@@ -30,13 +30,32 @@ cp .env.example .env.local
 ./dev.sh
 ```
 
-The same monorepo is live at [dau.huynhrobert.com](https://dau.huynhrobert.com) as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service. The native pYIN, SciPy, LLVM, and PyAV stack uses [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb); the deployed function keeps the same DSP and browser-audio decoding in production.
+The same monorepo is live at [dau.huynhrobert.com](https://dau.huynhrobert.com) as one Vercel project: Vite owns `/`, FastAPI owns `/api`, and the OpenAI secret remains scoped to the Python service. Live learner pitch grading stays in the browser. The native pYIN, SciPy, LLVM, and PyAV stack remains server-side for corpus validation, evaluation, and analyzer receipts, using [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb).
 
 GitHub Actions is manual-only during the build to preserve the free-plan quota. The same lint, test, build, and offline end-to-end checks run locally before each published milestone.
 
 ## How it works
 
-1. `gpt-realtime-2.1` speaks five Thầy Minh reference candidates for every target in Northern and Southern Vietnamese, using the provider voice ID `cedar`. The same DSP used for learners rejects acoustically invalid candidates before one take can become ground truth.
+### Production architecture
+
+```mermaid
+flowchart LR
+    Mic["Microphone recording"] --> BrowserDSP["Browser DSP<br/>Web Audio decode + autocorrelation F0<br/>64-point normalized contour"]
+    Targets["Committed validated targets<br/>WAV + contour + meaning art"] --> UI["Tone Lab<br/>curve overlay + verdict + wrong meaning"]
+    BrowserDSP --> UI
+    UI --> Rules["Instant rule-based coach"]
+    UI -. "optional keyed refinement" .-> API["FastAPI on Vercel<br/>secret stays server-side"]
+    API --> GPT["gpt-5.6-sol<br/>coach + next drill + Echo explanation"]
+    API --> ASR["gpt-4o-transcribe<br/>Echo transcription"]
+    API --> Speech["gpt-realtime-2.1-mini<br/>Echo shadowing speech"]
+    API --> Images["gpt-image-2<br/>optional Echo reveal"]
+    Realtime["gpt-realtime-2.1<br/>five reference candidates"] --> Validation["Server DSP<br/>librosa pYIN + quality gates"]
+    Validation --> Targets
+```
+
+The latency boundary is deliberate. Recording, pitch extraction, tone-family grading, contour drawing, the first coaching sentence, and the next-practice reason require no network request. FastAPI handles keyed coaching refinement and Echo composition, while the heavier pYIN stack remains the authority for accepting reference audio and producing evaluation receipts. `/api/analyze` remains available for reproducible committed-demo and compatibility checks, but it is not on the live microphone path.
+
+1. `gpt-realtime-2.1` speaks five Thầy Minh reference candidates for every target in Northern and Southern Vietnamese, using the provider voice ID `cedar`. The server validation DSP rejects acoustically invalid candidates before one take can become ground truth.
 2. `librosa.pyin` extracts authoritative target and evaluation F0, fills valid unvoiced gaps, normalizes pitch into speaker-relative semitones, and resamples each contour to 64 points. Learner recordings are decoded and graded directly in the browser with Web Audio and deterministic autocorrelation pitch tracking, so the visible practice loop does not wait for a hosted Python cold start. Both paths produce the same 64-point contour contract, and coaching never delays the verdict.
 3. `gpt-5.6-sol` runs only on the FastAPI server for specific coaching, next-drill selection with visible reasoning, themed ordering of committed inventory words, and Echo meaning explanations. Rule-based coaching covers the same loop when no key is present.
 4. `gpt-4o-transcribe` runs server-side for keyed Echo transcription. `gpt-realtime-2.1-mini` generates bounded Echo shadowing speech. Available validated drill playback uses committed reference audio and is never synthesized during practice.
