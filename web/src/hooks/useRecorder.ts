@@ -7,6 +7,7 @@ type RecorderOptions = {
   minimumMs?: number;
   silenceMs?: number;
   hardStopMs?: number;
+  processingTimeoutMs?: number;
 };
 
 type RecorderApi = {
@@ -25,7 +26,13 @@ function preferredMimeType(): string | undefined {
   return options.find((mime) => window.MediaRecorder?.isTypeSupported(mime));
 }
 
-export function useRecorder({ onRecording, minimumMs = 350, silenceMs = 800, hardStopMs = 6_000 }: RecorderOptions): RecorderApi {
+export function useRecorder({
+  onRecording,
+  minimumMs = 350,
+  silenceMs = 800,
+  hardStopMs = 6_000,
+  processingTimeoutMs = 8_000,
+}: RecorderOptions): RecorderApi {
   const [state, setState] = useState<RecorderState>("idle");
   const [level, setLevel] = useState(0);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -91,9 +98,19 @@ export function useRecorder({ onRecording, minimumMs = 350, silenceMs = 800, har
           setState("idle");
           return;
         }
+        let callbackSettled = false;
+        const processingDeadline = window.setTimeout(() => {
+          if (callbackSettled) return;
+          setError("That take is taking too long to grade. Try once more, or use a sample below.");
+          setState("idle");
+        }, processingTimeoutMs);
         Promise.resolve(callbackRef.current(blob))
           .catch(() => undefined)
-          .finally(() => setState("idle"));
+          .finally(() => {
+            callbackSettled = true;
+            window.clearTimeout(processingDeadline);
+            setState("idle");
+          });
       });
 
       const audioContext = new AudioContext();
@@ -141,7 +158,7 @@ export function useRecorder({ onRecording, minimumMs = 350, silenceMs = 800, har
       setError(denied ? "Microphone access is off. Allow it in your browser, or use a sample to see the full loop." : "Dấu could not open the microphone. Check that another app is not using it.");
       setState("idle");
     }
-  }, [hardStopMs, minimumMs, release, silenceMs, state, stop]);
+  }, [hardStopMs, minimumMs, processingTimeoutMs, release, silenceMs, state, stop]);
 
   const toggle = useCallback(() => {
     if (state === "recording") stop();

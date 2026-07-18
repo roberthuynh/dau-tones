@@ -9,6 +9,7 @@ import type {
 } from "../types";
 
 const API_PREFIX = "/api";
+const ANALYSIS_TIMEOUT_MS = 6_000;
 let analysisWarmup: Promise<void> | null = null;
 
 export class ApiError extends Error {
@@ -82,7 +83,7 @@ export async function analyzeRecording(audio: Blob, wordId: string, intendedTone
   form.append("intended_tone", intendedTone);
   form.append("accent", accent);
   try {
-    return await json<AnalysisResult>("/analyze", { method: "POST", body: form }, 60_000);
+    return await json<AnalysisResult>("/analyze", { method: "POST", body: form }, ANALYSIS_TIMEOUT_MS);
   } catch (error) {
     if (error instanceof ApiError && error.status === 422 && error.detail?.needs_retry) {
       const tone = intendedTone as AnalysisResult["tone_intended"];

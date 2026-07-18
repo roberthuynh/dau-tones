@@ -151,7 +151,12 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
     [accent, acceptResult, currentWord.id, currentWord.tone],
   );
 
-  const recorder = useRecorder({ onRecording, silenceMs: 650, hardStopMs: 5_000 });
+  const recorder = useRecorder({
+    onRecording,
+    silenceMs: 650,
+    hardStopMs: 5_000,
+    processingTimeoutMs: 7_000,
+  });
 
   const runDemo = (demoId: DemoId) => {
     const intendedId = demoId === "phuong-ward" ? "phuong-name" : "ma-mother";
