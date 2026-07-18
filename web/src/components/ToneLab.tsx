@@ -153,19 +153,22 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
 
   const recorder = useRecorder({ onRecording, silenceMs: 650, hardStopMs: 5_000 });
 
-  const runDemo = async (demoId: DemoId) => {
+  const runDemo = (demoId: DemoId) => {
     const intendedId = demoId === "phuong-ward" ? "phuong-name" : "ma-mother";
     selectWord(intendedId);
     setError(null);
     const apiDemoId = demoId === "phuong-ward" ? "phuong-name-said-ward" : demoId === "ma-ghost" ? "ma-mother-said-ghost" : "ma-mother-correct";
     const intended = wordById(intendedId, payload.words)!;
-    try {
-      const analysis = await analyzeCommittedDemo(apiDemoId, intended.id, intended.tone, accent);
-      acceptResult(analysis, undefined, intended);
-    } catch {
-      const analysis = demoAnalysis(demoId, accent);
-      acceptResult(analysis, demoCoach(demoId), intended);
-    }
+    // The committed receipt makes the no-mic reveal instant, even when a hosted
+    // DSP instance is still warming. Replay the WAV through the real analyzer in
+    // the background and replace only the contour result when it returns.
+    acceptResult(demoAnalysis(demoId, accent), demoCoach(demoId), intended);
+    const requestId = coachRequestRef.current;
+    void analyzeCommittedDemo(apiDemoId, intended.id, intended.tone, accent)
+      .then((analysis) => {
+        if (coachRequestRef.current === requestId) setResult(analysis);
+      })
+      .catch(() => undefined);
   };
 
   const moveNext = () => {
