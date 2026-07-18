@@ -491,7 +491,7 @@ def _resample_audio(samples: np.ndarray, source_rate: int, target_rate: int) -> 
     if source_rate == target_rate:
         return samples.astype(np.float32, copy=False)
     try:
-        import librosa
+        from .librosa_compat import librosa
 
         return np.asarray(
             librosa.resample(
@@ -827,7 +827,7 @@ def extract_pitch_contour(
         sample_rate = SAMPLE_RATE
     segment, initial_quality = isolate_primary_speech(waveform, sample_rate)
     try:
-        import librosa
+        from .librosa_compat import librosa
     except ImportError as error:
         raise RuntimeError("Pitch extraction requires librosa") from error
 

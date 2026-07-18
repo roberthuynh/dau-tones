@@ -166,6 +166,29 @@ def test_pyin_decoded_voicing_is_used_when_frame_probabilities_are_low(
     assert np.max(np.abs(analysis.points)) < 1e-8
 
 
+def test_librosa_stub_fallback_uses_vendored_package_data(monkeypatch) -> None:
+    from dau import librosa_compat
+
+    original = librosa_compat._ORIGINAL_ATTACH_STUB
+
+    def missing_then_real(package_name: str, filename: str):
+        if filename == "/stripped/librosa/__init__.py":
+            raise ValueError(
+                "Cannot load imports from non-existent stub "
+                "'/stripped/librosa/__init__.pyi'"
+            )
+        return original(package_name, filename)
+
+    monkeypatch.setattr(librosa_compat, "_ORIGINAL_ATTACH_STUB", missing_then_real)
+
+    _getattr, _dir, exported = librosa_compat._attach_stub_with_fallback(
+        "librosa", "/stripped/librosa/__init__.py"
+    )
+
+    assert "pyin" in exported
+    assert "resample" in exported
+
+
 @pytest.mark.parametrize("tone", TONE_ORDER)
 def test_expected_shape_passes_target_validation(tone: Tone) -> None:
     validation = validate_target_candidate(_fixture_analysis(tone), tone, accent=Accent.NORTH)
