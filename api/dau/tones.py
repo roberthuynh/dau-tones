@@ -300,15 +300,21 @@ class CandidateValidation:
     separation_margin: float
     reason_codes: tuple[str, ...]
     contour: PitchContour | None = field(default=None, repr=False)
+    accent_family_verified: bool = False
 
     def as_dict(self) -> dict[str, Any]:
+        shape_score = round(self.shape_score, 6) if math.isfinite(self.shape_score) else None
+        separation_margin = (
+            round(self.separation_margin, 6) if math.isfinite(self.separation_margin) else None
+        )
         result: dict[str, Any] = {
             "passed": self.passed,
             "tone": self.tone.value,
             "accent": self.accent.value,
-            "shape_score": round(self.shape_score, 6),
-            "separation_margin": round(self.separation_margin, 6),
+            "shape_score": shape_score,
+            "separation_margin": separation_margin,
             "reason_codes": list(self.reason_codes),
+            "accent_family_verified": self.accent_family_verified,
         }
         if self.contour is not None:
             result.update(self.contour.as_dict())
@@ -686,6 +692,31 @@ def _remove_octave_spikes(f0: np.ndarray) -> np.ndarray:
     return corrected
 
 
+def _select_voiced_frames(
+    f0: np.ndarray,
+    voiced_flag: np.ndarray,
+    voiced_probability: np.ndarray | None,
+) -> np.ndarray:
+    """Prefer high-confidence pYIN frames without discarding its decoded track.
+
+    ``librosa.pyin`` already applies Viterbi decoding to produce ``voiced_flag``.
+    Its independent per-frame probability can remain low for breathy or
+    glottalized Vietnamese vowels even when the decoded pitch track is coherent.
+    Keep the stricter mask when it has enough coverage, then fall back to the
+    decoded mask so that probability is not treated as a second voicing verdict.
+    """
+
+    decoded = np.asarray(voiced_flag, dtype=bool) & np.isfinite(f0) & (f0 > 0)
+    if voiced_probability is None:
+        return decoded
+    probability = np.asarray(voiced_probability, dtype=np.float64)
+    confident = decoded & (np.nan_to_num(probability, nan=0.0) >= 0.35)
+    confident_fraction = float(np.mean(confident)) if confident.size else 0.0
+    if int(np.sum(confident)) >= 5 and confident_fraction >= 0.32:
+        return confident
+    return decoded
+
+
 def _smooth(values: np.ndarray) -> np.ndarray:
     if values.size < 5:
         return values.copy()
@@ -811,10 +842,7 @@ def extract_pitch_contour(
         center=True,
     )
     f0 = np.asarray(f0, dtype=np.float64)
-    voiced = np.asarray(voiced_flag, dtype=bool) & np.isfinite(f0) & (f0 > 0)
-    if voiced_probability is not None:
-        probability = np.asarray(voiced_probability, dtype=np.float64)
-        voiced &= np.nan_to_num(probability, nan=0.0) >= 0.35
+    voiced = _select_voiced_frames(f0, voiced_flag, voiced_probability)
     voiced_fraction = float(np.mean(voiced)) if voiced.size else 0.0
     if int(np.sum(voiced)) < 5 or voiced_fraction < 0.32:
         raise SignalQualityError(
@@ -1235,6 +1263,48 @@ def _candidate_rule_failures(
     return reasons
 
 
+def _range_adapted_validation_scores(analysis: PitchContour, accent: Accent) -> dict[Tone, float]:
+    """Compare target shape after adapting broad priors to its pitch excursion.
+
+    Cedar often realizes emphatic rising tones over a much wider semitone range
+    than the hand-authored prior. This retry changes the prior's amplitude, not
+    its direction or timing; the independent tone rules and separation gate
+    still referee the result.
+    """
+
+    scores: dict[Tone, float] = {}
+    for candidate in TONE_ORDER:
+        prior = expected_tone_contour(candidate, accent)
+        prior_features = extract_features(prior)
+        if candidate is not Tone.NGANG:
+            scale = float(
+                np.clip(
+                    analysis.features.pitch_range / max(prior_features.pitch_range, 1e-6),
+                    0.6,
+                    3.0,
+                )
+            )
+            prior = prior * scale
+            prior_features = extract_features(prior)
+        scores[candidate] = constrained_dtw_distance(analysis.points, prior) + 0.25 * (
+            feature_distance(analysis.features, prior_features)
+        )
+    return scores
+
+
+def _southern_dipping_family_evidence(features: ContourFeatures, tone: Tone) -> bool:
+    """Verify the merged Southern hỏi/ngã family with pitch and creak evidence."""
+
+    if tone not in {Tone.HOI, Tone.NGA}:
+        return False
+    pitch_descent = features.start - features.minimum
+    has_dip_shape = (
+        0.25 <= features.dip_position <= 0.70 and pitch_descent >= 0.60 and features.recovery >= 1.0
+    )
+    has_creak_evidence = features.central_rms_dip >= 0.20 or features.longest_voicing_gap_ms >= 40.0
+    return has_dip_shape and has_creak_evidence
+
+
 def validate_target_candidate(
     source: str | Path | bytes | bytearray | BinaryIO | PitchContour,
     expected_tone: Tone | str,
@@ -1274,10 +1344,26 @@ def validate_target_candidate(
     )
     margin = competing_score - expected_score
     reasons = [] if lexical_verified else ["lexical_mismatch"]
-    reasons.extend(_candidate_rule_failures(analysis.features, tone, resolved_accent))
-    if expected_score > 1.15:
+    rule_failures = _candidate_rule_failures(analysis.features, tone, resolved_accent)
+    reasons.extend(rule_failures)
+    if not rule_failures and (expected_score > 1.15 or margin < -0.08):
+        adapted_scores = _range_adapted_validation_scores(analysis, resolved_accent)
+        adapted_expected = adapted_scores[tone]
+        adapted_competing = min(
+            score for candidate, score in adapted_scores.items() if candidate is not tone
+        )
+        adapted_margin = adapted_competing - adapted_expected
+        if adapted_expected <= 1.15 and adapted_margin >= -0.08:
+            expected_score = adapted_expected
+            margin = adapted_margin
+    accent_family_verified = (
+        resolved_accent is Accent.SOUTH
+        and not rule_failures
+        and _southern_dipping_family_evidence(analysis.features, tone)
+    )
+    if expected_score > 1.15 and not accent_family_verified:
         reasons.append("shape_distance")
-    if margin < -0.08:
+    if margin < -0.08 and not accent_family_verified:
         reasons.append("wrong_tone_shape")
     return CandidateValidation(
         passed=not reasons,
@@ -1287,6 +1373,7 @@ def validate_target_candidate(
         separation_margin=float(margin),
         reason_codes=tuple(dict.fromkeys(reasons)),
         contour=analysis,
+        accent_family_verified=accent_family_verified,
     )
 
 

@@ -18,6 +18,7 @@ from dau.tones import (
     constrained_dtw_distance,
     contour_from_points,
     expected_tone_contour,
+    extract_pitch_contour,
     feature_differences,
     isolate_primary_speech,
     tips_from_differences,
@@ -113,6 +114,14 @@ def test_silence_is_a_typed_quality_error() -> None:
     assert captured.value.as_dict()["code"] == "silence"
 
 
+def test_rejected_target_metrics_are_strict_json_values() -> None:
+    validation = validate_target_candidate(b"not a wav", Tone.NGANG)
+
+    assert not validation.passed
+    assert validation.as_dict()["shape_score"] is None
+    assert validation.as_dict()["separation_margin"] is None
+
+
 def test_clipping_is_a_typed_quality_error() -> None:
     clipped = np.ones(22_050) * 0.999
     with pytest.raises(SignalQualityError) as captured:
@@ -132,6 +141,31 @@ def test_two_substantial_islands_are_rejected() -> None:
     assert captured.value.code is SignalQualityCode.MULTIPLE_UTTERANCES
 
 
+def test_pyin_decoded_voicing_is_used_when_frame_probabilities_are_low(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sample_rate = 22_050
+    time = np.arange(round(0.42 * sample_rate)) / sample_rate
+    syllable = 0.15 * np.sin(2.0 * math.pi * 180.0 * time)
+    waveform = np.concatenate((np.zeros(1_500), syllable, np.zeros(1_500)))
+
+    def low_probability_track(*_args, **_kwargs):
+        frame_count = 36
+        return (
+            np.full(frame_count, 180.0),
+            np.ones(frame_count, dtype=bool),
+            np.full(frame_count, 0.12),
+        )
+
+    monkeypatch.setattr("librosa.pyin", low_probability_track)
+
+    analysis = extract_pitch_contour(waveform, sample_rate)
+
+    assert analysis.quality.voiced_fraction == pytest.approx(1.0)
+    assert np.all(analysis.raw_voiced)
+    assert np.max(np.abs(analysis.points)) < 1e-8
+
+
 @pytest.mark.parametrize("tone", TONE_ORDER)
 def test_expected_shape_passes_target_validation(tone: Tone) -> None:
     validation = validate_target_candidate(_fixture_analysis(tone), tone, accent=Accent.NORTH)
@@ -143,6 +177,38 @@ def test_wrong_expected_tone_fails_target_validation() -> None:
     validation = validate_target_candidate(_fixture_analysis(Tone.SAC), Tone.HUYEN)
     assert not validation.passed
     assert "wrong_tone_shape" in validation.reason_codes or "no_fall" in validation.reason_codes
+
+
+def test_target_validation_adapts_to_a_wider_correct_pitch_excursion() -> None:
+    emphatic_rise = contour_from_points(
+        expected_tone_contour(Tone.SAC) * 3.5,
+        duration_s=0.4,
+    )
+
+    validation = validate_target_candidate(emphatic_rise, Tone.SAC)
+
+    assert validation.passed, validation.reason_codes
+    assert validation.shape_score <= 1.15
+    assert validation.separation_margin >= -0.08
+
+
+def test_southern_dipping_family_uses_pitch_and_energy_evidence() -> None:
+    x = np.linspace(0.0, 1.0, 64)
+    asymmetric_dip = np.where(x < 0.45, 1.0 - 4.5 * x, -1.025 + 9.0 * (x - 0.45) / 0.55)
+    analysis = contour_from_points(
+        asymmetric_dip,
+        duration_s=0.45,
+        central_rms_dip=0.4,
+    )
+
+    validation = validate_target_candidate(
+        analysis,
+        Tone.NGA,
+        accent=Accent.SOUTH,
+    )
+
+    assert validation.passed, validation.reason_codes
+    assert validation.accent_family_verified
 
 
 def test_feature_diff_produces_physical_tip_codes() -> None:

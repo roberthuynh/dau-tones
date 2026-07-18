@@ -39,6 +39,21 @@ def _pcm_to_wav(chunks: Iterable[bytes]) -> bytes:
     return stream.getvalue()
 
 
+def _usable_incomplete_audio(
+    response: dict[str, object], *, allow_incomplete_audio: bool, has_audio: bool
+) -> bool:
+    """Allow only token-capped partial audio into a downstream validation gate."""
+
+    details = response.get("status_details")
+    reason = details.get("reason") if isinstance(details, dict) else None
+    return (
+        allow_incomplete_audio
+        and has_audio
+        and response.get("status") == "incomplete"
+        and reason == "max_output_tokens"
+    )
+
+
 def synthesize_utterance(
     text: str,
     *,
@@ -47,6 +62,7 @@ def synthesize_utterance(
     instructions: str | None = None,
     max_output_tokens: int = 192,
     timeout_seconds: float = 45.0,
+    allow_incomplete_audio: bool = False,
 ) -> bytes:
     """Open one Realtime session, collect one Cedar utterance, then close it."""
 
@@ -121,9 +137,15 @@ def synthesize_utterance(
                 message = event.get("error", {}).get("message", "Realtime speech failed")
                 raise RuntimeError(message)
             elif event_type == "response.done":
-                status = event.get("response", {}).get("status")
-                if status not in {None, "completed"}:
-                    raise RuntimeError(f"Realtime response ended with status {status}")
+                response = event.get("response", {})
+                status = response.get("status")
+                if status not in {None, "completed"} and not _usable_incomplete_audio(
+                    response,
+                    allow_incomplete_audio=allow_incomplete_audio,
+                    has_audio=bool(audio_chunks),
+                ):
+                    details = response.get("status_details")
+                    raise RuntimeError(f"Realtime response ended with status {status}: {details}")
                 break
     if not audio_chunks:
         raise RuntimeError("Realtime returned no audio")
