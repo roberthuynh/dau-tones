@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 
 from .analysis_service import SignalQualityError, analyze_recording, scoring_mode
 from .coach import coach, generate_drill
-from .content import demo_document, echo_document, public_words
+from .content import demo_document, echo_document, public_words, reference_corpus_is_complete
 from .echo import align_transcript, literal_explanation, normalize_text
 from .models import IMAGE_MODEL, TEXT_MODEL, TRANSCRIPTION_MODEL
 from .realtime_audio import synthesize_utterance
@@ -26,7 +26,6 @@ from .settings import (
     AI_TIMEOUT_SECONDS,
     MAX_UPLOAD_BYTES,
     REPO_ROOT,
-    TARGETS_ROOT,
     has_openai_key,
     openai_api_key,
 )
@@ -59,12 +58,11 @@ class EchoExplanation(BaseModel):
 
 
 def _health() -> dict[str, Any]:
-    manifest_exists = (TARGETS_ROOT / "manifest.json").exists()
     key = has_openai_key()
     return {
         "status": "ok",
         "ready": True,
-        "reference_corpus_validated": manifest_exists,
+        "reference_corpus_validated": reference_corpus_is_complete(),
         "scoring_modes": {
             "north": "six_tone" if scoring_mode("north").value == "six-tone" else "four_family",
             "south": "four_family",

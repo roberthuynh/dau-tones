@@ -10,7 +10,7 @@ from typing import Any
 
 import numpy as np
 
-from .settings import DATA_ROOT, TARGETS_ROOT
+from .settings import DATA_ROOT, REPO_ROOT, TARGETS_ROOT
 
 TONE_ORDER = ("ngang", "huyen", "sac", "hoi", "nga", "nang")
 TONE_FAMILIES = {
@@ -58,6 +58,30 @@ def demo_document() -> dict[str, Any]:
 @lru_cache(maxsize=1)
 def target_manifest() -> dict[str, Any]:
     return _load_json(TARGETS_ROOT / "manifest.json", {"targets": []})
+
+
+def reference_corpus_is_complete() -> bool:
+    """Return true only when every inventory/accent target passed validation."""
+
+    expected = {
+        (word["id"], accent)
+        for word in inventory_document().get("words", [])
+        for accent in ("north", "south")
+    }
+    targets = target_manifest().get("targets", [])
+    resolved: set[tuple[str, str]] = set()
+    for target in targets:
+        key = (str(target.get("word_id", "")), str(target.get("accent", "")))
+        relative_path = target.get("path")
+        if (
+            key not in expected
+            or not isinstance(relative_path, str)
+            or not (REPO_ROOT / relative_path).is_file()
+            or not target.get("validation", {}).get("passed", False)
+        ):
+            return False
+        resolved.add(key)
+    return bool(expected) and resolved == expected and len(targets) == len(expected)
 
 
 def generic_contour(tone: str, accent: str = "north") -> list[float]:

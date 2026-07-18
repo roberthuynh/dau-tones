@@ -30,6 +30,7 @@ def test_health_exposes_offline_capabilities(monkeypatch) -> None:
     assert payload["capabilities"]["local_dsp"] is True
     assert payload["capabilities"]["ai_coaching"] is False
     assert payload["banner"] == "Add an OpenAI key for AI coaching"
+    assert payload["reference_corpus_validated"] is False
 
 
 def test_words_starts_with_phuong_and_has_64_point_targets() -> None:
