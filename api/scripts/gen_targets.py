@@ -1,4 +1,4 @@
-"""Generate Cedar candidates and allow DSP to referee each reference target."""
+"""Generate Cô Linh reference candidates and let DSP referee every target."""
 
 from __future__ import annotations
 
