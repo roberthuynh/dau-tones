@@ -12,7 +12,11 @@
       "functions": {
         "api/index.py": {
           "memory": 2048,
-          "maxDuration": 300
+          "maxDuration": 300,
+          "includeFiles": [
+            "api/data/**",
+            "targets/**"
+          ]
         }
       }
     }

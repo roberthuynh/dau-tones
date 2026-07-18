@@ -44,6 +44,7 @@ def test_words_starts_with_phuong_and_has_64_point_targets() -> None:
     assert phuong["surface"] == "Phương"
     assert len(phuong["targets"]["north"]["contour"]) == 64
     assert len(phuong["targets"]["south"]["contour"]) == 64
+    assert payload["scoring_modes"] == client.get("/healthz").json()["scoring_modes"]
 
 
 def test_silent_upload_returns_human_retry_error() -> None:

@@ -137,6 +137,11 @@ def word_surface(word: dict[str, Any]) -> str:
 
 def public_words() -> dict[str, Any]:
     document = inventory_document()
+    evaluation = _load_json(DATA_ROOT / "evaluation.json", {})
+    northern_mode = (
+        evaluation.get("accents", {}).get("north", {}).get("scoring_mode", "four_family")
+    )
+    northern_mode = "four_family" if northern_mode not in {"six_tone", "six-tone"} else "six_tone"
     words: list[dict[str, Any]] = []
     for source in document.get("words", []):
         word = dict(source)
@@ -157,7 +162,7 @@ def public_words() -> dict[str, Any]:
         "words": words,
         "featured_queue": document.get("featured_queue", []),
         "drills": {item["id"]: item for item in document.get("themed_drills", [])},
-        "scoring_modes": {"north": "six_tone", "south": "four_family"},
+        "scoring_modes": {"north": northern_mode, "south": "four_family"},
     }
 
 
