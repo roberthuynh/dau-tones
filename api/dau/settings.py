@@ -11,7 +11,10 @@ from pathlib import Path
 
 API_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = API_ROOT.parent
-DATA_ROOT = API_ROOT / "data"
+# Vercel installs ``dau`` into ``_vendor`` before importing the checked-in
+# entrypoint. Repository assets still live beside ``api/index.py``, so resolve
+# data from the repository root instead of beside the installed package.
+DATA_ROOT = REPO_ROOT / "api" / "data"
 TARGETS_ROOT = REPO_ROOT / "targets"
 FIXTURES_ROOT = REPO_ROOT / "fixtures"
 WEB_PUBLIC_ROOT = REPO_ROOT / "web" / "public"
