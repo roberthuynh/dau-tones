@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "model": "gpt-image-2",
+  "style": "warm near-black cinematic flat 2D story illustration; recurring cast; no text or border",
+  "assets": [
+    {
+      "id": "meet-family",
+      "file": "meet-family.webp",
+      "model": "gpt-image-2",
+      "size_requested": "2048x1152",
+      "quality_requested": "medium",
+      "webp_quality": 80,
+      "dimensions": [
+        1600,
+        900
+      ],
+      "prompt": "Create a cinematic flat 2D story illustration for a Vietnamese language-learning app. Scene: evening outside a welcoming multigenerational Vietnamese family home in Hanoi; Minh, a friendly Vietnamese man in his early thirties with short black hair and an indigo overshirt, arrives beside the learner, a Vietnamese-American young woman with shoulder-length black hair and a coral blouse; through the warm doorway we glimpse her mother Phương in a burnt-orange blouse and younger sister Phượng in a teal blouse greeting them. Consistent recurring cast, expressive natural gestures, culturally grounded contemporary Vietnam, warm near-black background, coral amber teal and violet palette, layered paper-cut shapes, soft theatrical lighting, clear focal hierarchy, generous breathing room for overlaid conversation bubbles. No text, no letters, no numbers, no speech bubbles, no border, no watermark.",
+      "prompt_sha256": "01977572223c52c482f6ec35e8610a32a1e36dd8d73a7525b4c204cb131fd313",
+      "file_sha256": "078bba5237a6c1b68aeec922634d85cc3290a52e79ce70bee2941350f33d6ff9",
+      "bytes": 119258,
+      "source_job": 1
+    },
+    {
+      "id": "family-dinner",
+      "file": "family-dinner.webp",
+      "model": "gpt-image-2",
+      "size_requested": "2048x1152",
+      "quality_requested": "medium",
+      "webp_quality": 80,
+      "dimensions": [
+        1600,
+        900
+      ],
+      "prompt": "Create a cinematic flat 2D story illustration for a Vietnamese language-learning app. Scene: a warm Vietnamese family dinner at a low wooden table; the same recurring Minh, friendly Vietnamese man in his early thirties with short black hair and indigo overshirt, sits with the same learner, Vietnamese-American young woman with shoulder-length black hair and coral blouse, her mother Phương in a burnt-orange blouse, and younger sister Phượng in a teal blouse; bowls of rice, fish, milk, vegetables and fruit create a clear dinner setting. Expressive natural gestures, contemporary Vietnamese home, warm near-black background, coral amber teal and violet palette, layered paper-cut shapes, soft theatrical lighting, clear focal hierarchy, generous breathing room for overlaid conversation bubbles. No text, no letters, no numbers, no speech bubbles, no border, no watermark.",
+      "prompt_sha256": "044f4287aa950a65e8de7d2b3fcd95773e275a1ddcfe30cf6e07b32c908cd22b",
+      "file_sha256": "d2c5e1b4644e5c7089f96098b3597b3ee2394fc64b308342f2265407c344c2c3",
+      "bytes": 107608,
+      "source_job": 2
+    },
+    {
+      "id": "pho-shop",
+      "file": "pho-shop.webp",
+      "model": "gpt-image-2",
+      "size_requested": "2048x1152",
+      "quality_requested": "medium",
+      "webp_quality": 80,
+      "dimensions": [
+        1600,
+        900
+      ],
+      "prompt": "Create a cinematic flat 2D story illustration for a Vietnamese language-learning app. Scene: morning inside a lively but uncluttered Hanoi phở shop; the same recurring Minh, friendly Vietnamese man in his early thirties with short black hair and indigo overshirt, and the same learner, Vietnamese-American young woman with shoulder-length black hair and coral blouse, sit at a small table with steaming bowls of phở, herbs, water and a small fish dish; open shopfront suggests a Hanoi street beyond. Expressive natural gestures, culturally grounded contemporary Vietnam, warm near-black background, coral amber teal and violet palette, layered paper-cut shapes, soft theatrical lighting, clear focal hierarchy, generous breathing room for overlaid conversation bubbles. No text, no letters, no numbers, no speech bubbles, no border, no watermark.",
+      "prompt_sha256": "837fe70a5f9e5416bd46428fc6251d496da021dc094b905f171eef1ed2f97104",
+      "file_sha256": "3cc19f3903733388148071d53488cb3175a75a064c087e9516b286be2f530660",
+      "bytes": 128686,
+      "source_job": 3
+    },
+    {
+      "id": "around-ward",
+      "file": "around-ward.webp",
+      "model": "gpt-image-2",
+      "size_requested": "2048x1152",
+      "quality_requested": "medium",
+      "webp_quality": 80,
+      "dimensions": [
+        1600,
+        900
+      ],
+      "prompt": "Create a cinematic flat 2D story illustration for a Vietnamese language-learning app. Scene: the same recurring Minh, friendly Vietnamese man in his early thirties with short black hair and indigo overshirt, guides the same learner, Vietnamese-American young woman with shoulder-length black hair and coral blouse, through a contemporary Vietnamese urban ward; a civic ward-office building sits in the middle distance, a large gate and crossroads lead toward rice fields where an elderly grandmother plants seedlings; a quiet grave mound is far off and understated. Expressive natural gestures, warm near-black background, coral amber teal and violet palette, layered paper-cut shapes, soft theatrical lighting, clear focal hierarchy, generous breathing room for overlaid conversation bubbles. No signage, no text, no letters, no numbers, no speech bubbles, no border, no watermark.",
+      "prompt_sha256": "ea41778aa825e284a8a4ece287ab2eefb6a1f0455359f81c33c59199e1233d62",
+      "file_sha256": "ded4e05a95d5d436785878a8e23ad89d8851331f2e77a6126d8ee186418b78f7",
+      "bytes": 102166,
+      "source_job": 4
+    },
+    {
+      "id": "mistake-ghost-dinner",
+      "file": "mistake-ghost-dinner.webp",
+      "model": "gpt-image-2",
+      "size_requested": "2048x1152",
+      "quality_requested": "medium",
+      "webp_quality": 80,
+      "dimensions": [
+        1600,
+        900
+      ],
+      "prompt": "Create a witty cinematic flat 2D literal-mistake illustration for a Vietnamese tone-learning app. At a warm Vietnamese family dinner, the same learner, a Vietnamese-American young woman with shoulder-length black hair and coral blouse, has accidentally invited a friendly translucent folktale ghost to sit at the table beside bowls of rice and fish; the family reacts with gentle surprise, never fear. Make the semantic mistake instantly understandable at thumbnail size. Warm near-black background, coral amber teal and violet palette, layered paper-cut shapes, soft theatrical lighting, centered subject, no text, no letters, no numbers, no speech bubbles, no border, no watermark.",
+      "prompt_sha256": "f3071fec5dc6ceaf00b688acb0c6a1a7ee1be58224f98a1ff89bdd3a2b2791cc",
+      "file_sha256": "821d3c02ec635342de73aeda7ef4ca9a17d75406898c62129c0be30304e03331",
+      "bytes": 131916,
+      "source_job": 5
+    },
+    {
+      "id": "mistake-ward-mother",
+      "file": "mistake-ward-mother.webp",
+      "model": "gpt-image-2",
+      "size_requested": "2048x1152",
+      "quality_requested": "medium",
+      "webp_quality": 80,
+      "dimensions": [
+        1600,
+        900
+      ],
+      "prompt": "Create a witty cinematic flat 2D literal-mistake illustration for a Vietnamese tone-learning app. A warm Vietnamese mother in a burnt-orange blouse is being introduced as if she were an entire urban ward office: she stands bemused behind a small civic service counter while miniature neighborhood buildings and a ward map shape surround her; the same learner in a coral blouse gestures apologetically. Make the mother-versus-urban-ward semantic mistake instantly understandable without labels. Warm near-black background, coral amber teal and violet palette, layered paper-cut shapes, soft theatrical lighting, centered subject, no text, no letters, no numbers, no signage, no speech bubbles, no border, no watermark.",
+      "prompt_sha256": "123e00021ea272df8ee573a9cb2b16fc3ea11ab38bfc185316ce2a1032eddb46",
+      "file_sha256": "6fc7e85da5fe8a212f93fd59924bdef0c19b0993083ac0f320c22d48da08e636",
+      "bytes": 109272,
+      "source_job": 6
+    },
+    {
+      "id": "mistake-seedling-code",
+      "file": "mistake-seedling-code.webp",
+      "model": "gpt-image-2",
+      "size_requested": "2048x1152",
+      "quality_requested": "medium",
+      "webp_quality": 80,
+      "dimensions": [
+        1600,
+        900
+      ],
+      "prompt": "Create a witty cinematic flat 2D literal-mistake illustration for a Vietnamese tone-learning app. A modern front-door keypad has been absurdly replaced by neat rows of living rice seedlings growing from tiny flooded paddy squares; the same learner, a Vietnamese-American young woman in a coral blouse, holds one seedling toward the locked door while Minh in an indigo overshirt looks amused. Make the rice-seedlings-used-as-a-door-code mistake instantly understandable without showing digits. Warm near-black background, coral amber teal and violet palette, layered paper-cut shapes, soft theatrical lighting, centered subject, no text, no letters, no numbers, no speech bubbles, no border, no watermark.",
+      "prompt_sha256": "ad2202a853385409f7a744c681b2e4ac9082514862a651b64ab87d36851e3ce8",
+      "file_sha256": "d0db1d8237039c84d68f16b9c728ea9bc4af5fe47c5178f23ba974152b6c8711",
+      "bytes": 112732,
+      "source_job": 7
+    }
+  ],
+  "contact_sheet": "contact-sheet.webp"
+}

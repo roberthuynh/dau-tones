@@ -25,8 +25,8 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import soundfile as sf
-from scipy.signal import resample_poly
+import soundfile as sf  # type: ignore[import-untyped]
+from scipy.signal import resample_poly  # type: ignore[import-untyped]
 
 from dau.content import clear_content_caches, inventory_document, word_surface
 from dau.settings import TARGETS_ROOT
@@ -416,10 +416,12 @@ def import_recordings(
                     reasons.append("lexical_mismatch")
                 validation["reason_codes"] = reasons
             if validation.get("passed") is not True:
-                reasons = ", ".join(str(reason) for reason in validation.get("reason_codes", []))
+                reason_text = ", ".join(
+                    str(reason) for reason in validation.get("reason_codes", [])
+                )
                 raise PhoneImportError(
                     f"Recording {spec.pair_id} failed validation"
-                    + (f": {reasons}" if reasons else ".")
+                    + (f": {reason_text}" if reason_text else ".")
                 )
             normalized_bytes = normalized_path.read_bytes()
             destination = resolved_targets_root / spec.accent / f"{spec.word_id}.wav"

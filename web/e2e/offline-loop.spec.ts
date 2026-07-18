@@ -1,32 +1,10 @@
-import { Buffer } from "node:buffer";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-function silentWav(): Buffer {
-  const sampleBytes = 1_600;
-  const wav = Buffer.alloc(44 + sampleBytes);
-  wav.write("RIFF", 0);
-  wav.writeUInt32LE(wav.length - 8, 4);
-  wav.write("WAVE", 8);
-  wav.write("fmt ", 12);
-  wav.writeUInt32LE(16, 16);
-  wav.writeUInt16LE(1, 20);
-  wav.writeUInt16LE(1, 22);
-  wav.writeUInt32LE(8_000, 24);
-  wav.writeUInt32LE(16_000, 28);
-  wav.writeUInt16LE(2, 32);
-  wav.writeUInt16LE(16, 34);
-  wav.write("data", 36);
-  wav.writeUInt32LE(sampleBytes, 40);
-  return wav;
-}
-
-test("offline learner closes the word and Echo loops without external requests", async ({ page, baseURL }) => {
-  const localOrigin = new URL(baseURL!).origin;
+async function installOfflineHarness(page: Page, baseURL: string) {
+  const localOrigin = new URL(baseURL).origin;
   const externalRequests: string[] = [];
-  let correctSpeechRequests = 0;
 
   await page.emulateMedia({ reducedMotion: "reduce" });
-
   await page.addInitScript(() => {
     const state = window as typeof window & { __dauAudioPlayCount?: number };
     state.__dauAudioPlayCount = 0;
@@ -36,17 +14,11 @@ test("offline learner closes the word and Echo loops without external requests",
     };
     HTMLMediaElement.prototype.pause = function pause() {};
   });
-
   await page.route("**/*", async (route) => {
     const url = new URL(route.request().url());
     if (url.origin !== localOrigin) {
       externalRequests.push(url.href);
       await route.abort("blockedbyclient");
-      return;
-    }
-    if (url.pathname === "/api/echo/speak" && route.request().method() === "POST") {
-      correctSpeechRequests += 1;
-      await route.fulfill({ status: 200, contentType: "audio/wav", body: silentWav() });
       return;
     }
     if (url.pathname.startsWith("/api/")) {
@@ -56,51 +28,103 @@ test("offline learner closes the word and Echo loops without external requests",
     await route.continue();
   });
 
+  return externalRequests;
+}
+
+test("offline learner closes the Tone Shapes and Dialogue Practice loops", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  const externalRequests = await installOfflineHarness(page, baseURL!);
+
   await page.goto("/");
-  await expect(page.getByText("demo mode", { exact: true })).toBeVisible();
-  await expect(page.locator(".stage-actions--desktop").getByText(/Thầy Minh · Hà Nội/)).toBeVisible();
+  await expect(page.getByText("Add an OpenAI key for AI coaching", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ma", exact: true })).toBeVisible();
+  await expect(page.getByText("Northern profile: four acoustic families; the closest exact form remains visible.")).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "The six tones of ma" }).getByRole("button")).toHaveCount(6);
+  await expect(page.getByRole("button", { name: "Record your tone" })).toBeVisible();
   await expect(page.locator("body")).not.toContainText("Cedar");
-  await expect(page.getByRole("img", { name: "Illustration of Phương, a woman's name" })).toBeVisible();
-  await expect(page.locator(".co-dau__mouth")).toHaveAttribute("data-vowel-shape", "rounded");
-  await expect(page.locator(".co-dau__arrow")).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("Cô Linh");
 
   const skipLink = page.getByRole("link", { name: "Skip to practice" });
   await skipLink.focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#main-content$/);
 
-  const signatureDemo = page.getByRole("button", { name: "Phương → phường" });
+  await page.getByRole("button", { name: "✓ correct má", exact: true }).click();
+  await expect(page.locator(".tone-verdict--correct")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Correct(?: family)? · má · dấu sắc/ })).toBeVisible();
+  await expect(page.getByText(/full contour stayed closest to sắc/i)).toBeVisible();
+
+  const signatureDemo = page.getByRole("button", { name: /Phương → phường/ });
   await signatureDemo.focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: "You meant Phương, the name. You said phường, an urban ward." })).toBeVisible();
+  await expect(page.locator(".tone-verdict--wrong")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Heard: phường · dấu huyền · falling" })).toBeVisible();
+  await expect(page.getByText("Phương, a woman's name", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("urban ward", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Hold your chin steady and carry Phương straight across without letting the ending sink.")).toBeVisible();
-  const nextDecision = page.locator(".next-decision");
-  await expect(nextDecision).toContainText("phường");
-  await expect(nextDecision).toContainText("Contrast the level name with phường while that accidental fall is fresh.");
+  await expect(page.locator(".next-decision")).toContainText("Contrast the level name with phường while that accidental fall is fresh.");
 
-  await page.getByRole("button", { name: "Finish session" }).click();
+  await page.getByRole("button", { name: "Finish", exact: true }).click();
   const summary = page.getByRole("dialog", { name: "Your tones, in focus." });
   await expect(summary).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await summary.getByRole("button", { name: "Share summary card" }).click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe("dau-tone-session.png");
+  expect((await downloadPromise).suggestedFilename()).toBe("dau-tone-session.png");
   await page.keyboard.press("Escape");
   await expect(summary).toBeHidden();
 
-  const echoTab = page.getByRole("button", { name: "Echo sentences" });
-  await echoTab.focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: "Tones carry the stakes." })).toBeVisible();
-  await page.getByRole("button", { name: "Try “a ghost at dinner”" }).click();
-  await expect(page.getByText("You said ma, a ghost, instead of má, mother. You invited a ghost to dinner.")).toBeVisible();
-  await expect(page.locator(".echo-token--tone_only")).toContainText("ma");
+  await page.getByRole("button", { name: /2 Dialogue Practice/ }).click();
+  await expect(page.getByRole("heading", { name: "Use the tone in a real conversation." })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Dialogue scenes" }).getByRole("button")).toHaveCount(4);
+  await page.getByRole("button", { name: /No key or no Vietnamese/ }).click();
+  await expect(page.getByRole("heading", { name: "Here is exactly what changed." })).toBeVisible();
+  await expect(page.getByText("You said ma (ghost) instead of má (mother). That turns a family dinner into an invitation for a ghost.")).toBeVisible();
+  await expect(page.getByText("dấu sắc · mother", { exact: true })).toBeVisible();
+  await expect(page.getByText("không dấu · ghost", { exact: true })).toBeVisible();
 
-  const shadowButton = page.getByRole("button", { name: "Hear it correctly, then shadow" });
-  await shadowButton.focus();
-  await page.keyboard.press("Enter");
-  await expect.poll(() => correctSpeechRequests).toBe(1);
-  await expect.poll(() => page.evaluate(() => (window as typeof window & { __dauAudioPlayCount?: number }).__dauAudioPlayCount ?? 0)).toBeGreaterThan(0);
-  await expect(page.locator(".co-dau--playing")).toBeVisible();
+  await page.getByRole("button", { name: /Your take/ }).click();
+  await page.getByRole("button", { name: /Correct take/ }).click();
+  await expect.poll(() => page.evaluate(() => (window as typeof window & { __dauAudioPlayCount?: number }).__dauAudioPlayCount ?? 0)).toBeGreaterThanOrEqual(2);
+
+  await page.getByRole("button", { name: /Practice this word in Tone Shapes/ }).click();
+  await expect(page.getByRole("heading", { name: "má", exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/mode=tones/);
   expect(externalRequests).toEqual([]);
+});
+
+test("the six-tone workbench stays usable at every release viewport", async ({ page, baseURL }) => {
+  await installOfflineHarness(page, baseURL!);
+  const viewports = [
+    { width: 1366, height: 768, desktopFit: true },
+    { width: 1440, height: 900, desktopFit: true },
+    { width: 1920, height: 1080, desktopFit: false },
+    { width: 1024, height: 768, desktopFit: false },
+    { width: 768, height: 1024, desktopFit: false },
+    { width: 390, height: 844, desktopFit: false },
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const toneButtons = page.getByRole("navigation", { name: "The six tones of ma" }).getByRole("button");
+    await expect(toneButtons).toHaveCount(6);
+    await expect(page.getByRole("button", { name: "Record your tone" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Listen \+ watch/ })).toBeVisible();
+    await expect(page.getByRole("img", { name: /Cô Dấu demonstrating/ })).toBeVisible();
+    await expect(page.locator("body")).toHaveJSProperty("scrollWidth", viewport.width);
+
+    if (viewport.desktopFit) {
+      for (const locator of [
+        toneButtons.first(),
+        toneButtons.last(),
+        page.getByRole("button", { name: "Record your tone" }),
+        page.getByRole("button", { name: /Listen \+ watch/ }),
+        page.getByRole("img", { name: /Cô Dấu demonstrating/ }),
+      ]) {
+        const box = await locator.boundingBox();
+        expect(box, `missing box at ${viewport.width}×${viewport.height}`).not.toBeNull();
+        expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 1);
+      }
+    }
+  }
 });

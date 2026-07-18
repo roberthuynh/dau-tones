@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import math
 import wave
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -157,6 +158,18 @@ def test_pcm_wav_uses_standard_decoder_without_importing_pyav(monkeypatch) -> No
     assert sample_rate == 22_050
     assert samples.shape == voice.shape
     assert np.max(np.abs(samples)) == pytest.approx(0.2, abs=0.001)
+
+
+def test_pcm_wav_path_uses_standard_decoder(tmp_path: Path) -> None:
+    time = np.arange(4_410) / 22_050
+    voice = 0.2 * np.sin(2 * np.pi * 180 * time)
+    path = tmp_path / "tone.wav"
+    path.write_bytes(_wav(voice))
+
+    samples, sample_rate = decode_audio(path)
+
+    assert sample_rate == 22_050
+    assert samples.shape == voice.shape
 
 
 def test_rejected_target_metrics_are_strict_json_values() -> None:

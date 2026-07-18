@@ -7,7 +7,7 @@ import json
 import math
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -43,22 +43,85 @@ def _load_json(path: Path, default: Any) -> Any:
 
 @lru_cache(maxsize=1)
 def inventory_document() -> dict[str, Any]:
-    return _load_json(DATA_ROOT / "inventory.json", {"tones": [], "words": []})
+    return cast(
+        dict[str, Any], _load_json(DATA_ROOT / "inventory.json", {"tones": [], "words": []})
+    )
 
 
 @lru_cache(maxsize=1)
 def echo_document() -> dict[str, Any]:
-    return _load_json(DATA_ROOT / "echo_sentences.json", {"sentences": []})
+    """Return the scene course plus flattened compatibility sentence records."""
+
+    legacy = cast(dict[str, Any], _load_json(DATA_ROOT / "echo_sentences.json", {"sentences": []}))
+    course = cast(dict[str, Any], _load_json(DATA_ROOT / "echo_scenes.json", {"scenes": []}))
+    ordered_scenes = sorted(course.get("scenes", []), key=lambda item: item.get("order", 0))
+    flat_source = [(scene, turn) for scene in ordered_scenes for turn in scene.get("turns", [])]
+    next_by_id = {
+        turn["id"]: flat_source[index + 1][1]["id"] if index + 1 < len(flat_source) else None
+        for index, (_, turn) in enumerate(flat_source)
+    }
+    previous_by_id = {
+        turn["id"]: flat_source[index - 1][1]["id"] if index else None
+        for index, (_, turn) in enumerate(flat_source)
+    }
+    scenes: list[dict[str, Any]] = []
+    turns: list[dict[str, Any]] = []
+    learner_sentences: list[dict[str, Any]] = []
+    for scene in ordered_scenes:
+        learner_number = 0
+        normalized_turns: list[dict[str, Any]] = []
+        for turn_index, source_turn in enumerate(scene.get("turns", [])):
+            if source_turn.get("speaker") == "learner":
+                learner_number += 1
+            turn = {
+                **source_turn,
+                "scene_id": scene["id"],
+                "scene_order": scene.get("order"),
+                "turn_index": turn_index,
+                "learner_turn_number": learner_number
+                if source_turn.get("speaker") == "learner"
+                else None,
+                "role_label": "Thầy Minh" if source_turn.get("speaker") == "minh" else "You",
+                "next_turn_id": next_by_id[source_turn["id"]],
+                "previous_turn_id": previous_by_id[source_turn["id"]],
+                "focus_word_ids": [
+                    focus["word_id"]
+                    for focus in source_turn.get("focuses", [])
+                    if focus.get("word_id")
+                ],
+            }
+            normalized_turns.append(turn)
+            turns.append(turn)
+            if turn["speaker"] == "learner":
+                learner_sentences.append(
+                    {
+                        **turn,
+                        "sentence_id": turn["id"],
+                        "theme": scene["id"],
+                        "literal_stakes": turn.get("literal_stakes", []),
+                    }
+                )
+        scenes.append({**scene, "turns": normalized_turns})
+    return {
+        **course,
+        "scenes": scenes,
+        "turns": turns,
+        "sentences": learner_sentences,
+        "legacy_sentences": legacy.get("sentences", []),
+    }
 
 
 @lru_cache(maxsize=1)
 def demo_document() -> dict[str, Any]:
-    return _load_json(DATA_ROOT / "demo_manifest.json", {"analyzer": [], "echo": []})
+    return cast(
+        dict[str, Any],
+        _load_json(DATA_ROOT / "demo_manifest.json", {"analyzer": [], "echo": []}),
+    )
 
 
 @lru_cache(maxsize=1)
 def target_manifest() -> dict[str, Any]:
-    return _load_json(TARGETS_ROOT / "manifest.json", {"targets": []})
+    return cast(dict[str, Any], _load_json(TARGETS_ROOT / "manifest.json", {"targets": []}))
 
 
 @lru_cache(maxsize=1)
@@ -183,17 +246,22 @@ def public_words() -> dict[str, Any]:
             target = target_for(word["id"], accent)
             contour = (target or {}).get("contour") or generic_contour(word["tone"], accent)
             word["targets"][accent] = {
-                "audio_url": f"/api/targets/{accent}/{word['id']}.wav",
+                "audio_url": (
+                    f"/audio/targets/{accent}/{word['id']}.wav" if target else ""
+                ),
                 "contour": contour,
                 "validated": bool(target and target.get("validation", {}).get("passed", True)),
             }
         words.append(word)
+    classifier_document = _load_json(DATA_ROOT / "classifier_profile.json", {})
     return {
         "tones": document.get("tones", []),
         "words": words,
         "featured_queue": document.get("featured_queue", []),
+        "minimal_pair_groups": document.get("minimal_pair_groups", []),
         "drills": {item["id"]: item for item in document.get("themed_drills", [])},
         "scoring_modes": {"north": northern_mode, "south": "four_family"},
+        "classifier_profiles": classifier_document.get("profiles", {}),
     }
 
 

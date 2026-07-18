@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "note": "Fixture paths are stable contracts for the committed offline demo recordings produced during corpus generation.",
   "analyzer_demos": [
     {
@@ -99,6 +99,230 @@
         }
       },
       "sha256": "28881816fff1ec82f411b426b68e3c8c0a034e8060901f78820f95febd28093e"
+    },
+    {
+      "id": "meet-family-said-ghost",
+      "title": "Meet the family wrong-tone replay",
+      "scene_id": "meet-family",
+      "turn_id": "meet-family-learner-01",
+      "sentence_id": "meet-family-learner-01",
+      "accent": "north",
+      "target_text": "Được chứ, tối nay tôi về nhà ăn cơm với má và cả gia đình.",
+      "committed_transcript": "Được chứ, tối nay tôi về nhà ăn cơm với ma và cả gia đình.",
+      "recording_path": "targets/demos/echo/meet-family-said-ghost.wav",
+      "mistake_art_url": "/art/scenes/mistake-ghost-dinner.webp",
+      "generation": {
+        "model": "gpt-realtime-2.1-mini",
+        "voice": "cedar",
+        "display_voice": "Thầy Minh",
+        "validation": {
+          "selected": {
+            "passed": true,
+            "transcript": "Được chứ, tối nay tôi về nhà ăn cơm với ma và cả gia đình.",
+            "lexical_verified": true,
+            "contour_quality": {
+              "passed": true,
+              "duration_s": 3.8,
+              "peak": 0.567657,
+              "rms": 0.076904,
+              "clipping_fraction": 0.0,
+              "voiced_fraction": 0.837535
+            }
+          },
+          "attempts": [
+            {
+              "model": "gpt-realtime-2.1-mini",
+              "validation": {
+                "passed": true,
+                "transcript": "Được chứ, tối nay tôi về nhà ăn cơm với ma và cả gia đình.",
+                "lexical_verified": true,
+                "contour_quality": {
+                  "passed": true,
+                  "duration_s": 3.8,
+                  "peak": 0.567657,
+                  "rms": 0.076904,
+                  "clipping_fraction": 0.0,
+                  "voiced_fraction": 0.837535
+                }
+              }
+            }
+          ]
+        },
+        "quality_note": "Realtime speech passed exact Vietnamese ASR and contour checks"
+      },
+      "sha256": "d9a752ebbadd95b91f23dcb251743489e5ad7af247cc73b8b3ccf3f86eaaf789"
+    },
+    {
+      "id": "family-dinner-seedling-code",
+      "title": "Family dinner wrong-tone replay",
+      "scene_id": "family-dinner",
+      "turn_id": "family-dinner-learner-03",
+      "sentence_id": "family-dinner-learner-03",
+      "accent": "north",
+      "target_text": "Cửa nhà màu xanh, mã cửa là hai ba sáu, bạn cứ vào nhé.",
+      "committed_transcript": "Cửa nhà màu xanh, mạ cửa là hai ba sáu, bạn cứ vào nhé.",
+      "generation_text": "Cửa nhà màu xanh. Mạ. Cửa là hai ba sáu. Bạn cứ vào nhé.",
+      "recording_path": "targets/demos/echo/family-dinner-seedling-code.wav",
+      "mistake_art_url": "/art/scenes/mistake-seedling-code.webp",
+      "generation": {
+        "model": "gpt-realtime-2.1",
+        "voice": "cedar",
+        "display_voice": "Thầy Minh",
+        "validation": {
+          "selected": {
+            "passed": true,
+            "lexical_verified": true,
+            "validation_method": "sample-accurate composition of two validated Realtime sources",
+            "transcript": "Cửa nhà màu xanh, mạ cửa là hai ba sáu, bạn cứ vào nhé.",
+            "contour_quality": {
+              "passed": true,
+              "duration_s": 4.15,
+              "peak": 0.739532,
+              "rms": 0.076331,
+              "clipping_fraction": 0.0,
+              "voiced_fraction": 0.735897
+            },
+            "inserted_tone": "nang",
+            "inserted_surface": "mạ",
+            "inserted_target_validation": {
+              "transcript": "mạ",
+              "shape_score": 0.539032,
+              "separation_margin": 0.150924
+            }
+          },
+          "attempts": [],
+          "construction": {
+            "dialogue_source": "targets/echo/north/family-dinner-learner-03.wav",
+            "dialogue_sha256": "99ed33412453b9e6f121c9810148283391d3147e8bcf61890de6c0d993aa6357",
+            "word_source": "targets/north/ma-seedling.wav",
+            "word_sha256": "6da86be19d3add06b089dfad4a6625ea9d2904c6cb36c6dbfdc74311516fe2fe",
+            "destination_seconds": [
+              1.18,
+              1.43
+            ],
+            "source_seconds": [
+              0.62,
+              0.9
+            ],
+            "crossfade_ms": 15
+          }
+        },
+        "quality_note": "Validated Realtime sentence with its mã segment replaced by the validated Realtime mạ target; sample-accurate provenance is recorded"
+      },
+      "sha256": "204362a9ba3bb998fb39b5ef1605885921a2af36ed284b9d1b678cb206d56956"
+    },
+    {
+      "id": "pho-shop-said-listless",
+      "title": "At the phở shop wrong-tone replay",
+      "scene_id": "pho-shop",
+      "turn_id": "pho-shop-learner-01",
+      "sentence_id": "pho-shop-learner-01",
+      "accent": "north",
+      "target_text": "Cho tôi một tô phở bò, một đĩa rau và một ly nước.",
+      "committed_transcript": "Cho tôi một tô phờ bò, một đĩa rau và một ly nước.",
+      "generation_text": "Cho tôi một tô phờ bò, một đĩa rau và một ly nước.",
+      "recording_path": "targets/demos/echo/pho-shop-said-listless.wav",
+      "mistake_art_url": null,
+      "generation": {
+        "model": "gpt-realtime-2.1-mini",
+        "voice": "cedar",
+        "display_voice": "Thầy Minh",
+        "validation": {
+          "selected": {
+            "passed": true,
+            "lexical_verified": true,
+            "validation_method": "sample-accurate DSP tone transform of validated Realtime speech",
+            "transcript": "Cho tôi một tô phờ bò, một đĩa rau và một ly nước.",
+            "contour_quality": {
+              "passed": true,
+              "duration_s": 3.35,
+              "peak": 0.604065,
+              "rms": 0.075566,
+              "clipping_fraction": 0.0,
+              "voiced_fraction": 0.771429
+            },
+            "inserted_tone": "huyen",
+            "inserted_surface": "phờ",
+            "inserted_target_validation": {
+              "transcript": "phonemes retained from the validated phở source segment",
+              "shape_score": 0.2609599747168704,
+              "separation_margin": 0.09650471260131188,
+              "reason_codes": []
+            }
+          },
+          "attempts": [],
+          "construction": {
+            "dialogue_source": "targets/echo/north/pho-shop-learner-01.wav",
+            "dialogue_sha256": "1318ed915ab8c02a341968cfce73b83cb8df2b708a7efa9facb32229bd922f78",
+            "source_surface": "phở",
+            "transformed_surface": "phờ",
+            "destination_seconds": [
+              0.84,
+              1.04
+            ],
+            "piecewise_pitch_shift_semitones": [
+              2.0,
+              0.0,
+              -2.0
+            ],
+            "transformed_segment_sha256": "399da7436b5fac7a690148fe167d48d5d5966afd5cfd5ead6057b632d1122946"
+          }
+        },
+        "quality_note": "Validated Realtime phở phonemes transformed into a falling phờ contour; the isolated result passed the deterministic tone referee"
+      },
+      "sha256": "ddbb6bc1325bf4b8c9e650d8c3d80725324b86f49058d3b2cc7591c18453f3f3"
+    },
+    {
+      "id": "around-ward-grave-became-ghost",
+      "title": "Around the ward wrong-tone replay",
+      "scene_id": "around-ward",
+      "turn_id": "around-ward-learner-03",
+      "sentence_id": "around-ward-learner-03",
+      "accent": "north",
+      "target_text": "Tôi không sợ ma, nhưng tôi không đi gần mả vào ban đêm.",
+      "committed_transcript": "Tôi không sợ ma, nhưng tôi không đi gần ma vào ban đêm.",
+      "recording_path": "targets/demos/echo/around-ward-grave-became-ghost.wav",
+      "mistake_art_url": null,
+      "generation": {
+        "model": "gpt-realtime-2.1-mini",
+        "voice": "cedar",
+        "display_voice": "Thầy Minh",
+        "validation": {
+          "selected": {
+            "passed": true,
+            "transcript": "Tôi không sợ ma, nhưng tôi không đi gần ma vào ban đêm.",
+            "lexical_verified": true,
+            "contour_quality": {
+              "passed": true,
+              "duration_s": 3.55,
+              "peak": 0.733398,
+              "rms": 0.072498,
+              "clipping_fraction": 0.0,
+              "voiced_fraction": 0.840841
+            }
+          },
+          "attempts": [
+            {
+              "model": "gpt-realtime-2.1-mini",
+              "validation": {
+                "passed": true,
+                "transcript": "Tôi không sợ ma, nhưng tôi không đi gần ma vào ban đêm.",
+                "lexical_verified": true,
+                "contour_quality": {
+                  "passed": true,
+                  "duration_s": 3.55,
+                  "peak": 0.733398,
+                  "rms": 0.072498,
+                  "clipping_fraction": 0.0,
+                  "voiced_fraction": 0.840841
+                }
+              }
+            }
+          ]
+        },
+        "quality_note": "Realtime speech passed exact Vietnamese ASR and contour checks"
+      },
+      "sha256": "fcc9d20a1d8a4365d96db294916977abaec5957d6695f5e2d5ade1b28435a00d"
     }
   ]
 }

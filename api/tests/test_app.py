@@ -55,12 +55,15 @@ def test_analysis_warmup_reports_timing_and_is_idempotent(monkeypatch) -> None:
     assert "pitch_warmup;dur=8.50" in first.headers["server-timing"]
 
 
-def test_words_starts_with_phuong_and_has_64_point_targets() -> None:
+def test_words_starts_with_all_six_ma_forms_and_has_64_point_targets() -> None:
     payload = client.get("/words").json()
-    assert payload["featured_queue"][:3] == [
-        "phuong-name",
-        "phuong-ward",
-        "phuong-phoenix",
+    assert payload["featured_queue"][:6] == [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling",
     ]
     phuong = next(item for item in payload["words"] if item["id"] == "phuong-name")
     assert phuong["surface"] == "Phương"
@@ -120,6 +123,7 @@ def test_offline_coach_is_specific(monkeypatch) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert "lift" in payload["coaching_sentence"].lower()
+    assert "measurable shape difference" in payload["observation"]
     assert payload["source"] == "rules"
     assert payload["next_word"]
     assert payload["rationale"].startswith("because")
@@ -176,6 +180,81 @@ def test_offline_echo_demo_closes_transcript_loop(monkeypatch) -> None:
     assert payload["tokens"] == payload["diff"]
     assert "ghost" in payload["literal_explanation"]
     assert "ghost" in payload["explanation"]
+
+
+def test_echo_scenes_expose_four_linked_dialogues_and_static_audio() -> None:
+    response = client.get("/echo/scenes")
+    assert response.status_code == 200
+    payload = response.json()
+    assert [scene["id"] for scene in payload["scenes"]] == [
+        "meet-family",
+        "family-dinner",
+        "pho-shop",
+        "around-ward",
+    ]
+    turns = [turn for scene in payload["scenes"] for turn in scene["turns"]]
+    assert len(turns) == 26
+    assert sum(turn["speaker"] == "learner" for turn in turns) == 13
+    assert turns[0]["id"] == "meet-family-minh-01"
+    assert turns[0]["audio_urls"]["north"] == ("/audio/echo/north/meet-family-minh-01.wav")
+    assert all(len(turn["focuses"]) >= 1 for turn in turns)
+
+
+def test_echo_sentences_remains_a_learner_turn_compatibility_alias() -> None:
+    response = client.get("/echo/sentences")
+    assert response.status_code == 200
+    sentences = response.json()["sentences"]
+    assert len(sentences) == 13
+    assert all(item["speaker"] == "learner" for item in sentences)
+    assert all(item["sentence_id"] == item["id"] for item in sentences)
+    assert all(item["text"] != "Xin chào!" for item in sentences)
+
+
+def test_scene_demo_returns_navigation_tones_and_practice_ids(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    response = client.post(
+        "/echo/transcribe",
+        data={
+            "turn_id": "meet-family-learner-01",
+            "demo_id": "meet-family-said-ghost",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["scene_id"] == "meet-family"
+    assert payload["turn_id"] == payload["sentence_id"] == "meet-family-learner-01"
+    assert payload["next_turn_id"] == "meet-family-minh-02"
+    assert payload["practice_word_ids"] == ["ma-mother"]
+    assert payload["meaning_status"] == "known_word_change"
+    assert payload["detected_tones"] == [
+        {
+            "token_index": 10,
+            "target": "má",
+            "heard": "ma",
+            "intended_tone": "sac",
+            "detected_tone": "ngang",
+            "target_word_id": "ma-mother",
+            "heard_word_id": "ma-ghost",
+            "semantic_status": "known_word",
+        }
+    ]
+
+
+def test_scene_transcribe_accepts_sentence_id_alias(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    response = client.post(
+        "/echo/transcribe",
+        data={
+            "sentence_id": "family-dinner-learner-03",
+            "demo_id": "family-dinner-seedling-code",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["scene_id"] == "family-dinner"
+    assert payload["turn_id"] == "family-dinner-learner-03"
+    assert payload["meaning_status"] == "known_word_change"
+    assert payload["practice_word_ids"] == ["ma-code"]
 
 
 def test_keyed_echo_returns_a_reveal_id_without_background_generation(monkeypatch) -> None:
@@ -265,8 +344,7 @@ def test_signature_audio_demo_runs_through_validated_partial_templates(monkeypat
     assert response.status_code == 200
     assert "decode;dur=" in response.headers["server-timing"]
     assert any(
-        label in response.headers["server-timing"]
-        for label in ("pitch;dur=", "pitch_fast;dur=")
+        label in response.headers["server-timing"] for label in ("pitch;dur=", "pitch_fast;dur=")
     )
     assert "classify;dur=" in response.headers["server-timing"]
     assert "total;dur=" in response.headers["server-timing"]
@@ -280,6 +358,19 @@ def test_signature_audio_demo_runs_through_validated_partial_templates(monkeypat
     assert payload["alternatives"]
     assert all("confidence" in item for item in payload["alternatives"])
     assert payload["detected_word"]["id"] == "phuong-ward"
+    assert payload["semantic_status"] == "wrong_known_word"
+    assert payload["class_confidence"] == payload["confidence"]
+    assert payload["signal_confidence"] > 0.35
+    assert payload["meaning_verdict"] == {
+        "status": "wrong_known_word",
+        "assertion_level": "family",
+        "detected_surface": "phường",
+        "detected_meaning_en": "urban ward",
+        "detected_word_id": "phuong-ward",
+        "tone_mark_label": "dấu huyền",
+    }
+    assert payload["classifier_version"].startswith("dau-")
+    assert len(payload["classifier_manifest_hash"]) == 64
     assert payload["verdict_copy"] == (
         "You meant Phương, the name. You said phường, an urban ward."
     )

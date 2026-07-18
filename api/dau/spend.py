@@ -5,7 +5,7 @@ from __future__ import annotations
 import fcntl
 import json
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 
 from .settings import BUILD_SPEND_HARD_STOP_USD, BUILD_SPEND_TARGET_USD, REPO_ROOT
 
@@ -16,7 +16,7 @@ LOCK_PATH = REPO_ROOT / ".cache" / "spend_ledger.lock"
 def load_ledger() -> dict[str, Any]:
     if not LEDGER_PATH.exists():
         return {"estimated_total_usd": 0.0, "events": []}
-    return json.loads(LEDGER_PATH.read_text(encoding="utf-8"))
+    return cast(dict[str, Any], json.loads(LEDGER_PATH.read_text(encoding="utf-8")))
 
 
 def approve(projected_usd: float, label: str) -> None:

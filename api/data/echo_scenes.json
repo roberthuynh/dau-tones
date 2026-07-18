@@ -1,0 +1,365 @@
+{
+  "schema_version": 2,
+  "locale": "vi-VN",
+  "accent_ids": [
+    "north",
+    "south"
+  ],
+  "scenes": [
+    {
+      "id": "meet-family",
+      "order": 1,
+      "title": "Meet the family",
+      "title_vi": "Gặp gia đình",
+      "description": "Introduce your mother and sister without changing their names or meanings.",
+      "art_url": "/art/scenes/meet-family.webp",
+      "offline_demo": {
+        "id": "meet-family-said-ghost",
+        "turn_id": "meet-family-learner-01",
+        "committed_transcript": "Được chứ, tối nay tôi về nhà ăn cơm với ma và cả gia đình.",
+        "recording_path": "targets/demos/echo/meet-family-said-ghost.wav",
+        "mistake_art_url": "/art/scenes/mistake-ghost-dinner.webp"
+      },
+      "turns": [
+        {
+          "id": "meet-family-minh-01",
+          "speaker": "minh",
+          "text": "Chào bạn, hôm nay bạn đưa tôi đến thăm gia đình nhé.",
+          "gloss_en": "Hi, please take me to visit your family today.",
+          "focuses": [
+            {"token_index": 1, "token": "bạn", "tone": "nang", "word_id": "ban-friend", "meaning_en": "friend / you"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/meet-family-minh-01.wav", "south": "targets/echo/south/meet-family-minh-01.wav"}
+        },
+        {
+          "id": "meet-family-learner-01",
+          "speaker": "learner",
+          "text": "Được chứ, tối nay tôi về nhà ăn cơm với má và cả gia đình.",
+          "gloss_en": "Of course. Tonight I am going home to eat with Mom and the whole family.",
+          "focuses": [
+            {"token_index": 10, "token": "má", "tone": "sac", "word_id": "ma-mother", "meaning_en": "mother"},
+            {"token_index": 6, "token": "nhà", "tone": "huyen", "word_id": "nha-home", "meaning_en": "home"},
+            {"token_index": 8, "token": "cơm", "tone": "ngang", "word_id": "com-rice", "meaning_en": "cooked rice / meal"}
+          ],
+          "literal_stakes": [
+            {"target_token": "má", "heard_token": "ma", "intended_word_id": "ma-mother", "heard_word_id": "ma-ghost", "explanation": "You said ma, a ghost, instead of má, mother. You invited a ghost to dinner."}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/meet-family-learner-01.wav", "south": "targets/echo/south/meet-family-learner-01.wav"}
+        },
+        {
+          "id": "meet-family-minh-02",
+          "speaker": "minh",
+          "text": "Tuyệt quá. Má bạn tên gì, và tôi nên xưng hô thế nào?",
+          "gloss_en": "Wonderful. What is your mother's name, and how should I address her?",
+          "focuses": [
+            {"token_index": 2, "token": "Má", "tone": "sac", "word_id": "ma-mother", "meaning_en": "mother"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/meet-family-minh-02.wav", "south": "targets/echo/south/meet-family-minh-02.wav"}
+        },
+        {
+          "id": "meet-family-learner-02",
+          "speaker": "learner",
+          "text": "Má tôi tên là Phương, còn em gái tôi tên là Phượng.",
+          "gloss_en": "My mother's name is Phương, and my younger sister's name is Phượng.",
+          "focuses": [
+            {"token_index": 4, "token": "Phương", "tone": "ngang", "word_id": "phuong-name", "meaning_en": "Phương, a woman's name"},
+            {"token_index": 11, "token": "Phượng", "tone": "nang", "word_id": "phuong-phoenix", "meaning_en": "phoenix"},
+            {"token_index": 0, "token": "Má", "tone": "sac", "word_id": "ma-mother", "meaning_en": "mother"}
+          ],
+          "literal_stakes": [
+            {"target_token": "Phương", "heard_token": "phường", "intended_word_id": "phuong-name", "heard_word_id": "phuong-ward", "explanation": "You said phường, an urban ward, instead of Phương, the name. Your mother's name became an urban ward."}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/meet-family-learner-02.wav", "south": "targets/echo/south/meet-family-learner-02.wav"}
+        },
+        {
+          "id": "meet-family-minh-03",
+          "speaker": "minh",
+          "text": "Hai cái tên nghe gần giống nhau, bạn nói lại chậm hơn được không?",
+          "gloss_en": "The two names sound similar. Could you say them again more slowly?",
+          "focuses": [
+            {"token_index": 7, "token": "bạn", "tone": "nang", "word_id": "ban-friend", "meaning_en": "friend / you"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/meet-family-minh-03.wav", "south": "targets/echo/south/meet-family-minh-03.wav"}
+        },
+        {
+          "id": "meet-family-learner-03",
+          "speaker": "learner",
+          "text": "Đây là má Phương, còn Phượng là em gái của tôi.",
+          "gloss_en": "This is Mom Phương, and Phượng is my younger sister.",
+          "focuses": [
+            {"token_index": 2, "token": "má", "tone": "sac", "word_id": "ma-mother", "meaning_en": "mother"},
+            {"token_index": 3, "token": "Phương", "tone": "ngang", "word_id": "phuong-name", "meaning_en": "Phương, a woman's name"},
+            {"token_index": 5, "token": "Phượng", "tone": "nang", "word_id": "phuong-phoenix", "meaning_en": "phoenix"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/meet-family-learner-03.wav", "south": "targets/echo/south/meet-family-learner-03.wav"}
+        }
+      ]
+    },
+    {
+      "id": "family-dinner",
+      "order": 2,
+      "title": "Family dinner",
+      "title_vi": "Bữa tối gia đình",
+      "description": "Plan dinner, bring groceries, and share the door code.",
+      "art_url": "/art/scenes/family-dinner.webp",
+      "offline_demo": {
+        "id": "family-dinner-seedling-code",
+        "turn_id": "family-dinner-learner-03",
+        "committed_transcript": "Cửa nhà màu xanh, mạ cửa là hai ba sáu, bạn cứ vào nhé.",
+        "recording_path": "targets/demos/echo/family-dinner-seedling-code.wav",
+        "mistake_art_url": "/art/scenes/mistake-seedling-code.webp"
+      },
+      "turns": [
+        {
+          "id": "family-dinner-minh-01",
+          "speaker": "minh",
+          "text": "Tôi nên mang gì đến bữa tối?",
+          "gloss_en": "What should I bring to dinner?",
+          "focuses": [
+            {"token_index": 6, "token": "tối", "tone": "sac", "word_id": null, "meaning_en": "evening"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/family-dinner-minh-01.wav", "south": "targets/echo/south/family-dinner-minh-01.wav"}
+        },
+        {
+          "id": "family-dinner-learner-01",
+          "speaker": "learner",
+          "text": "Bạn mang ít sữa nhé, má tôi đã nấu cơm và cá rồi.",
+          "gloss_en": "Bring some milk. Mom has already cooked rice and fish.",
+          "focuses": [
+            {"token_index": 3, "token": "sữa", "tone": "nga", "word_id": "sua-milk", "meaning_en": "milk"},
+            {"token_index": 5, "token": "má", "tone": "sac", "word_id": "ma-mother", "meaning_en": "mother"},
+            {"token_index": 9, "token": "cơm", "tone": "ngang", "word_id": "com-rice", "meaning_en": "cooked rice / meal"},
+            {"token_index": 11, "token": "cá", "tone": "sac", "word_id": "ca-fish", "meaning_en": "fish"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/family-dinner-learner-01.wav", "south": "targets/echo/south/family-dinner-learner-01.wav"}
+        },
+        {
+          "id": "family-dinner-minh-02",
+          "speaker": "minh",
+          "text": "Tôi có cần mua thêm rau hay món gì khác không?",
+          "gloss_en": "Should I buy vegetables or anything else?",
+          "focuses": [
+            {"token_index": 3, "token": "mua", "tone": "ngang", "word_id": null, "meaning_en": "buy"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/family-dinner-minh-02.wav", "south": "targets/echo/south/family-dinner-minh-02.wav"}
+        },
+        {
+          "id": "family-dinner-learner-02",
+          "speaker": "learner",
+          "text": "Không cần đâu, nhưng mà bạn có thể mua thêm một ít trái cây.",
+          "gloss_en": "No need, but you can buy a little more fruit.",
+          "focuses": [
+            {"token_index": 4, "token": "mà", "tone": "huyen", "word_id": "ma-but", "meaning_en": "but / that"},
+            {"token_index": 5, "token": "bạn", "tone": "nang", "word_id": "ban-friend", "meaning_en": "friend / you"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/family-dinner-learner-02.wav", "south": "targets/echo/south/family-dinner-learner-02.wav"}
+        },
+        {
+          "id": "family-dinner-minh-03",
+          "speaker": "minh",
+          "text": "Tôi sẽ đến lúc bảy giờ. Nhà bạn có dễ tìm không?",
+          "gloss_en": "I will arrive at seven. Is your house easy to find?",
+          "focuses": [
+            {"token_index": 6, "token": "Nhà", "tone": "huyen", "word_id": "nha-home", "meaning_en": "home"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/family-dinner-minh-03.wav", "south": "targets/echo/south/family-dinner-minh-03.wav"}
+        },
+        {
+          "id": "family-dinner-learner-03",
+          "speaker": "learner",
+          "text": "Cửa nhà màu xanh, mã cửa là hai ba sáu, bạn cứ vào nhé.",
+          "gloss_en": "The house door is blue. The door code is two-three-six, so come right in.",
+          "focuses": [
+            {"token_index": 4, "token": "mã", "tone": "nga", "word_id": "ma-code", "meaning_en": "code"},
+            {"token_index": 0, "token": "Cửa", "tone": "hoi", "word_id": "cua-door", "meaning_en": "door"},
+            {"token_index": 1, "token": "nhà", "tone": "huyen", "word_id": "nha-home", "meaning_en": "home"}
+          ],
+          "literal_stakes": [
+            {"target_token": "mã", "heard_token": "mạ", "intended_word_id": "ma-code", "heard_word_id": "ma-seedling", "explanation": "You said mạ, rice seedlings, instead of mã, code. The rice seedlings became the door code."}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/family-dinner-learner-03.wav", "south": "targets/echo/south/family-dinner-learner-03.wav"}
+        }
+      ]
+    },
+    {
+      "id": "pho-shop",
+      "order": 3,
+      "title": "At the phở shop",
+      "title_vi": "Ở quán phở",
+      "description": "Order breakfast and respond naturally when your friend checks the meal.",
+      "art_url": "/art/scenes/pho-shop.webp",
+      "offline_demo": {
+        "id": "pho-shop-said-listless",
+        "turn_id": "pho-shop-learner-01",
+        "committed_transcript": "Cho tôi một tô phờ bò, một đĩa rau và một ly nước.",
+        "recording_path": "targets/demos/echo/pho-shop-said-listless.wav",
+        "mistake_art_url": null
+      },
+      "turns": [
+        {
+          "id": "pho-shop-minh-01",
+          "speaker": "minh",
+          "text": "Sáng nay mình ăn gì trước khi đi tham quan?",
+          "gloss_en": "What should we eat this morning before sightseeing?",
+          "focuses": [
+            {"token_index": 0, "token": "Sáng", "tone": "sac", "word_id": null, "meaning_en": "morning"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/pho-shop-minh-01.wav", "south": "targets/echo/south/pho-shop-minh-01.wav"}
+        },
+        {
+          "id": "pho-shop-learner-01",
+          "speaker": "learner",
+          "text": "Cho tôi một tô phở bò, một đĩa rau và một ly nước.",
+          "gloss_en": "Please give me a bowl of beef phở, a plate of vegetables, and a glass of water.",
+          "focuses": [
+            {"token_index": 4, "token": "phở", "tone": "hoi", "word_id": "pho-noodle-soup", "meaning_en": "phở noodle soup"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/pho-shop-learner-01.wav", "south": "targets/echo/south/pho-shop-learner-01.wav"}
+        },
+        {
+          "id": "pho-shop-minh-02",
+          "speaker": "minh",
+          "text": "Bạn có muốn gọi thêm cơm hoặc cá không?",
+          "gloss_en": "Would you like to order rice or fish as well?",
+          "focuses": [
+            {"token_index": 5, "token": "cơm", "tone": "ngang", "word_id": "com-rice", "meaning_en": "cooked rice / meal"},
+            {"token_index": 7, "token": "cá", "tone": "sac", "word_id": "ca-fish", "meaning_en": "fish"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/pho-shop-minh-02.wav", "south": "targets/echo/south/pho-shop-minh-02.wav"}
+        },
+        {
+          "id": "pho-shop-learner-02",
+          "speaker": "learner",
+          "text": "Tôi không gọi thêm cơm, nhưng cho tôi một đĩa cá nhỏ.",
+          "gloss_en": "I will not order more rice, but please give me a small plate of fish.",
+          "focuses": [
+            {"token_index": 4, "token": "cơm", "tone": "ngang", "word_id": "com-rice", "meaning_en": "cooked rice / meal"},
+            {"token_index": 10, "token": "cá", "tone": "sac", "word_id": "ca-fish", "meaning_en": "fish"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/pho-shop-learner-02.wav", "south": "targets/echo/south/pho-shop-learner-02.wav"}
+        },
+        {
+          "id": "pho-shop-minh-03",
+          "speaker": "minh",
+          "text": "Món ăn có vừa miệng không?",
+          "gloss_en": "Does the food suit your taste?",
+          "focuses": [
+            {"token_index": 1, "token": "ăn", "tone": "ngang", "word_id": null, "meaning_en": "eat / food"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/pho-shop-minh-03.wav", "south": "targets/echo/south/pho-shop-minh-03.wav"}
+        },
+        {
+          "id": "pho-shop-learner-03",
+          "speaker": "learner",
+          "text": "Phở rất ngon, cảm ơn bạn đã giới thiệu quán này cho tôi.",
+          "gloss_en": "The phở is delicious. Thank you for introducing me to this restaurant.",
+          "focuses": [
+            {"token_index": 0, "token": "Phở", "tone": "hoi", "word_id": "pho-noodle-soup", "meaning_en": "phở noodle soup"},
+            {"token_index": 5, "token": "bạn", "tone": "nang", "word_id": "ban-friend", "meaning_en": "friend / you"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/pho-shop-learner-03.wav", "south": "targets/echo/south/pho-shop-learner-03.wav"}
+        }
+      ]
+    },
+    {
+      "id": "around-ward",
+      "order": 4,
+      "title": "Around the ward",
+      "title_vi": "Quanh phường",
+      "description": "Ask for directions, confirm the route, and talk about the neighborhood.",
+      "art_url": "/art/scenes/around-ward.webp",
+      "offline_demo": {
+        "id": "around-ward-grave-became-ghost",
+        "turn_id": "around-ward-learner-03",
+        "committed_transcript": "Tôi không sợ ma, nhưng tôi không đi gần ma vào ban đêm.",
+        "recording_path": "targets/demos/echo/around-ward-grave-became-ghost.wav",
+        "mistake_art_url": null
+      },
+      "turns": [
+        {
+          "id": "around-ward-minh-01",
+          "speaker": "minh",
+          "text": "Sau bữa sáng, bạn muốn đi đâu?",
+          "gloss_en": "Where would you like to go after breakfast?",
+          "focuses": [
+            {"token_index": 1, "token": "bữa", "tone": "nga", "word_id": null, "meaning_en": "meal"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-minh-01.wav", "south": "targets/echo/south/around-ward-minh-01.wav"}
+        },
+        {
+          "id": "around-ward-learner-01",
+          "speaker": "learner",
+          "text": "Xin lỗi, bạn chỉ giúp tôi ủy ban phường ở đâu được không?",
+          "gloss_en": "Excuse me, could you show me where the ward committee office is?",
+          "focuses": [
+            {"token_index": 8, "token": "phường", "tone": "huyen", "word_id": "phuong-ward", "meaning_en": "urban ward"},
+            {"token_index": 2, "token": "bạn", "tone": "nang", "word_id": "ban-friend", "meaning_en": "friend / you"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-learner-01.wav", "south": "targets/echo/south/around-ward-learner-01.wav"}
+        },
+        {
+          "id": "around-ward-minh-02",
+          "speaker": "minh",
+          "text": "Đi qua cửa lớn rồi rẽ phải ở ngã tư.",
+          "gloss_en": "Go through the large gate, then turn right at the intersection.",
+          "focuses": [
+            {"token_index": 2, "token": "cửa", "tone": "hoi", "word_id": "cua-door", "meaning_en": "door"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-minh-02.wav", "south": "targets/echo/south/around-ward-minh-02.wav"}
+        },
+        {
+          "id": "around-ward-learner-02",
+          "speaker": "learner",
+          "text": "Tôi đi qua cửa lớn rồi rẽ phải, đúng không?",
+          "gloss_en": "I go through the large gate and turn right, correct?",
+          "focuses": [
+            {"token_index": 3, "token": "cửa", "tone": "hoi", "word_id": "cua-door", "meaning_en": "door"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-learner-02.wav", "south": "targets/echo/south/around-ward-learner-02.wav"}
+        },
+        {
+          "id": "around-ward-minh-03",
+          "speaker": "minh",
+          "text": "Đúng rồi. Bạn có sợ đi ngang nghĩa trang không?",
+          "gloss_en": "Right. Are you afraid to pass the cemetery?",
+          "focuses": [
+            {"token_index": 0, "token": "Đúng", "tone": "sac", "word_id": null, "meaning_en": "correct"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-minh-03.wav", "south": "targets/echo/south/around-ward-minh-03.wav"}
+        },
+        {
+          "id": "around-ward-learner-03",
+          "speaker": "learner",
+          "text": "Tôi không sợ ma, nhưng tôi không đi gần mả vào ban đêm.",
+          "gloss_en": "I am not afraid of ghosts, but I do not go near graves at night.",
+          "focuses": [
+            {"token_index": 3, "token": "ma", "tone": "ngang", "word_id": "ma-ghost", "meaning_en": "ghost"},
+            {"token_index": 9, "token": "mả", "tone": "hoi", "word_id": "ma-grave", "meaning_en": "grave"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-learner-03.wav", "south": "targets/echo/south/around-ward-learner-03.wav"}
+        },
+        {
+          "id": "around-ward-minh-04",
+          "speaker": "minh",
+          "text": "Cánh đồng bên kia có gì vậy?",
+          "gloss_en": "What is in the field over there?",
+          "focuses": [
+            {"token_index": 1, "token": "đồng", "tone": "huyen", "word_id": null, "meaning_en": "field"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-minh-04.wav", "south": "targets/echo/south/around-ward-minh-04.wav"}
+        },
+        {
+          "id": "around-ward-learner-04",
+          "speaker": "learner",
+          "text": "Bà tôi đang cấy mạ ngoài đồng, còn tôi mang cơm ra cho bà.",
+          "gloss_en": "My grandmother is planting rice seedlings in the field, and I am bringing her a meal.",
+          "focuses": [
+            {"token_index": 4, "token": "mạ", "tone": "nang", "word_id": "ma-seedling", "meaning_en": "rice seedling"},
+            {"token_index": 10, "token": "cơm", "tone": "ngang", "word_id": "com-rice", "meaning_en": "cooked rice / meal"}
+          ],
+          "shadow_audio": {"north": "targets/echo/north/around-ward-learner-04.wav", "south": "targets/echo/south/around-ward-learner-04.wav"}
+        }
+      ]
+    }
+  ]
+}

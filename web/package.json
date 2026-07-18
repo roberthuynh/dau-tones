@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "generate:echo-course": "node src/data/build-echo-course.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint . --max-warnings 0",
     "preview": "vite preview",

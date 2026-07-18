@@ -35,7 +35,12 @@ def assert_safe_relative_path(path: str) -> None:
 
 
 def test_all_committed_data_is_nfc() -> None:
-    for filename in ("inventory.json", "echo_sentences.json", "demo_manifest.json"):
+    for filename in (
+        "inventory.json",
+        "echo_sentences.json",
+        "echo_scenes.json",
+        "demo_manifest.json",
+    ):
         for value in walk_strings(load(filename)):
             assert value == unicodedata.normalize("NFC", value), (
                 f"{filename} contains a non-NFC string: {value!r}"
@@ -131,15 +136,28 @@ def test_minimal_pair_mappings_are_closed_and_signature_copy_is_exact() -> None:
     words = {word["id"]: word for word in data["words"]}
     groups = {group["id"]: group for group in data["minimal_pair_groups"]}
 
-    assert set(groups) == {"ma-six-tones", "phuong-name-test"}
+    assert set(groups) == {"ma-six-tones", "phuong-six-tones"}
     for group_id, group in groups.items():
         assert ASCII_ID.fullmatch(group_id)
-        members = set(group["word_ids"])
+        members = {form["word_id"] for form in group["forms"] if form["word_id"]}
         assert members <= words.keys()
         for word_id in members:
             word = words[word_id]
             assert word["minimal_pair_group"] == group_id
             assert set(word["minimal_pair_ids"]) == members - {word_id}
+        assert {form["tone"] for form in group["forms"]} == TONE_IDS
+
+    phuong_forms = {form["tone"]: form for form in groups["phuong-six-tones"]["forms"]}
+    assert phuong_forms["nang"] == {
+        "tone": "nang",
+        "surface": "phượng",
+        "word_id": "phuong-phoenix",
+        "meaning_en": "phoenix",
+    }
+    assert all(
+        phuong_forms[tone]["word_id"] is None
+        for tone in ("sac", "hoi", "nga")
+    )
 
     phuong = words["phuong-name"]
     assert phuong["syllable"] == "Phương"
@@ -162,15 +180,15 @@ def test_featured_queue_and_fallback_drills_only_reference_inventory() -> None:
     queue = data["featured_queue"]
 
     assert queue[:9] == [
-        "phuong-name",
-        "phuong-ward",
-        "phuong-phoenix",
         "ma-ghost",
         "ma-but",
         "ma-mother",
         "ma-grave",
         "ma-code",
         "ma-seedling",
+        "phuong-name",
+        "phuong-ward",
+        "phuong-phoenix",
     ]
     assert len(queue) == len(word_ids)
     assert set(queue) == word_ids
@@ -224,8 +242,12 @@ def test_demo_manifest_references_canonical_ids_and_safe_paths() -> None:
     inventory = load("inventory.json")
     word_ids = {word["id"] for word in inventory["words"]}
     tones = {tone["id"] for tone in inventory["tones"]}
-    echo = load("echo_sentences.json")
-    sentence_ids = {sentence["id"] for sentence in echo["sentences"]}
+    legacy_echo = load("echo_sentences.json")
+    scene_echo = load("echo_scenes.json")
+    sentence_ids = {sentence["id"] for sentence in legacy_echo["sentences"]}
+    turn_ids = {
+        turn["id"] for scene in scene_echo["scenes"] for turn in scene["turns"]
+    }
     demos = load("demo_manifest.json")
 
     assert [demo["id"] for demo in demos["analyzer_demos"]] == [
@@ -244,18 +266,26 @@ def test_demo_manifest_references_canonical_ids_and_safe_paths() -> None:
     assert len(demos["echo_demos"]) >= 1
     for demo in demos["echo_demos"]:
         assert ASCII_ID.fullmatch(demo["id"])
-        assert demo["sentence_id"] in sentence_ids
+        assert demo["sentence_id"] in sentence_ids | turn_ids
         assert demo["accent"] in ACCENT_IDS
         assert_safe_relative_path(demo["recording_path"])
-        for divergence in demo["expected_divergences"]:
+        for divergence in demo.get("expected_divergences", []):
             assert divergence["kind"] in {"tone_only", "lexical", "missing", "extra"}
             assert divergence["intended_word_id"] in word_ids
             assert divergence["heard_word_id"] in word_ids
+        if "scene_id" in demo:
+            assert demo["turn_id"] in turn_ids
+            assert demo["generation"]["validation"]["selected"]["passed"] is True
 
 
 def test_data_never_names_the_deprecated_tts_model() -> None:
     serialized = "\n".join(
         (DATA_DIR / name).read_text(encoding="utf-8")
-        for name in ("inventory.json", "echo_sentences.json", "demo_manifest.json")
+        for name in (
+            "inventory.json",
+            "echo_sentences.json",
+            "echo_scenes.json",
+            "demo_manifest.json",
+        )
     )
     assert "gpt-4o-mini-tts" not in serialized

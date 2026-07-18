@@ -15,7 +15,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, cast
 
 import numpy as np
 
@@ -399,7 +399,14 @@ def _pcm_bytes_to_float(data: bytes, sample_width: int, channels: int) -> np.nda
 def _decode_wave(
     source: str | Path | bytes | bytearray | BinaryIO,
 ) -> tuple[np.ndarray, int]:
-    stream: Any = io.BytesIO(bytes(source)) if isinstance(source, (bytes, bytearray)) else source
+    stream: Any
+    if isinstance(source, (bytes, bytearray)):
+        stream = io.BytesIO(bytes(source))
+    elif isinstance(source, Path):
+        # Python 3.11's wave.open treats Path as an already-open stream.
+        stream = str(source)
+    else:
+        stream = source
     try:
         with wave.open(stream, "rb") as wav:
             channels = wav.getnchannels()
@@ -419,7 +426,7 @@ def _decode_av(
     source: str | Path | bytes | bytearray | BinaryIO,
 ) -> tuple[np.ndarray, int]:
     try:
-        import av  # type: ignore[import-not-found]
+        import av
     except ImportError as error:
         raise SignalQualityError(
             SignalQualityCode.DECODE_FAILED,
@@ -514,7 +521,7 @@ def _resample_audio(samples: np.ndarray, source_rate: int, target_rate: int) -> 
         )
     except ImportError:
         try:
-            from scipy.signal import resample_poly
+            from scipy.signal import resample_poly  # type: ignore[import-untyped]
         except ImportError as error:
             raise RuntimeError("Audio resampling needs librosa or scipy") from error
         divisor = math.gcd(source_rate, target_rate)
@@ -721,13 +728,13 @@ def _select_voiced_frames(
 
     decoded = np.asarray(voiced_flag, dtype=bool) & np.isfinite(f0) & (f0 > 0)
     if voiced_probability is None:
-        return decoded
+        return cast(np.ndarray, decoded)
     probability = np.asarray(voiced_probability, dtype=np.float64)
     confident = decoded & (np.nan_to_num(probability, nan=0.0) >= 0.35)
     confident_fraction = float(np.mean(confident)) if confident.size else 0.0
     if int(np.sum(confident)) >= 5 and confident_fraction >= 0.32:
-        return confident
-    return decoded
+        return cast(np.ndarray, confident)
+    return cast(np.ndarray, decoded)
 
 
 def _smooth(values: np.ndarray) -> np.ndarray:
@@ -1157,7 +1164,7 @@ def robust_feature_scales(templates: Sequence[ToneTemplate]) -> np.ndarray:
     matrix = np.vstack([_feature_vector(template.features) for template in templates])
     median = np.median(matrix, axis=0)
     mad = np.median(np.abs(matrix - median), axis=0) * 1.4826
-    return np.maximum(mad, _DEFAULT_FEATURE_SCALES * 0.35)
+    return cast(np.ndarray, np.maximum(mad, _DEFAULT_FEATURE_SCALES * 0.35))
 
 
 def feature_distance(

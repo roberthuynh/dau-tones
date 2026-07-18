@@ -11,11 +11,11 @@ from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
-import soundfile as sf
-from scipy.signal import resample_poly
+import soundfile as sf  # type: ignore[import-untyped]
+from scipy.signal import resample_poly  # type: ignore[import-untyped]
 from websockets.sync.client import connect
 
 from dau.content import reference_corpus_is_complete, target_manifest
@@ -182,7 +182,7 @@ def _audio_pcm24(path: Path) -> bytes:
     if rate != 24_000:
         divisor = np.gcd(rate, 24_000)
         samples = resample_poly(samples, 24_000 // divisor, rate // divisor)
-    return (np.clip(samples, -1.0, 1.0) * 32767).astype("<i2").tobytes()
+    return cast(bytes, (np.clip(samples, -1.0, 1.0) * 32767).astype("<i2").tobytes())
 
 
 def _ask(path: Path) -> tuple[str, dict[str, Any]]:

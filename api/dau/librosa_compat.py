@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import lazy_loader  # type: ignore[import-untyped]
 
@@ -15,14 +15,17 @@ def _attach_stub_with_fallback(package_name: str, filename: str) -> tuple[Any, A
     """Use vendored upstream stubs only when a packager removed package data."""
 
     try:
-        return _ORIGINAL_ATTACH_STUB(package_name, filename)
+        return cast(tuple[Any, Any, Any], _ORIGINAL_ATTACH_STUB(package_name, filename))
     except ValueError as error:
         if "non-existent stub" not in str(error) or not package_name.startswith("librosa"):
             raise
         fallback = _STUB_ROOT.joinpath(*package_name.split("."), "__init__.pyi")
         if not fallback.is_file():
             raise
-        return _ORIGINAL_ATTACH_STUB(package_name, str(fallback))
+        return cast(
+            tuple[Any, Any, Any],
+            _ORIGINAL_ATTACH_STUB(package_name, str(fallback)),
+        )
 
 
 # Vercel's Python packager strips dependency ``.pyi`` files. Librosa uses those

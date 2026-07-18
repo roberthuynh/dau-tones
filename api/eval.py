@@ -677,6 +677,18 @@ def main() -> int:
     parser.add_argument("--markdown", type=Path, default=DEFAULT_MARKDOWN)
     parser.add_argument("--figure", type=Path, default=DEFAULT_FIGURE)
     arguments = parser.parse_args()
+    if not arguments.manifest.is_file():
+        generation_report = ROOT / "targets" / "generation-report.json"
+        missing: list[str] = []
+        if generation_report.is_file():
+            payload = json.loads(generation_report.read_text(encoding="utf-8"))
+            missing = [str(item["pair_id"]) for item in payload.get("failures", [])]
+        detail = f" Missing validated pairs: {', '.join(missing)}." if missing else ""
+        parser.error(
+            "The final target manifest is withheld until every reference passes validation."
+            f"{detail} Import the phone fallbacks with api/scripts/import_phone_targets.py, "
+            "then rerun this command."
+        )
     templates = load_templates(arguments.manifest)
     receipt = corpus_receipt(arguments.manifest, templates)
     report = evaluate(templates, receipt=receipt)

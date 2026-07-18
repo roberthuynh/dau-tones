@@ -7,7 +7,7 @@ import base64
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from openai import OpenAI
 from PIL import Image, ImageDraw
@@ -46,7 +46,7 @@ def usage_payload(usage: Any) -> dict[str, Any] | None:
         return usage
     model_dump = getattr(usage, "model_dump", None)
     if callable(model_dump):
-        return model_dump(mode="json")
+        return cast(dict[str, Any], model_dump(mode="json"))
     return {"raw": str(usage)}
 
 
@@ -138,7 +138,8 @@ def main() -> None:
             output_format="png",
             n=1,
         )
-        image_bytes = base64.b64decode(result.data[0].b64_json)
+        result_data = cast(list[Any], result.data)
+        image_bytes = base64.b64decode(cast(str, result_data[0].b64_json))
         destination = output_dir / f"{word['id']}.png"
         destination.write_bytes(image_bytes)
         existing_by_id[word["id"]] = manifest_entry(word, prompt, destination)

@@ -14,9 +14,12 @@ from .settings import AI_TIMEOUT_SECONDS, openai_api_key
 PHYSICAL_TIPS = {
     "started_too_high": "Start lower, then let the pitch travel into the tone.",
     "started_too_low": "Begin a little higher so the tone has room to move.",
+    "ended_too_high": "Let your chin settle sooner so the ending lands lower.",
+    "ended_too_low": "Keep the vowel supported and finish a little higher.",
     "no_final_rise": "Keep the vowel open and lift your chin through the final rise.",
     "fell_instead_of_level": "Hold your chin still and carry the pitch straight through the vowel.",
     "too_flat": "Give the vowel more pitch movement instead of holding it in one place.",
+    "range_too_flat": "Give the vowel more pitch movement instead of holding it in one place.",
     "dip_too_early": "Delay the dip until the middle of the vowel, then recover smoothly.",
     "dip_too_late": "Let the pitch turn downward earlier, around the middle of the vowel.",
     "missing_dip": "Drop into the middle of the vowel before you bring the pitch back up.",
@@ -26,6 +29,9 @@ PHYSICAL_TIPS = {
         "Briefly tighten at the throat in the middle, then release into the rise."
     ),
     "needs_retry": "Try once more in a quiet breath, holding the phone about a hand away.",
+    "match_the_target_shape": (
+        "Trace the target with your chin while keeping the vowel open and steady."
+    ),
 }
 
 
@@ -49,6 +55,71 @@ def _tip_codes(verdict: dict[str, Any]) -> list[str]:
     if verdict.get("needs_retry"):
         codes.insert(0, "needs_retry")
     return codes
+
+
+def _numeric_differences(verdict: dict[str, Any]) -> dict[str, float]:
+    tips = verdict.get("tips_features", {})
+    raw = tips.get("numeric", {}) if isinstance(tips, dict) else {}
+    return {
+        str(key): float(value)
+        for key, value in raw.items()
+        if isinstance(value, int | float) and not isinstance(value, bool)
+    }
+
+
+def _difference(numeric: dict[str, float], *names: str) -> float | None:
+    return next((numeric[name] for name in names if name in numeric), None)
+
+
+def _measured_observation(verdict: dict[str, Any], codes: list[str]) -> str:
+    """Turn the first correction code into one factual, learner-facing measurement."""
+
+    numeric = _numeric_differences(verdict)
+    code = next((item for item in codes if item != "match_the_target_shape"), None)
+    if code == "needs_retry":
+        return "The pitch tracker could not recover one stable 64-point contour from this take."
+    if code in {"started_too_high", "started_too_low"}:
+        value = _difference(numeric, "start", "start_semitones")
+        if value is not None:
+            direction = "above" if value > 0 else "below"
+            return f"Your pitch began {abs(value):.1f} semitones {direction} the target."
+    if code in {"ended_too_high", "ended_too_low", "fell_instead_of_level"}:
+        value = _difference(numeric, "end", "end_semitones")
+        if value is not None:
+            direction = "above" if value > 0 else "below"
+            return f"Your ending landed {abs(value):.1f} semitones {direction} the target."
+    if code == "no_final_rise":
+        value = _difference(numeric, "final_rise")
+        if value is not None:
+            return f"Your final rise was {abs(value):.1f} semitones smaller than the target."
+    if code in {"too_flat", "range_too_flat"}:
+        value = _difference(numeric, "pitch_range")
+        if value is not None:
+            comparison = "narrower" if value < 0 else "wider"
+            return f"Your pitch range was {abs(value):.1f} semitones {comparison} than the target."
+    if code in {"dip_too_early", "dip_too_late", "missing_dip"}:
+        value = _difference(numeric, "dip_position")
+        if value is not None:
+            direction = "later" if value > 0 else "earlier"
+            return f"Your lowest point arrived {abs(value) * 100:.0f}% of the vowel {direction}."
+    if code in {"too_long", "too_short"}:
+        value = _difference(numeric, "duration_s")
+        if value is not None:
+            comparison = "longer" if value > 0 else "shorter"
+            return f"Your vowel was {abs(value) * 1000:.0f} milliseconds {comparison} than target."
+    if code == "weak_glottal_break":
+        value = _difference(numeric, "central_rms_dip")
+        if value is not None:
+            return (
+                f"Your middle energy dip was {abs(value) * 100:.0f} percentage points too shallow."
+            )
+
+    confidence = verdict.get("class_confidence", verdict.get("confidence"))
+    if isinstance(confidence, int | float) and not isinstance(confidence, bool):
+        label = "target" if verdict.get("correct") else "closest measured shape"
+        percent = float(confidence) * 100
+        return f"The 64-point contour matched its {label} at {percent:.0f}% confidence."
+    return "The pitch tracker recovered a full contour and found a measurable shape difference."
 
 
 def _next_word(request: CoachRequest) -> tuple[str, str]:
@@ -90,6 +161,7 @@ def deterministic_coach(request: CoachRequest) -> CoachResponse:
         )
     next_id, rationale = _next_word(request)
     return CoachResponse(
+        observation=_measured_observation(request.verdict, codes),
         coaching_sentence=sentence,
         next_word=next_id,
         rationale=rationale,
@@ -103,6 +175,18 @@ def coach(request: CoachRequest) -> CoachResponse:
     if not key:
         return fallback
     valid_ids = [word["id"] for word in inventory_document().get("words", [])]
+    meaning = request.verdict.get("meaning_verdict", {})
+    meaning = meaning if isinstance(meaning, dict) else {}
+    confusion_history = [
+        {
+            "intended_tone": item.get("tone_intended") or item.get("intended_tone"),
+            "detected_tone": item.get("tone_detected") or item.get("detected_tone"),
+            "semantic_status": item.get("semantic_status"),
+            "correct": item.get("correct"),
+        }
+        for item in request.history[-12:]
+        if item.get("correct") is False
+    ]
     try:
         client = _openai_client(key)
         response = client.responses.parse(
@@ -115,16 +199,29 @@ def coach(request: CoachRequest) -> CoachResponse:
                     "content": (
                         "You are an encouraging, precise Vietnamese tone coach for heritage "
                         "learners. Give exactly one concrete physical instruction, never generic "
-                        "praise. Select the next word only from the supplied IDs and explain the "
-                        "selection in one short visible rationale."
+                        "praise. Observation must state one supplied measurement and must not "
+                        "invent a number. Never reclassify the tone or assert an accidental "
+                        "meaning beyond the supplied assertion level and known meaning. Select "
+                        "the next word only from the supplied IDs and explain the selection in "
+                        "one short visible rationale."
                     ),
                 },
                 {
                     "role": "user",
                     "content": json.dumps(
                         {
-                            "verdict": request.verdict,
-                            "recent_history": request.history[-12:],
+                            "intended_tone": request.verdict.get("tone_intended")
+                            or request.verdict.get("intended_tone"),
+                            "detected_tone": request.verdict.get("tone_detected")
+                            or request.verdict.get("detected_tone"),
+                            "semantic_status": request.verdict.get("semantic_status"),
+                            "assertion_level": meaning.get("assertion_level", "none"),
+                            "known_meaning": meaning.get("detected_meaning_en"),
+                            "feature_differences": _numeric_differences(request.verdict),
+                            "feature_codes": _tip_codes(request.verdict),
+                            "class_confidence": request.verdict.get("class_confidence"),
+                            "signal_confidence": request.verdict.get("signal_confidence"),
+                            "confusion_pair_history": confusion_history,
                             "accent": request.accent,
                             "valid_word_ids": valid_ids,
                             "offline_suggestion": fallback.model_dump(),
@@ -134,7 +231,9 @@ def coach(request: CoachRequest) -> CoachResponse:
                 },
             ],
             text_format=CoachResponse,
-            max_output_tokens=180,
+            # GPT-5.6 reasoning tokens share this ceiling with the structured
+            # payload. A 180-token cap can complete reasoning with no JSON.
+            max_output_tokens=600,
         )
         parsed = response.output_parsed
         if (
@@ -143,8 +242,9 @@ def coach(request: CoachRequest) -> CoachResponse:
             or word_by_id(parsed.next_word) is None
         ):
             return fallback
-        parsed.source = "gpt-5.6-sol"
-        return parsed
+        return CoachResponse.model_validate(
+            {**parsed.model_dump(mode="json"), "source": "gpt-5.6-sol"}
+        )
     except Exception:
         return fallback
 
@@ -198,7 +298,7 @@ def generate_drill(request: DrillRequest) -> dict[str, Any]:
                 },
             ],
             text_format=DrillSelection,
-            max_output_tokens=160,
+            max_output_tokens=500,
         )
         parsed = response.output_parsed
         if parsed is None or not all(item in valid_ids for item in parsed.word_ids):

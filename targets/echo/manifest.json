@@ -1,32 +1,38 @@
 {
-  "schema_version": 1,
-  "voice": "cedar",
+  "schema_version": 2,
+  "provider_voice": "cedar",
+  "display_voice": "Thầy Minh",
   "primary_model": "gpt-realtime-2.1-mini",
   "fallback_model": "gpt-realtime-2.1",
   "validation": [
     "exact Vietnamese token match from gpt-4o-transcribe",
     "signal quality and pYIN contour presence"
   ],
+  "expected_utterance_count": 52,
   "utterances": [
     {
-      "sentence_id": "xin-chao",
+      "turn_id": "meet-family-minh-01",
+      "sentence_id": "meet-family-minh-01",
+      "scene_id": "meet-family",
+      "speaker": "minh",
       "accent": "north",
       "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/north/xin-chao.wav",
-      "sha256": "ec608ebd5e36462fa633c82e6df73768b10404194f907f2d322d806d670c453e",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/meet-family-minh-01.wav",
+      "sha256": "7332220e56dcc041633ae1bf383d3fa890a85754bd087dc2af6d975a4f1d94a2",
       "validation": {
         "selected": {
           "passed": true,
-          "transcript": "Xin chào",
+          "transcript": "Chào bạn! Hôm nay bạn đưa tôi đến thăm gia đình nhé?",
           "lexical_verified": true,
           "contour_quality": {
             "passed": true,
-            "duration_s": 0.9,
-            "peak": 0.679535,
-            "rms": 0.074864,
+            "duration_s": 2.85,
+            "peak": 0.805084,
+            "rms": 0.092541,
             "clipping_fraction": 0.0,
-            "voiced_fraction": 0.6
+            "voiced_fraction": 0.761194
           }
         },
         "attempts": [
@@ -34,15 +40,15 @@
             "model": "gpt-realtime-2.1-mini",
             "validation": {
               "passed": true,
-              "transcript": "Xin chào",
+              "transcript": "Chào bạn! Hôm nay bạn đưa tôi đến thăm gia đình nhé?",
               "lexical_verified": true,
               "contour_quality": {
                 "passed": true,
-                "duration_s": 0.9,
-                "peak": 0.679535,
-                "rms": 0.074864,
+                "duration_s": 2.85,
+                "peak": 0.805084,
+                "rms": 0.092541,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.6
+                "voiced_fraction": 0.761194
               }
             }
           }
@@ -51,402 +57,28 @@
       "quality_note": "Realtime mini passed ASR and contour-presence checks"
     },
     {
-      "sentence_id": "xin-chao",
+      "turn_id": "meet-family-minh-01",
+      "sentence_id": "meet-family-minh-01",
+      "scene_id": "meet-family",
+      "speaker": "minh",
       "accent": "south",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/south/xin-chao.wav",
-      "sha256": "4f805b6586c6ac302ba51ba20b850dd94dc4658ff105eef05c4a644b6d68a848",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Xin chào!",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 1.0,
-            "peak": 0.791809,
-            "rms": 0.103808,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.606383
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Xin chào!",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.0,
-                "peak": 0.791809,
-                "rms": 0.103808,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.606383
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "cam-on-ban",
-      "accent": "north",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/north/cam-on-ban.wav",
-      "sha256": "79509b9d98bca0029ddee7e7b34358c7b1a0411fce5e941ff6d25f4862bf57a9",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Cảm ơn bạn.",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 0.9,
-            "peak": 0.830444,
-            "rms": 0.089198,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.423529
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Cảm ơn bạn.",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 0.9,
-                "peak": 0.830444,
-                "rms": 0.089198,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.423529
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "cam-on-ban",
-      "accent": "south",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/south/cam-on-ban.wav",
-      "sha256": "df03dd3080d25895ba272f60765c489b059662b7b011beae76aee1f6536759ed",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Cảm ơn bạn.",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 1.1,
-            "peak": 0.670227,
-            "rms": 0.06074,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.653846
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Cảm ơn bạn.",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.1,
-                "peak": 0.670227,
-                "rms": 0.06074,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.653846
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "ban-khoe-khong",
-      "accent": "north",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/north/ban-khoe-khong.wav",
-      "sha256": "adcf20d586c1da001783b969f014b449249dded967793e61d0ebccd86294c86e",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Bạn khỏe không?",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 1.2,
-            "peak": 0.686798,
-            "rms": 0.063708,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.212389
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Bạn khỏe không?",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.2,
-                "peak": 0.686798,
-                "rms": 0.063708,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.212389
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "ban-khoe-khong",
-      "accent": "south",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/south/ban-khoe-khong.wav",
-      "sha256": "982b79efeef8022698b42108e87b99b0f248d56b132b61e8825040bf936975b8",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Bạn khỏe không?",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 1.15,
-            "peak": 0.756592,
-            "rms": 0.063183,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.861111
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Bạn khỏe không?",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.15,
-                "peak": 0.756592,
-                "rms": 0.063183,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.861111
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "me-toi-ten-la-phuong",
-      "accent": "north",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/north/me-toi-ten-la-phuong.wav",
-      "sha256": "7e87d2f6849d25690d43d33bb4770bf9614e760faf519d324a2ee333975f2cd8",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Mẹ tôi tên là Phương.",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 1.7,
-            "peak": 0.538086,
-            "rms": 0.080497,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.85
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Mẹ tôi tên là Phương.",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.7,
-                "peak": 0.538086,
-                "rms": 0.080497,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.85
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "me-toi-ten-la-phuong",
-      "accent": "south",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/south/me-toi-ten-la-phuong.wav",
-      "sha256": "5d5e42327cb0dbdebfc4fa3aa8ba2e35e208a6b69199ede671fac291bbfdea96",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Mẹ tôi tên là Phương.",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 1.5,
-            "peak": 0.572845,
-            "rms": 0.066407,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.794326
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Mẹ tôi tên là Phương.",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.5,
-                "peak": 0.572845,
-                "rms": 0.066407,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.794326
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "invite-mom-to-dinner",
-      "accent": "north",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/north/invite-mom-to-dinner.wav",
-      "sha256": "25bf7e79c5f70e95514978b0fdd5f96bf2466f59372e0ebfd941931a6ca32403",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Tối nay con mời má đi ăn cơm.",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 2.3,
-            "peak": 0.532257,
-            "rms": 0.066378,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.75463
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Tối nay con mời má đi ăn cơm.",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 2.3,
-                "peak": 0.532257,
-                "rms": 0.066378,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.75463
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "invite-mom-to-dinner",
-      "accent": "south",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/south/invite-mom-to-dinner.wav",
-      "sha256": "17d3f2301e0e5b5828192db034f0c9df58981aba4b816e5e295e7fb54598649d",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Tối nay con mời má đi ăn cơm.",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 2.15,
-            "peak": 0.441437,
-            "rms": 0.057248,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.782178
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Tối nay con mời má đi ăn cơm.",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 2.15,
-                "peak": 0.441437,
-                "rms": 0.057248,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.782178
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime mini passed ASR and contour-presence checks"
-    },
-    {
-      "sentence_id": "order-pho",
-      "accent": "north",
       "model": "gpt-realtime-2.1",
-      "voice": "cedar",
-      "path": "targets/echo/north/order-pho.wav",
-      "sha256": "6e14a8b5cafe83e1fc84db8eec5a2d74011d57146e8b8e15ccd3de0fd89bccd6",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/meet-family-minh-01.wav",
+      "sha256": "989722c6e0bc6610718556b73d5ccdf7061e394ec35e4373894f0383f9806774",
       "validation": {
         "selected": {
           "passed": true,
-          "transcript": "Cho tôi một tô phở.",
+          "transcript": "Chào bạn. Hôm nay bạn đưa tôi đến thăm gia đình nhé.",
           "lexical_verified": true,
           "contour_quality": {
             "passed": true,
-            "duration_s": 2.3,
-            "peak": 0.638397,
-            "rms": 0.08238,
+            "duration_s": 3.75,
+            "peak": 0.777161,
+            "rms": 0.076233,
             "clipping_fraction": 0.0,
-            "voiced_fraction": 0.615741
+            "voiced_fraction": 0.786932
           }
         },
         "attempts": [
@@ -454,15 +86,15 @@
             "model": "gpt-realtime-2.1-mini",
             "validation": {
               "passed": false,
-              "transcript": "Có một ô phở",
+              "transcript": "Hôm nay bạn đưa tôi đến thăm gia đình nhé.",
               "lexical_verified": false,
               "contour_quality": {
                 "passed": true,
-                "duration_s": 1.4,
-                "peak": 0.567291,
-                "rms": 0.075495,
+                "duration_s": 3.25,
+                "peak": 0.750397,
+                "rms": 0.082862,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.681818
+                "voiced_fraction": 0.793443
               }
             }
           },
@@ -470,15 +102,15 @@
             "model": "gpt-realtime-2.1",
             "validation": {
               "passed": true,
-              "transcript": "Cho tôi một tô phở.",
+              "transcript": "Chào bạn. Hôm nay bạn đưa tôi đến thăm gia đình nhé.",
               "lexical_verified": true,
               "contour_quality": {
                 "passed": true,
-                "duration_s": 2.3,
-                "peak": 0.638397,
-                "rms": 0.08238,
+                "duration_s": 3.75,
+                "peak": 0.777161,
+                "rms": 0.076233,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.615741
+                "voiced_fraction": 0.786932
               }
             }
           }
@@ -487,82 +119,120 @@
       "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
     },
     {
-      "sentence_id": "order-pho",
-      "accent": "south",
-      "model": "gpt-realtime-2.1",
-      "voice": "cedar",
-      "path": "targets/echo/south/order-pho.wav",
-      "sha256": "78b5fda3ef1c1171a01cc086781806452c325e18a005ed053b7274da01e25a26",
+      "turn_id": "meet-family-learner-01",
+      "sentence_id": "meet-family-learner-01",
+      "scene_id": "meet-family",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/meet-family-learner-01.wav",
+      "sha256": "7d5ac904e633d15ec413528729beed0f23181692f9c40c8d59bb17112f48529b",
       "validation": {
         "selected": {
           "passed": true,
-          "transcript": "Cho tôi một tô phở.",
+          "transcript": "Được chứ, tối nay tôi về nhà ăn cơm với má và cả gia đình.",
           "lexical_verified": true,
           "contour_quality": {
             "passed": true,
-            "duration_s": 1.9,
-            "peak": 0.522308,
-            "rms": 0.081724,
+            "duration_s": 3.65,
+            "peak": 0.708221,
+            "rms": 0.089972,
             "clipping_fraction": 0.0,
-            "voiced_fraction": 0.743017
+            "voiced_fraction": 0.795918
           }
         },
         "attempts": [
           {
             "model": "gpt-realtime-2.1-mini",
             "validation": {
-              "passed": false,
-              "transcript": "Giao tôi một tô phở.",
-              "lexical_verified": false,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.4,
-                "peak": 0.571167,
-                "rms": 0.068229,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.727273
-              }
-            }
-          },
-          {
-            "model": "gpt-realtime-2.1",
-            "validation": {
               "passed": true,
-              "transcript": "Cho tôi một tô phở.",
+              "transcript": "Được chứ, tối nay tôi về nhà ăn cơm với má và cả gia đình.",
               "lexical_verified": true,
               "contour_quality": {
                 "passed": true,
-                "duration_s": 1.9,
-                "peak": 0.522308,
-                "rms": 0.081724,
+                "duration_s": 3.65,
+                "peak": 0.708221,
+                "rms": 0.089972,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.743017
+                "voiced_fraction": 0.795918
               }
             }
           }
         ]
       },
-      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
     },
     {
-      "sentence_id": "order-water",
+      "turn_id": "meet-family-learner-01",
+      "sentence_id": "meet-family-learner-01",
+      "scene_id": "meet-family",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/meet-family-learner-01.wav",
+      "sha256": "42044b5aeba61a34fdd9740266ba073d951db5070494e4b5f051e05c495cb74d",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Được chứ, tối nay tôi về nhà ăn cơm với má và cả gia đình.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.1,
+            "peak": 0.640717,
+            "rms": 0.072481,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.786942
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Được chứ, tối nay tôi về nhà ăn cơm với má và cả gia đình.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.1,
+                "peak": 0.640717,
+                "rms": 0.072481,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.786942
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "meet-family-minh-02",
+      "sentence_id": "meet-family-minh-02",
+      "scene_id": "meet-family",
+      "speaker": "minh",
       "accent": "north",
       "model": "gpt-realtime-2.1",
-      "voice": "cedar",
-      "path": "targets/echo/north/order-water.wav",
-      "sha256": "3816138f676eb97097434965859b60d4ca4f537b78a14ada821aec7266a04ab3",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/meet-family-minh-02.wav",
+      "sha256": "d2c603752af281edf6cb6133d88849ff6a414e46647a3dfa40afac97e23a5c45",
       "validation": {
         "selected": {
           "passed": true,
-          "transcript": "Cho tôi một ly nước.",
+          "transcript": "Tuyệt quá! Má bạn tên gì và tôi nên xưng hô thế nào?",
           "lexical_verified": true,
           "contour_quality": {
             "passed": true,
-            "duration_s": 1.85,
-            "peak": 0.358948,
-            "rms": 0.056135,
+            "duration_s": 4.4,
+            "peak": 0.888031,
+            "rms": 0.103428,
             "clipping_fraction": 0.0,
-            "voiced_fraction": 0.844828
+            "voiced_fraction": 0.74092
           }
         },
         "attempts": [
@@ -570,15 +240,15 @@
             "model": "gpt-realtime-2.1-mini",
             "validation": {
               "passed": false,
-              "transcript": "Cho tôi một ly nữa.",
+              "transcript": "Tiếc quá! Mã bạn tên gì và tôi nên xưng hô thế nào?",
               "lexical_verified": false,
               "contour_quality": {
                 "passed": true,
-                "duration_s": 1.15,
-                "peak": 0.301147,
-                "rms": 0.058287,
+                "duration_s": 3.6,
+                "peak": 0.858398,
+                "rms": 0.07705,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.768519
+                "voiced_fraction": 0.511834
               }
             }
           },
@@ -586,15 +256,15 @@
             "model": "gpt-realtime-2.1",
             "validation": {
               "passed": true,
-              "transcript": "Cho tôi một ly nước.",
+              "transcript": "Tuyệt quá! Má bạn tên gì và tôi nên xưng hô thế nào?",
               "lexical_verified": true,
               "contour_quality": {
                 "passed": true,
-                "duration_s": 1.85,
-                "peak": 0.358948,
-                "rms": 0.056135,
+                "duration_s": 4.4,
+                "peak": 0.888031,
+                "rms": 0.103428,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.844828
+                "voiced_fraction": 0.74092
               }
             }
           }
@@ -603,98 +273,1444 @@
       "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
     },
     {
-      "sentence_id": "order-water",
+      "turn_id": "meet-family-minh-02",
+      "sentence_id": "meet-family-minh-02",
+      "scene_id": "meet-family",
+      "speaker": "minh",
       "accent": "south",
       "model": "gpt-realtime-2.1",
-      "voice": "cedar",
-      "path": "targets/echo/south/order-water.wav",
-      "sha256": "d9d284b030a7f4474bb657049f72124a22dbcc9653771bbf0dd93dff52bf55a7",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/meet-family-minh-02.wav",
+      "sha256": "d4c1567bab3c08d4d8737eb53b62980a9670a2de2bd43a4cf082ee6dac8c9867",
       "validation": {
         "selected": {
           "passed": true,
-          "transcript": "Cho tôi một ly nước.",
+          "transcript": "Tuyệt quá! Má bạn tên gì, và tôi nên xưng hô thế nào?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 5.5,
+            "peak": 0.850433,
+            "rms": 0.080331,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.728682
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Tuyệt quá! Má bạn tên gì, và bôi nên xưng hô thế nào?",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.3,
+                "peak": 0.975861,
+                "rms": 0.087132,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.60396
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Tuyệt quá! Má bạn tên gì, và tôi nên xưng hô thế nào?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 5.5,
+                "peak": 0.850433,
+                "rms": 0.080331,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.728682
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "meet-family-learner-02",
+      "sentence_id": "meet-family-learner-02",
+      "scene_id": "meet-family",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/meet-family-learner-02.wav",
+      "sha256": "489f697b841f019b785c687bd35e5ad7bd2b40624970f7cafb1c75e0ab4b5d53",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Má tôi tên là Phương, còn em gái tôi tên là Phượng.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.7,
+            "peak": 0.873169,
+            "rms": 0.087754,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.704724
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Má tôi tên là Phương, còn em gái tôi tên là Phượng.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.7,
+                "peak": 0.873169,
+                "rms": 0.087754,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.704724
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "meet-family-learner-02",
+      "sentence_id": "meet-family-learner-02",
+      "scene_id": "meet-family",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/meet-family-learner-02.wav",
+      "sha256": "f8ae4308644c35cd8deba829267389385d0633daef2c7322990fc93314989909",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Má tôi tên là Phương, còn em gái tôi tên là Phượng.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.6,
+            "peak": 0.802948,
+            "rms": 0.081251,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.683432
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Má tôi tên là Phương, còn em gái tôi tên là Phượng.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.6,
+                "peak": 0.802948,
+                "rms": 0.081251,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.683432
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "meet-family-minh-03",
+      "sentence_id": "meet-family-minh-03",
+      "scene_id": "meet-family",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/meet-family-minh-03.wav",
+      "sha256": "c342456e057be08289d254284c112c103f1f35a25560019d568f13fd0fe9669c",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Hai cái tên nghe gần giống nhau. Bạn nói lại chậm hơn được không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 4.1,
+            "peak": 0.704742,
+            "rms": 0.087117,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.818182
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Hai cái tên nghe đền giống nhau, bạn nói lại chậm hơn được không?",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.4,
+                "peak": 0.630981,
+                "rms": 0.073266,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.739812
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Hai cái tên nghe gần giống nhau. Bạn nói lại chậm hơn được không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.1,
+                "peak": 0.704742,
+                "rms": 0.087117,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.818182
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "meet-family-minh-03",
+      "sentence_id": "meet-family-minh-03",
+      "scene_id": "meet-family",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/meet-family-minh-03.wav",
+      "sha256": "3f6436b587a94698608fdce1636b194609ea40cf9d3a9a4d703e68bb50627f11",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Hai cái tên nghe gần giống nhau, bạn nói lại chậm hơn được không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.35,
+            "peak": 0.597382,
+            "rms": 0.068742,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.68254
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Hai cái tên nghe gần giống nhau, bạn nói lại chậm hơn được không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.35,
+                "peak": 0.597382,
+                "rms": 0.068742,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.68254
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "meet-family-learner-03",
+      "sentence_id": "meet-family-learner-03",
+      "scene_id": "meet-family",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/meet-family-learner-03.wav",
+      "sha256": "622e4cefec2223fcdaab0de6dc7f9f07d22bba561031f3f370e30232b99f9d39",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Đây là má Phương, còn Phượng là em gái của tôi.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.1,
+            "peak": 0.903687,
+            "rms": 0.092625,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.797251
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Đây là má Phương, còn Phượng là em gái của tôi.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.1,
+                "peak": 0.903687,
+                "rms": 0.092625,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.797251
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "meet-family-learner-03",
+      "sentence_id": "meet-family-learner-03",
+      "scene_id": "meet-family",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/meet-family-learner-03.wav",
+      "sha256": "7a1fea44e81d8b8f0f4eb89a5a8b540f42b65777804a47abc96322e9d92cb01c",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Đây là má Phương, còn Phượng là em gái của tôi.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.15,
+            "peak": 0.784485,
+            "rms": 0.075484,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.75
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Đây là má Phương, còn Phượng là em gái của tôi.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.15,
+                "peak": 0.784485,
+                "rms": 0.075484,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.75
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-minh-01",
+      "sentence_id": "family-dinner-minh-01",
+      "scene_id": "family-dinner",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/family-dinner-minh-01.wav",
+      "sha256": "04f61d3b7aa692696303f369804210fd222d467643236b1b8a41ca7dbde7c1bb",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi nên mang gì đến bữa tối?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.1,
+            "peak": 0.358429,
+            "rms": 0.071718,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.837563
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi nên mang gì đến bữa tối?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.1,
+                "peak": 0.358429,
+                "rms": 0.071718,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.837563
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-minh-01",
+      "sentence_id": "family-dinner-minh-01",
+      "scene_id": "family-dinner",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/family-dinner-minh-01.wav",
+      "sha256": "ed0625d46af7636e8bfb129653de46fdf156915e53e7924f0683535c74fc19b9",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi nên mang gì đến bữa tối?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 1.95,
+            "peak": 0.443939,
+            "rms": 0.065587,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.781421
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi nên mang gì đến bữa tối?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 1.95,
+                "peak": 0.443939,
+                "rms": 0.065587,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.781421
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-learner-01",
+      "sentence_id": "family-dinner-learner-01",
+      "scene_id": "family-dinner",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/family-dinner-learner-01.wav",
+      "sha256": "04d4e83d6b97150bc37ae5fa5ff4716f43ebfcd9776407581b63b3d7b93a76e9",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Bạn mang ít sữa nhé, má tôi đã nấu cơm và cá rồi.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.4,
+            "peak": 0.864594,
+            "rms": 0.088219,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.827586
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Bạn mang ít sữa nhé, má tôi đã nấu cơm và cá rồi.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.4,
+                "peak": 0.864594,
+                "rms": 0.088219,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.827586
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-learner-01",
+      "sentence_id": "family-dinner-learner-01",
+      "scene_id": "family-dinner",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/family-dinner-learner-01.wav",
+      "sha256": "c1b1c5935b6a480fb1639cff393cae5d2c84f3a6111f2f4f251ba460903572de",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Bạn mang ít sữa nhé. Má tôi đã nấu cơm và cá rồi.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.4,
+            "peak": 0.777283,
+            "rms": 0.082143,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.746082
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Bạn mang ít sữa nhé. Má tôi đã nấu cơm và cá rồi.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.4,
+                "peak": 0.777283,
+                "rms": 0.082143,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.746082
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-minh-02",
+      "sentence_id": "family-dinner-minh-02",
+      "scene_id": "family-dinner",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/family-dinner-minh-02.wav",
+      "sha256": "d4236920bea49e9ed61c8f6a2ef82c416236fa4dd06790810ecd989069357de3",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi có cần mua thêm rau hay món gì khác không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.95,
+            "peak": 0.717957,
+            "rms": 0.066024,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.826715
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi có cần mua thêm rau hay món gì khác không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.95,
+                "peak": 0.717957,
+                "rms": 0.066024,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.826715
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-minh-02",
+      "sentence_id": "family-dinner-minh-02",
+      "scene_id": "family-dinner",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/family-dinner-minh-02.wav",
+      "sha256": "bd72286a0a4ab9d3f3869e4db2c000719b23ff561889e4ca49dd8e9c3c2772d9",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi có cần mua thêm rau hay món gì khác không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.65,
+            "peak": 0.542084,
+            "rms": 0.066409,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.803213
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi có cần mua thêm rau hay món gì khác không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.65,
+                "peak": 0.542084,
+                "rms": 0.066409,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.803213
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-learner-02",
+      "sentence_id": "family-dinner-learner-02",
+      "scene_id": "family-dinner",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/family-dinner-learner-02.wav",
+      "sha256": "63403eca1bd02c904dba08cfaca6e90baa54f2e0702a5813a307fdd7176f7cdd",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Không cần đâu, nhưng mà bạn có thể mua thêm một ít trái cây.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.15,
+            "peak": 0.744263,
+            "rms": 0.078344,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.756757
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Không cần đâu, nhưng mà bạn có thể mua thêm một ít trái cây.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.15,
+                "peak": 0.744263,
+                "rms": 0.078344,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.756757
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-learner-02",
+      "sentence_id": "family-dinner-learner-02",
+      "scene_id": "family-dinner",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/family-dinner-learner-02.wav",
+      "sha256": "2a3f9262d6ba2b0cf188e0139f3f903d94b5f2a665035be768fefba5a1c99acd",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Không cần đâu, nhưng mà bạn có thể mua thêm một ít trái cây.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.2,
+            "peak": 0.709045,
+            "rms": 0.077775,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.760797
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Không cần đâu, nhưng mà bạn có thể mua thêm một ít trái cây.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.2,
+                "peak": 0.709045,
+                "rms": 0.077775,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.760797
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-minh-03",
+      "sentence_id": "family-dinner-minh-03",
+      "scene_id": "family-dinner",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/family-dinner-minh-03.wav",
+      "sha256": "539d2a735c8e597cdb0ae67735a88e52aa4a383ef7c3dbcef13743b734e1f30a",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi sẽ đến lúc bảy giờ. Nhà bạn có dễ tìm không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 5.95,
+            "peak": 0.768555,
+            "rms": 0.07679,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.734767
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Cô ấy sẽ đến lúc 7 giờ. Nhà bạn có dễ tìm không?",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.15,
+                "peak": 0.684357,
+                "rms": 0.070953,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.72973
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi sẽ đến lúc bảy giờ. Nhà bạn có dễ tìm không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 5.95,
+                "peak": 0.768555,
+                "rms": 0.07679,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.734767
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-minh-03",
+      "sentence_id": "family-dinner-minh-03",
+      "scene_id": "family-dinner",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/family-dinner-minh-03.wav",
+      "sha256": "73694a8b8eacbdb815bf5aff402e384798b25ba6e18a03424a1fa922681cd296",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi sẽ đến lúc bảy giờ. Nhà bạn có dễ tìm không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 4.6,
+            "peak": 0.694702,
+            "rms": 0.075603,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.81713
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Nhà bạn có dễ tìm không?",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.3,
+                "peak": 0.761932,
+                "rms": 0.075447,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.780645
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi sẽ đến lúc bảy giờ. Nhà bạn có dễ tìm không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.6,
+                "peak": 0.694702,
+                "rms": 0.075603,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.81713
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-learner-03",
+      "sentence_id": "family-dinner-learner-03",
+      "scene_id": "family-dinner",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/family-dinner-learner-03.wav",
+      "sha256": "99ed33412453b9e6f121c9810148283391d3147e8bcf61890de6c0d993aa6357",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Cửa nhà màu xanh, mã cửa là hai ba sáu. Bạn cứ vào nhé.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 4.15,
+            "peak": 0.745056,
+            "rms": 0.07633,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.707692
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Cửa nhà màu xanh, mã cửa là hai ba sáu. Bạn cứ vào nhé.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.15,
+                "peak": 0.745056,
+                "rms": 0.07633,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.707692
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "family-dinner-learner-03",
+      "sentence_id": "family-dinner-learner-03",
+      "scene_id": "family-dinner",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/family-dinner-learner-03.wav",
+      "sha256": "3fb86b4b39df90f7807fa0f8c3af5173b0cf167add734d6fd87b5fa337f4a58d",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Cửa nhà màu xanh, mã cửa là hai ba sáu, bạn cứ vào nhé.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 4.25,
+            "peak": 0.693573,
+            "rms": 0.085646,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.711779
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Cửa nhà màu xanh, mã cửa là hai ba sáu, bạn cứ vào nhé.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.25,
+                "peak": 0.693573,
+                "rms": 0.085646,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.711779
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-minh-01",
+      "sentence_id": "pho-shop-minh-01",
+      "scene_id": "pho-shop",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/pho-shop-minh-01.wav",
+      "sha256": "ab1bf5d1e06ac13b9f09aa79f53fed71ea9b8418c22f9ea872fb5672c6b519a0",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Sáng nay mình ăn gì trước khi đi tham quan?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.5,
+            "peak": 0.68985,
+            "rms": 0.058815,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.662614
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Sáng nay anh định ăn gì trước khi đi tham quan?",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.65,
+                "peak": 0.883545,
+                "rms": 0.077778,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.722892
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Sáng nay mình ăn gì trước khi đi tham quan?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.5,
+                "peak": 0.68985,
+                "rms": 0.058815,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.662614
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-minh-01",
+      "sentence_id": "pho-shop-minh-01",
+      "scene_id": "pho-shop",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/pho-shop-minh-01.wav",
+      "sha256": "13d59ec34e4150646e178daddc6f3d8b1e1c6d46e2ed19ce797b1506683b59b3",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Sáng nay mình ăn gì trước khi đi tham quan?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.35,
+            "peak": 0.857117,
+            "rms": 0.083109,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.868778
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Sáng nay mình ăn gì trước khi đi tham quan?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.35,
+                "peak": 0.857117,
+                "rms": 0.083109,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.868778
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-learner-01",
+      "sentence_id": "pho-shop-learner-01",
+      "scene_id": "pho-shop",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/pho-shop-learner-01.wav",
+      "sha256": "1318ed915ab8c02a341968cfce73b83cb8df2b708a7efa9facb32229bd922f78",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Cho tôi một tô phở bò, một đĩa rau và một ly nước.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.35,
+            "peak": 0.604065,
+            "rms": 0.076313,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.774603
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Cho tôi một tô phở bò, một đĩa rau và một ly nước.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.35,
+                "peak": 0.604065,
+                "rms": 0.076313,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.774603
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-learner-01",
+      "sentence_id": "pho-shop-learner-01",
+      "scene_id": "pho-shop",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/pho-shop-learner-01.wav",
+      "sha256": "cd70f78879ac604c6e7b29ab76977857bd54c1c67751112494bd7fb96cadd8af",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Cho tôi một tô phở bò, một đĩa rau và một ly nước.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.85,
+            "peak": 0.600983,
+            "rms": 0.063129,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.770083
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Cho tôi một tô phở bò, một đĩa rau và một ly nước.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.85,
+                "peak": 0.600983,
+                "rms": 0.063129,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.770083
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-minh-02",
+      "sentence_id": "pho-shop-minh-02",
+      "scene_id": "pho-shop",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/pho-shop-minh-02.wav",
+      "sha256": "d2c384e381d872486218822bb895af22174e7c1c8240a79cb887566df412ac2b",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Bạn có muốn gọi thêm cơm hoặc cá không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.25,
+            "peak": 0.756958,
+            "rms": 0.081972,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.663507
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Bạn có muốn gọi thêm cơm hoặc cá không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.25,
+                "peak": 0.756958,
+                "rms": 0.081972,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.663507
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-minh-02",
+      "sentence_id": "pho-shop-minh-02",
+      "scene_id": "pho-shop",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/pho-shop-minh-02.wav",
+      "sha256": "ccef78e147d24f30855799f71376e9c3c9f649fcdf534d69cde444e76f7551ce",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Bạn có muốn gọi thêm cơm hoặc cá không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.15,
+            "peak": 0.69873,
+            "rms": 0.074179,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.743243
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Bạn có muốn đòi thêm cơm hoặc cá không?",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.75,
+                "peak": 0.796906,
+                "rms": 0.077095,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.724806
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Bạn có muốn gọi thêm cơm hoặc cá không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.15,
+                "peak": 0.69873,
+                "rms": 0.074179,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.743243
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-learner-02",
+      "sentence_id": "pho-shop-learner-02",
+      "scene_id": "pho-shop",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/pho-shop-learner-02.wav",
+      "sha256": "6334f36465aa59a127bd1809c0ea7b27f7ec64a4aaba5cf8893cdc6128d8250c",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi không gọi thêm cơm, nhưng cho tôi một đĩa cá nhỏ.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.45,
+            "peak": 0.658905,
+            "rms": 0.081165,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.691358
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi không gọi thêm cơm, nhưng cho tôi một đĩa cá nhỏ.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.45,
+                "peak": 0.658905,
+                "rms": 0.081165,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.691358
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-learner-02",
+      "sentence_id": "pho-shop-learner-02",
+      "scene_id": "pho-shop",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/pho-shop-learner-02.wav",
+      "sha256": "c67aa45212a26bba84ee2839b997615be56665e7f04c459142b5a822b74c46c7",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi không gọi thêm cơm, nhưng cho tôi một đĩa cá nhỏ.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 4.25,
+            "peak": 0.716431,
+            "rms": 0.065954,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.779449
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Tôi không đòi thêm cơm, nhưng cho tôi một đĩa cá nhỏ.",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.6,
+                "peak": 0.522949,
+                "rms": 0.06308,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.642012
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi không gọi thêm cơm, nhưng cho tôi một đĩa cá nhỏ.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.25,
+                "peak": 0.716431,
+                "rms": 0.065954,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.779449
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-minh-03",
+      "sentence_id": "pho-shop-minh-03",
+      "scene_id": "pho-shop",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/pho-shop-minh-03.wav",
+      "sha256": "4bec822222502cfc593843ea0c658aee1a232ef733f1dea68212b1be8f18fe3a",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Món ăn có vừa miệng không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.25,
+            "peak": 0.616608,
+            "rms": 0.07351,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.810427
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Món ăn có vừa miệng không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.25,
+                "peak": 0.616608,
+                "rms": 0.07351,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.810427
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-minh-03",
+      "sentence_id": "pho-shop-minh-03",
+      "scene_id": "pho-shop",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/pho-shop-minh-03.wav",
+      "sha256": "261408cd097c9d671ecbcff48d6ca7435c4623398a07831183f510d34cac92fd",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Món ăn có vừa miệng không?",
           "lexical_verified": true,
           "contour_quality": {
             "passed": true,
             "duration_s": 1.65,
-            "peak": 0.347107,
-            "rms": 0.061623,
+            "peak": 0.623749,
+            "rms": 0.073112,
             "clipping_fraction": 0.0,
-            "voiced_fraction": 0.896774
+            "voiced_fraction": 0.774194
           }
         },
         "attempts": [
           {
             "model": "gpt-realtime-2.1-mini",
             "validation": {
-              "passed": false,
-              "transcript": "Cho tôi một ly nữa.",
-              "lexical_verified": false,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.35,
-                "peak": 0.688995,
-                "rms": 0.074267,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.787402
-              }
-            }
-          },
-          {
-            "model": "gpt-realtime-2.1",
-            "validation": {
               "passed": true,
-              "transcript": "Cho tôi một ly nước.",
+              "transcript": "Món ăn có vừa miệng không?",
               "lexical_verified": true,
               "contour_quality": {
                 "passed": true,
                 "duration_s": 1.65,
-                "peak": 0.347107,
-                "rms": 0.061623,
+                "peak": 0.623749,
+                "rms": 0.073112,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.896774
-              }
-            }
-          }
-        ]
-      },
-      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
-    },
-    {
-      "sentence_id": "find-restroom",
-      "accent": "north",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/north/find-restroom.wav",
-      "sha256": "dd59bcd99519da0990e4120513fba1d2fcddd8f8a618f0a29cfa70382d3d287c",
-      "validation": {
-        "selected": {
-          "passed": true,
-          "transcript": "Nhà vệ sinh ở đâu?",
-          "lexical_verified": true,
-          "contour_quality": {
-            "passed": true,
-            "duration_s": 1.0,
-            "peak": 0.752228,
-            "rms": 0.075745,
-            "clipping_fraction": 0.0,
-            "voiced_fraction": 0.595745
-          }
-        },
-        "attempts": [
-          {
-            "model": "gpt-realtime-2.1-mini",
-            "validation": {
-              "passed": true,
-              "transcript": "Nhà vệ sinh ở đâu?",
-              "lexical_verified": true,
-              "contour_quality": {
-                "passed": true,
-                "duration_s": 1.0,
-                "peak": 0.752228,
-                "rms": 0.075745,
-                "clipping_fraction": 0.0,
-                "voiced_fraction": 0.595745
+                "voiced_fraction": 0.774194
               }
             }
           }
@@ -703,24 +1719,90 @@
       "quality_note": "Realtime mini passed ASR and contour-presence checks"
     },
     {
-      "sentence_id": "find-restroom",
-      "accent": "south",
-      "model": "gpt-realtime-2.1-mini",
-      "voice": "cedar",
-      "path": "targets/echo/south/find-restroom.wav",
-      "sha256": "d4be02a278f70a7b16a37c9efb045aa71a0f25204a3dbff54f0db097b784d27f",
+      "turn_id": "pho-shop-learner-03",
+      "sentence_id": "pho-shop-learner-03",
+      "scene_id": "pho-shop",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/pho-shop-learner-03.wav",
+      "sha256": "5eb974429ad618026df1d883815e9d2f9acd48ab44f2b8d5256dea42b276425f",
       "validation": {
         "selected": {
           "passed": true,
-          "transcript": "Nhà vệ sinh ở đâu?",
+          "transcript": "Phở rất ngon, cảm ơn bạn đã giới thiệu quán này cho tôi.",
           "lexical_verified": true,
           "contour_quality": {
             "passed": true,
-            "duration_s": 1.35,
-            "peak": 0.903076,
-            "rms": 0.084351,
+            "duration_s": 4.35,
+            "peak": 0.939667,
+            "rms": 0.093866,
             "clipping_fraction": 0.0,
-            "voiced_fraction": 0.834646
+            "voiced_fraction": 0.708333
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Cảm ơn bạn đã giới thiệu cái máy cho tôi.",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.2,
+                "peak": 0.97937,
+                "rms": 0.099078,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.631229
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Phở rất ngon, cảm ơn bạn đã giới thiệu quán này cho tôi.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.35,
+                "peak": 0.939667,
+                "rms": 0.093866,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.708333
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "pho-shop-learner-03",
+      "sentence_id": "pho-shop-learner-03",
+      "scene_id": "pho-shop",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/pho-shop-learner-03.wav",
+      "sha256": "1035df83400825ab46ed1b16e92a26736a7642e1411df43760e1ed477ee1f5aa",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Phở rất ngon. Cảm ơn bạn đã giới thiệu quán này cho tôi.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.05,
+            "peak": 0.706207,
+            "rms": 0.089536,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.744755
           }
         },
         "attempts": [
@@ -728,15 +1810,783 @@
             "model": "gpt-realtime-2.1-mini",
             "validation": {
               "passed": true,
-              "transcript": "Nhà vệ sinh ở đâu?",
+              "transcript": "Phở rất ngon. Cảm ơn bạn đã giới thiệu quán này cho tôi.",
               "lexical_verified": true,
               "contour_quality": {
                 "passed": true,
-                "duration_s": 1.35,
-                "peak": 0.903076,
-                "rms": 0.084351,
+                "duration_s": 3.05,
+                "peak": 0.706207,
+                "rms": 0.089536,
                 "clipping_fraction": 0.0,
-                "voiced_fraction": 0.834646
+                "voiced_fraction": 0.744755
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-01",
+      "sentence_id": "around-ward-minh-01",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-minh-01.wav",
+      "sha256": "1a97a925dae0ec279baf467d12edbbf5306b3e0f0e97ae62b3380b4bc508c292",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Sau bữa sáng, bạn muốn đi đâu?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.35,
+            "peak": 0.82724,
+            "rms": 0.095096,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.714932
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Sáu bữa sáng, bạn muốn đi đâu?",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 1.75,
+                "peak": 0.739716,
+                "rms": 0.09835,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.648485
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Sau bữa sáng, bạn muốn đi đâu?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.35,
+                "peak": 0.82724,
+                "rms": 0.095096,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.714932
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-01",
+      "sentence_id": "around-ward-minh-01",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-minh-01.wav",
+      "sha256": "7c2048f3c44d380d576e2a03d8edb2900ff8b6cd8f4d937732f2130c63776454",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Sau bữa sáng, bạn muốn đi đâu?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 1.75,
+            "peak": 0.756165,
+            "rms": 0.095385,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.727273
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Sau bữa sáng, bạn muốn đi đâu?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 1.75,
+                "peak": 0.756165,
+                "rms": 0.095385,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.727273
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-01",
+      "sentence_id": "around-ward-learner-01",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-learner-01.wav",
+      "sha256": "16c3aafb1cf3b09bd7b1b556bb7b7f6d354bd32aa7bb73961dbc80b59e3c44e6",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Xin lỗi, bạn chỉ giúp tôi ủy ban phường ở đâu được không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.2,
+            "peak": 0.832581,
+            "rms": 0.080397,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.707641
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Xin lỗi, bạn chỉ giúp tôi ủy ban phường ở đâu được không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.2,
+                "peak": 0.832581,
+                "rms": 0.080397,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.707641
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-01",
+      "sentence_id": "around-ward-learner-01",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-learner-01.wav",
+      "sha256": "16ec7edcc13352e9e8acbfffd1aa997788fd4c97c9914675f7358d4f2bdc0e20",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Xin lỗi, bạn chỉ giúp tôi ủy ban phường ở đâu được không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.2,
+            "peak": 0.725739,
+            "rms": 0.073993,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.730897
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Xin lỗi, bạn chỉ giúp tôi ủy ban phường ở đâu được không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.2,
+                "peak": 0.725739,
+                "rms": 0.073993,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.730897
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-02",
+      "sentence_id": "around-ward-minh-02",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-minh-02.wav",
+      "sha256": "281e68c31528a78fd5c86c87ff736b2d5565970559b8bd119c059ed8aaac3873",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Đi qua cửa lớn rồi rẽ phải ở ngã tư.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.9,
+            "peak": 0.563507,
+            "rms": 0.061728,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.705882
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Đi qua cửa lớn rồi rẽ phải ở ngã tư.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.9,
+                "peak": 0.563507,
+                "rms": 0.061728,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.705882
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-02",
+      "sentence_id": "around-ward-minh-02",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-minh-02.wav",
+      "sha256": "6285dd60b3126c582ff2d64e51486b13355de2221ab785f4e4b379e4687fdea2",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Đi qua cửa lớn rồi rẽ phải ở ngã tư.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.5,
+            "peak": 0.476929,
+            "rms": 0.071171,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.838298
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Đi qua cửa lớn rồi rẽ phải ở ngã tư.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.5,
+                "peak": 0.476929,
+                "rms": 0.071171,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.838298
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-02",
+      "sentence_id": "around-ward-learner-02",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-learner-02.wav",
+      "sha256": "c062fa2075245cd6e15747475dccc08d6b1a9d5048b5d05cce3de613f5a30903",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi đi qua cửa lớn rồi rẽ phải, đúng không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.85,
+            "peak": 0.828949,
+            "rms": 0.071689,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.592798
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi đi qua cửa lớn rồi rẽ phải, đúng không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.85,
+                "peak": 0.828949,
+                "rms": 0.071689,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.592798
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-02",
+      "sentence_id": "around-ward-learner-02",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-learner-02.wav",
+      "sha256": "87493bd3c33900714d494d87525aa0ced9c5c5ebf5e00e208512c355fe3054d6",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi đi qua cửa lớn rồi rẽ phải, đúng không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.65,
+            "peak": 0.509308,
+            "rms": 0.066972,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.787149
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi đi qua cửa lớn rồi rẽ phải, đúng không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.65,
+                "peak": 0.509308,
+                "rms": 0.066972,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.787149
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-03",
+      "sentence_id": "around-ward-minh-03",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-minh-03.wav",
+      "sha256": "1310cf312b68c813eb3daf7e4b7a20b093278ad5ee36ae82647723d60af07545",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Đúng rồi. Bạn có sợ đi ngang nghĩa trang không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.6,
+            "peak": 0.76889,
+            "rms": 0.080981,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.655738
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Đúng rồi. Bạn có sợ đi ngang nghĩa trang không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.6,
+                "peak": 0.76889,
+                "rms": 0.080981,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.655738
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-03",
+      "sentence_id": "around-ward-minh-03",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-minh-03.wav",
+      "sha256": "b34c0f413cf5c51cde98faa7d216c9a5fb6c10fb67a13c0ebc0547419e817d96",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Đúng rồi. Bạn có sợ đi ngang nghĩa trang không?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.5,
+            "peak": 0.535339,
+            "rms": 0.065095,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.612766
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Đúng rồi. Bạn có sợ đi ngang nghĩa trang không?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.5,
+                "peak": 0.535339,
+                "rms": 0.065095,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.612766
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-03",
+      "sentence_id": "around-ward-learner-03",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-learner-03.wav",
+      "sha256": "35e246b60faf28ab3f82f80ce66bd9ad4d1cc153123c169e99bab6681ee4f5c5",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi không sợ ma nhưng tôi không đi gần mả vào ban đêm.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.55,
+            "peak": 0.654785,
+            "rms": 0.080907,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.735736
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi không sợ ma nhưng tôi không đi gần mả vào ban đêm.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.55,
+                "peak": 0.654785,
+                "rms": 0.080907,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.735736
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-03",
+      "sentence_id": "around-ward-learner-03",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-learner-03.wav",
+      "sha256": "64af58cd099fb672fd7242a0105c077fa479ffaafaf2b198b4edc0b8e33585ef",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Tôi không sợ ma, nhưng tôi không đi gần mả vào ban đêm.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 4.25,
+            "peak": 0.729218,
+            "rms": 0.073628,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.834586
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": false,
+              "transcript": "Ôi không sợ ma. Ninpo không vi gần ma vào ban đêm.",
+              "lexical_verified": false,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.45,
+                "peak": 0.664978,
+                "rms": 0.083799,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.719136
+              }
+            }
+          },
+          {
+            "model": "gpt-realtime-2.1",
+            "validation": {
+              "passed": true,
+              "transcript": "Tôi không sợ ma, nhưng tôi không đi gần mả vào ban đêm.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 4.25,
+                "peak": 0.729218,
+                "rms": 0.073628,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.834586
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime full model passed after mini failed ASR or contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-04",
+      "sentence_id": "around-ward-minh-04",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-minh-04.wav",
+      "sha256": "3ddf46669aec8344142d4abc5b8e3b8a584d17972f3501badf0044b4c100a02d",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Cánh đồng bên kia có gì vậy?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 2.0,
+            "peak": 0.769257,
+            "rms": 0.074875,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.75
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Cánh đồng bên kia có gì vậy?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 2.0,
+                "peak": 0.769257,
+                "rms": 0.074875,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.75
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-minh-04",
+      "sentence_id": "around-ward-minh-04",
+      "scene_id": "around-ward",
+      "speaker": "minh",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-minh-04.wav",
+      "sha256": "a4229cf0834bfec3b558ade2d9da6ddde61e2160c854875c98ca162d761ed2a0",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Cánh đồng bên kia có gì vậy?",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 1.85,
+            "peak": 0.650696,
+            "rms": 0.053546,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.5
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Cánh đồng bên kia có gì vậy?",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 1.85,
+                "peak": 0.650696,
+                "rms": 0.053546,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.5
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-04",
+      "sentence_id": "around-ward-learner-04",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "north",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/north/around-ward-learner-04.wav",
+      "sha256": "21f430dabf00b53c389836e746174c71149acfba56880018a873efea59145c1a",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Bà tôi đang cấy mạ ngoài đồng, còn tôi mang cơm ra cho bà.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.4,
+            "peak": 0.660492,
+            "rms": 0.075914,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.830721
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Bà tôi đang cấy mạ ngoài đồng, còn tôi mang cơm ra cho bà.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.4,
+                "peak": 0.660492,
+                "rms": 0.075914,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.830721
+              }
+            }
+          }
+        ]
+      },
+      "quality_note": "Realtime mini passed ASR and contour-presence checks"
+    },
+    {
+      "turn_id": "around-ward-learner-04",
+      "sentence_id": "around-ward-learner-04",
+      "scene_id": "around-ward",
+      "speaker": "learner",
+      "accent": "south",
+      "model": "gpt-realtime-2.1-mini",
+      "provider_voice": "cedar",
+      "display_voice": "Thầy Minh",
+      "path": "targets/echo/south/around-ward-learner-04.wav",
+      "sha256": "c6b492d1b9f5bb1b024671aeaa97a7024a3b59e4cff49e29ec7ffbb2589f5ecf",
+      "validation": {
+        "selected": {
+          "passed": true,
+          "transcript": "Bà tôi đang cấy mạ ngoài đồng, còn tôi mang cơm ra cho bà.",
+          "lexical_verified": true,
+          "contour_quality": {
+            "passed": true,
+            "duration_s": 3.7,
+            "peak": 0.782867,
+            "rms": 0.082293,
+            "clipping_fraction": 0.0,
+            "voiced_fraction": 0.755043
+          }
+        },
+        "attempts": [
+          {
+            "model": "gpt-realtime-2.1-mini",
+            "validation": {
+              "passed": true,
+              "transcript": "Bà tôi đang cấy mạ ngoài đồng, còn tôi mang cơm ra cho bà.",
+              "lexical_verified": true,
+              "contour_quality": {
+                "passed": true,
+                "duration_s": 3.7,
+                "peak": 0.782867,
+                "rms": 0.082293,
+                "clipping_fraction": 0.0,
+                "voiced_fraction": 0.755043
               }
             }
           }

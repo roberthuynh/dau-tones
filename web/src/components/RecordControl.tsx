@@ -9,6 +9,8 @@ type RecordControlProps = {
   idleHint?: string;
   processingLabel?: string;
   processingHint?: string;
+  disabled?: boolean;
+  disabledHint?: string;
 };
 
 export function RecordControl({
@@ -20,18 +22,22 @@ export function RecordControl({
   idleHint = "Tap once, say the word, then pause",
   processingLabel = "Reading your pitch",
   processingHint = "Mapping your voice against 64 pitch points",
+  disabled = false,
+  disabledHint = "A validated reference recording is needed first",
 }: RecordControlProps) {
   const recording = state === "recording";
   const busy = state === "requesting" || state === "processing";
   const scale = 1 + level * 0.26;
-  const stateLabel = recording ? "Recording now" : state === "requesting" ? "Opening microphone" : state === "processing" ? processingLabel : label;
+  const stateLabel = disabled ? "Reference pending" : recording ? "Recording now" : state === "requesting" ? "Opening microphone" : state === "processing" ? processingLabel : label;
   const stateHint = recording
     ? `${(elapsedMs / 1000).toFixed(1)}s · tap to finish early`
     : state === "requesting"
       ? "Allow microphone access in your browser"
       : state === "processing"
         ? processingHint
-        : idleHint;
+        : disabled
+          ? disabledHint
+          : idleHint;
 
   return (
     <div className={`record-control record-control--${state}`} aria-busy={busy}>
@@ -40,7 +46,7 @@ export function RecordControl({
         className={`record-button ${recording ? "record-button--live" : ""}`}
         style={{ "--mic-scale": scale } as React.CSSProperties}
         onClick={onToggle}
-        disabled={busy}
+        disabled={busy || disabled}
         aria-label={recording ? "Stop recording" : stateLabel}
         aria-pressed={recording}
       >

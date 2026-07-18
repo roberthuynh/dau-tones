@@ -278,7 +278,7 @@
       ],
       "usage_note": "Phương is presented here as a woman's name. The homograph phương can also mean direction; the compass art is a memory cue, not a claim about the name's etymology.",
       "art_concept": "a single elegant brass compass with a warm coral needle, used as a memory cue for the name Phương",
-      "minimal_pair_group": "phuong-name-test",
+      "minimal_pair_group": "phuong-six-tones",
       "minimal_pair_ids": [
         "phuong-ward",
         "phuong-phoenix"
@@ -299,7 +299,7 @@
       ],
       "usage_note": "Phường is an urban administrative ward in Vietnam.",
       "art_concept": "a welcoming Vietnamese urban ward office facade with a civic seal shape but no letters or numbers",
-      "minimal_pair_group": "phuong-name-test",
+      "minimal_pair_group": "phuong-six-tones",
       "minimal_pair_ids": [
         "phuong-name",
         "phuong-phoenix"
@@ -320,7 +320,7 @@
       ],
       "usage_note": "Phượng means phoenix and also names the flame tree in compounds such as hoa phượng.",
       "art_concept": "a graceful amber and coral phoenix bird folding its wings around one glowing feather",
-      "minimal_pair_group": "phuong-name-test",
+      "minimal_pair_group": "phuong-six-tones",
       "minimal_pair_ids": [
         "phuong-name",
         "phuong-ward"
@@ -549,16 +549,44 @@
       "copy": "You meant má, mother. You said ma, a ghost."
     }
   ],
+  "minimal_pair_groups": [
+    {
+      "id": "ma-six-tones",
+      "ascii_base": "ma",
+      "title": "The six meanings of ma",
+      "forms": [
+        { "tone": "ngang", "surface": "ma", "word_id": "ma-ghost", "meaning_en": "ghost" },
+        { "tone": "huyen", "surface": "mà", "word_id": "ma-but", "meaning_en": "but / that" },
+        { "tone": "sac", "surface": "má", "word_id": "ma-mother", "meaning_en": "mother" },
+        { "tone": "hoi", "surface": "mả", "word_id": "ma-grave", "meaning_en": "grave" },
+        { "tone": "nga", "surface": "mã", "word_id": "ma-code", "meaning_en": "code" },
+        { "tone": "nang", "surface": "mạ", "word_id": "ma-seedling", "meaning_en": "rice seedling" }
+      ]
+    },
+    {
+      "id": "phuong-six-tones",
+      "ascii_base": "phuong",
+      "title": "The Phương name test",
+      "forms": [
+        { "tone": "ngang", "surface": "Phương", "word_id": "phuong-name", "meaning_en": "Phương, a woman's name" },
+        { "tone": "huyen", "surface": "phường", "word_id": "phuong-ward", "meaning_en": "urban ward" },
+        { "tone": "sac", "surface": "phướng", "word_id": null, "meaning_en": null },
+        { "tone": "hoi", "surface": "phưởng", "word_id": null, "meaning_en": null },
+        { "tone": "nga", "surface": "phưỡng", "word_id": null, "meaning_en": null },
+        { "tone": "nang", "surface": "phượng", "word_id": "phuong-phoenix", "meaning_en": "phoenix" }
+      ]
+    }
+  ],
   "featured_queue": [
-    "phuong-name",
-    "phuong-ward",
-    "phuong-phoenix",
     "ma-ghost",
     "ma-but",
     "ma-mother",
     "ma-grave",
     "ma-code",
     "ma-seedling",
+    "phuong-name",
+    "phuong-ward",
+    "phuong-phoenix",
     "com-rice",
     "nha-home",
     "ca-fish",

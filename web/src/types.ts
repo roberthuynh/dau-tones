@@ -4,6 +4,48 @@ export type Accent = "north" | "south";
 
 export type ToneFamilyId = "level" | "falling" | "rising" | "dipping";
 
+export type ContourFeatures = {
+  start: number;
+  end: number;
+  slope: number;
+  curvature: number;
+  pitch_range: number;
+  minimum: number;
+  dip_position: number;
+  recovery: number;
+  final_rise: number;
+  duration_s: number;
+  voiced_fraction: number;
+  longest_voicing_gap_ms: number;
+  central_rms_dip: number;
+  terminal_energy_drop: number;
+};
+
+export type ClassifierTemplate = {
+  id: string;
+  word_id: string;
+  tone: ToneId;
+  accent: Accent;
+  contour: number[];
+  features: ContourFeatures;
+  validated: boolean;
+  source_path?: string;
+};
+
+export type ClassifierProfile = {
+  version: string;
+  manifest_hash: string;
+  accent: Accent;
+  scoring_mode: "six_tone" | "four_family";
+  temperature: number;
+  abstention_threshold: number;
+  minimum_margin: number;
+  feature_scales: number[];
+  corpus_complete: boolean;
+  missing_target_ids: string[];
+  templates: ClassifierTemplate[];
+};
+
 export type Tone = {
   id: ToneId;
   name_vi: string;
@@ -30,12 +72,28 @@ export type Word = {
   targets: Record<Accent, TargetReference>;
 };
 
+export type MinimalPairForm = {
+  tone: ToneId;
+  surface: string;
+  word_id: string | null;
+  meaning_en: string | null;
+};
+
+export type MinimalPairGroup = {
+  id: string;
+  ascii_base: string;
+  title: string;
+  forms: MinimalPairForm[];
+};
+
 export type WordsPayload = {
   tones: Tone[];
   words: Word[];
   featured_queue: string[];
   drills?: Record<string, { id: string; title: string; word_ids: string[] }>;
   scoring_modes: Record<Accent, "six_tone" | "four_family" | string>;
+  classifier_profiles?: Partial<Record<Accent, ClassifierProfile>>;
+  minimal_pair_groups?: MinimalPairGroup[];
 };
 
 export type AnalysisWord = {
@@ -67,6 +125,23 @@ export type RetrySignalQuality = {
   code: string;
   message: string;
   details?: Record<string, string | number>;
+};
+
+export type SemanticStatus =
+  | "exact_correct"
+  | "family_correct"
+  | "family_ambiguous"
+  | "wrong_known_word"
+  | "wrong_no_known_word"
+  | "uncertain";
+
+export type MeaningVerdict = {
+  status: SemanticStatus;
+  assertion_level: "exact" | "family" | "none";
+  detected_surface: string | null;
+  detected_meaning_en: string | null;
+  detected_word_id: string | null;
+  tone_mark_label: string;
 };
 
 export type AnalysisResult = {
@@ -105,9 +180,16 @@ export type AnalysisResult = {
   detected_word: AnalysisWord | null;
   verdict_copy: string | null;
   target_validated: boolean;
+  semantic_status: SemanticStatus;
+  class_confidence: number;
+  signal_confidence: number;
+  meaning_verdict: MeaningVerdict;
+  classifier_version: string;
+  classifier_manifest_hash: string;
 };
 
 export type CoachResult = {
+  observation?: string;
   coaching_sentence: string;
   next_word: string;
   rationale: string;

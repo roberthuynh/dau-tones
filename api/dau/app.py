@@ -7,7 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 from threading import Lock
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,21 +15,22 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from .analysis_service import (
-    SignalQualityError,
-    analyze_recording,
-    scoring_mode,
-    warm_analysis_runtime,
-)
 from .coach import coach, generate_drill
 from .content import demo_document, echo_document, public_words, reference_corpus_is_complete
-from .echo import align_transcript, literal_explanation, normalize_text
+from .echo import (
+    align_transcript,
+    detected_tone_metadata,
+    literal_explanation,
+    meaning_status,
+    normalize_text,
+    practice_word_ids,
+)
 from .models import IMAGE_MODEL, TEXT_MODEL, TRANSCRIPTION_MODEL
-from .realtime_audio import synthesize_utterance
 from .schemas import (
     AnalysisResponse,
     CoachRequest,
     DrillRequest,
+    EchoScenesResponse,
     EchoSpeakRequest,
     EchoTranscribeResponse,
 )
@@ -81,16 +82,22 @@ def _openai_client(key: str, *, timeout: float) -> Any:
     return OpenAI(api_key=key, timeout=timeout, max_retries=0)
 
 
+def warm_analysis_runtime(timing: dict[str, float]) -> bool:
+    """Load the pitch stack only when the compatibility warmup is explicitly called."""
+
+    from .analysis_service import warm_analysis_runtime as warm
+
+    return warm(timing)
+
+
 def _health() -> dict[str, Any]:
     key = has_openai_key()
+    modes = public_words().get("scoring_modes", {"north": "four_family", "south": "four_family"})
     return {
         "status": "ok",
         "ready": True,
         "reference_corpus_validated": reference_corpus_is_complete(),
-        "scoring_modes": {
-            "north": "six_tone" if scoring_mode("north").value == "six-tone" else "four_family",
-            "south": "four_family",
-        },
+        "scoring_modes": modes,
         "capabilities": {
             "local_dsp": True,
             "ai_coaching": key,
@@ -136,6 +143,8 @@ async def analyze(
     intended_tone: Annotated[str, Form()],
     accent: Annotated[str, Form()] = "north",
 ) -> JSONResponse:
+    from . import analysis_service
+
     payload = await audio.read(MAX_UPLOAD_BYTES + 1)
     if len(payload) > MAX_UPLOAD_BYTES:
         raise HTTPException(
@@ -144,7 +153,7 @@ async def analyze(
     timing: dict[str, float] = {}
     try:
         result = await run_in_threadpool(
-            analyze_recording,
+            analysis_service.analyze_recording,
             payload,
             word_id=word,
             intended_tone=intended_tone,
@@ -155,7 +164,7 @@ async def analyze(
             AnalysisResponse.model_validate(result).model_dump(mode="json"),
             headers={"Server-Timing": _server_timing(timing)},
         )
-    except SignalQualityError as error:
+    except analysis_service.SignalQualityError as error:
         return JSONResponse(
             status_code=422,
             content={"detail": {**error.as_dict(), "needs_retry": True}},
@@ -228,6 +237,8 @@ def demos() -> dict[str, Any]:
 
 @router.get("/echo/sentences")
 def echo_sentences() -> dict[str, Any]:
+    """Compatibility alias: expose learner turns in the legacy sentence shape."""
+
     sentences = []
     for item in echo_document().get("sentences", []):
         sentences.append(
@@ -242,16 +253,69 @@ def echo_sentences() -> dict[str, Any]:
     return {"sentences": sentences}
 
 
-def _sentence(sentence_id: str) -> dict[str, Any]:
+def _public_echo_turn(turn: dict[str, Any]) -> dict[str, Any]:
+    return {
+        **turn,
+        "audio_urls": {
+            accent: f"/audio/echo/{accent}/{turn['id']}.wav" for accent in ("north", "south")
+        },
+        "compatibility_audio_urls": {
+            accent: f"/api/echo/speak/{accent}/{turn['id']}.wav" for accent in ("north", "south")
+        },
+    }
+
+
+@router.get("/echo/scenes", response_model=EchoScenesResponse)
+def echo_scenes() -> dict[str, Any]:
+    document = echo_document()
+    scenes = [
+        {
+            **scene,
+            "offline_demo": {
+                **scene["offline_demo"],
+                "audio_url": f"/audio/demos/echo/{scene['offline_demo']['id']}.wav",
+            },
+            "turns": [_public_echo_turn(turn) for turn in scene.get("turns", [])],
+        }
+        for scene in document.get("scenes", [])
+    ]
+    return {
+        "schema_version": document.get("schema_version", 2),
+        "locale": document.get("locale", "vi-VN"),
+        "scenes": scenes,
+    }
+
+
+def _echo_entry(entry_id: str) -> dict[str, Any]:
+    document = echo_document()
     item = next(
-        (entry for entry in echo_document().get("sentences", []) if entry.get("id") == sentence_id),
+        (
+            entry
+            for entry in document.get("turns", []) + document.get("legacy_sentences", [])
+            if entry.get("id") == entry_id
+        ),
         None,
     )
     if item is None:
         raise HTTPException(
-            404, detail={"code": "unknown_sentence", "message": "Choose a seeded Echo sentence."}
+            404,
+            detail={"code": "unknown_sentence", "message": "Choose a seeded Echo dialogue line."},
         )
-    return item
+    return cast(dict[str, Any], item)
+
+
+def _sentence(sentence_id: str) -> dict[str, Any]:
+    """Retain the old resolver name for cached clients and tests."""
+
+    return _echo_entry(sentence_id)
+
+
+def _offline_demo(demo_id: str) -> dict[str, Any] | None:
+    for scene in echo_document().get("scenes", []):
+        demo = scene.get("offline_demo", {})
+        if demo.get("id") == demo_id:
+            return {**demo, "scene_id": scene["id"]}
+    return None
 
 
 def _ai_explanation(target: str, transcript: str, diff: list[dict[str, Any]], fallback: str) -> str:
@@ -282,7 +346,9 @@ def _ai_explanation(target: str, transcript: str, diff: list[dict[str, Any]], fa
                 },
             ],
             text_format=EchoExplanation,
-            max_output_tokens=100,
+            # Leave room for GPT-5.6's low-effort reasoning plus the tiny JSON
+            # payload. Smaller caps can finish with output_parsed=None.
+            max_output_tokens=400,
         )
         return response.output_parsed.explanation if response.output_parsed else fallback
     except Exception:
@@ -318,11 +384,19 @@ def _generate_reveal(explanation: str) -> bytes:
 
 @router.post("/echo/transcribe", response_model=EchoTranscribeResponse)
 async def echo_transcribe(
-    sentence_id: Annotated[str, Form()],
+    turn_id: Annotated[str | None, Form()] = None,
+    sentence_id: Annotated[str | None, Form()] = None,
     demo_id: Annotated[str | None, Form()] = None,
     audio: Annotated[UploadFile | None, File()] = None,
 ) -> dict[str, Any]:
-    sentence = _sentence(sentence_id)
+    requested_id = turn_id or sentence_id
+    if not requested_id:
+        raise HTTPException(
+            400,
+            detail={"code": "missing_turn", "message": "Choose a dialogue line to practice."},
+        )
+    sentence = _echo_entry(requested_id)
+    resolved_turn_id = sentence["id"]
     source = "fixture"
     transcript: str
     if demo_id:
@@ -334,7 +408,10 @@ async def echo_transcribe(
             ),
             None,
         )
-        if demo is None or demo.get("sentence_id") != sentence_id:
+        if demo is None:
+            demo = _offline_demo(demo_id)
+        demo_turn_id = (demo or {}).get("turn_id") or (demo or {}).get("sentence_id")
+        if demo is None or demo_turn_id != resolved_turn_id:
             raise HTTPException(
                 404, detail={"code": "unknown_demo", "message": "That Echo demo is unavailable."}
             )
@@ -382,17 +459,27 @@ async def echo_transcribe(
     reveal_id = None
     if has_openai_key() and any(item.get("kind") != "match" for item in diff):
         reveal_id = _reveal_cache_id(fallback)
-    return EchoTranscribeResponse(
-        sentence_id=sentence_id,
-        target_text=sentence["text"],
-        transcript=normalize_text(transcript),
-        tokens=diff,
-        explanation=explanation,
-        literal_explanation=fallback,
-        source=source,
-        reveal_id=reveal_id,
-        target=sentence["text"],
-        diff=diff,
+    practice_ids = practice_word_ids(diff)
+    tone_changes = detected_tone_metadata(diff)
+    return EchoTranscribeResponse.model_validate(
+        {
+            "sentence_id": resolved_turn_id,
+            "scene_id": sentence.get("scene_id"),
+            "turn_id": resolved_turn_id,
+            "next_turn_id": sentence.get("next_turn_id"),
+            "target_text": sentence["text"],
+            "transcript": normalize_text(transcript),
+            "tokens": diff,
+            "practice_word_ids": practice_ids,
+            "detected_tones": tone_changes,
+            "meaning_status": meaning_status(diff),
+            "explanation": explanation,
+            "literal_explanation": fallback,
+            "source": source,
+            "reveal_id": reveal_id,
+            "target": sentence["text"],
+            "diff": diff,
+        }
     ).model_dump(mode="json")
 
 
@@ -482,7 +569,7 @@ def echo_reveal_image(reveal_id: str) -> Response:
 
 @router.get("/echo/speak/{accent}/{sentence_id}.wav")
 def seeded_echo_speech(accent: str, sentence_id: str) -> FileResponse:
-    _sentence(sentence_id)
+    _echo_entry(sentence_id)
     if accent not in {"north", "south"}:
         raise HTTPException(404, detail="Unknown accent")
     return FileResponse(
@@ -494,8 +581,9 @@ def seeded_echo_speech(accent: str, sentence_id: str) -> FileResponse:
 
 @router.post("/echo/speak")
 def echo_speak(request: EchoSpeakRequest) -> Response:
-    if request.sentence_id:
-        item = _sentence(request.sentence_id)
+    requested_id = request.turn_id or request.sentence_id
+    if requested_id:
+        item = _echo_entry(requested_id)
         path = REPO_ROOT / item["shadow_audio"][request.accent]
         if path.is_file():
             return FileResponse(
@@ -519,6 +607,8 @@ def echo_speak(request: EchoSpeakRequest) -> Response:
             },
         )
     try:
+        from .realtime_audio import synthesize_utterance
+
         wav = synthesize_utterance(text, accent=request.accent)
     except Exception as error:
         raise HTTPException(

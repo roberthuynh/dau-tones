@@ -18,6 +18,7 @@ htmlcov/
 
 # JavaScript
 node_modules/
+.vite/
 web/dist/
 web/test-results/
 web/playwright-report/
@@ -29,6 +30,7 @@ api/.cache/
 api/data/generated/
 targets/candidates/
 targets/rejected/
+tmp/imagegen/
 
 # Hosting metadata
 .vercel/

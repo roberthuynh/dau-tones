@@ -7,7 +7,9 @@ DAU_CACHE_DIR="$DAU_ROOT/.cache"
 DAU_API_LOG="$DAU_CACHE_DIR/api.log"
 DAU_WEB_LOG="$DAU_CACHE_DIR/web.log"
 
-mkdir -p "$DAU_TOOLS_DIR" "$DAU_CACHE_DIR/numba"
+export UV_CACHE_DIR="$DAU_CACHE_DIR/uv"
+export UV_PYTHON_INSTALL_DIR="$DAU_TOOLS_DIR/python"
+mkdir -p "$DAU_TOOLS_DIR" "$DAU_CACHE_DIR/numba" "$UV_CACHE_DIR" "$UV_PYTHON_INSTALL_DIR"
 
 if command -v uv >/dev/null 2>&1; then
   DAU_UV="$(command -v uv)"
@@ -37,7 +39,7 @@ if (( DAU_NODE_MAJOR < 22 )); then
 fi
 
 install_api() {
-  "$DAU_UV" python install 3.11
+  "$DAU_UV" python install 3.11 --no-bin
   if [[ -f "$DAU_ROOT/api/uv.lock" ]]; then
     "$DAU_UV" sync --project "$DAU_ROOT/api" --python 3.11 --frozen
   else
@@ -67,11 +69,17 @@ if (( DAU_INSTALL_STATUS != 0 )); then
   exit "$DAU_INSTALL_STATUS"
 fi
 
+DAU_PYTHON="$DAU_ROOT/api/.venv/bin/python"
+DAU_UVICORN="$DAU_ROOT/api/.venv/bin/uvicorn"
+DAU_VITE="$DAU_ROOT/web/node_modules/.bin/vite"
+if [[ ! -x "$DAU_PYTHON" || ! -x "$DAU_UVICORN" || ! -x "$DAU_VITE" ]]; then
+  echo "The local API or web runtime did not install correctly." >&2
+  exit 1
+fi
+
 echo "Warming the local pYIN pitch tracker..."
-NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UV" run \
-  --project "$DAU_ROOT/api" \
-  --python 3.11 \
-  python -c 'import numpy as np, librosa; sr=22050; t=np.arange(int(sr*0.35))/sr; y=(0.12*np.sin(2*np.pi*220*t)).astype(np.float32); librosa.pyin(y, fmin=65, fmax=650, sr=sr, frame_length=1024, hop_length=256)'
+NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_PYTHON" \
+  -c 'import numpy as np, librosa; sr=22050; t=np.arange(int(sr*0.35))/sr; y=(0.12*np.sin(2*np.pi*220*t)).astype(np.float32); librosa.pyin(y, fmin=65, fmax=650, sr=sr, frame_length=1024, hop_length=256)'
 
 DAU_API_PID=""
 DAU_WEB_PID=""
@@ -90,20 +98,14 @@ trap cleanup EXIT INT TERM
 : > "$DAU_WEB_LOG"
 
 if [[ -f "$DAU_ROOT/.env.local" ]]; then
-  NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UV" run \
-    --project "$DAU_ROOT/api" \
-    --python 3.11 \
-    uvicorn dau.app:app \
+  NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UVICORN" dau.app:app \
     --app-dir "$DAU_ROOT/api" \
     --host 127.0.0.1 \
     --port 8000 \
     --env-file "$DAU_ROOT/.env.local" \
     >"$DAU_API_LOG" 2>&1 &
 else
-  NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UV" run \
-    --project "$DAU_ROOT/api" \
-    --python 3.11 \
-    uvicorn dau.app:app \
+  NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UVICORN" dau.app:app \
     --app-dir "$DAU_ROOT/api" \
     --host 127.0.0.1 \
     --port 8000 \
@@ -111,9 +113,10 @@ else
 fi
 DAU_API_PID=$!
 
-npm --prefix "$DAU_ROOT/web" run dev -- \
+"$DAU_VITE" "$DAU_ROOT/web" \
   --host 127.0.0.1 \
   --port 5173 \
+  --strictPort \
   >"$DAU_WEB_LOG" 2>&1 &
 DAU_WEB_PID=$!
 

@@ -6,7 +6,7 @@ import hashlib
 import json
 import shutil
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from dau.content import target_manifest
 from dau.settings import DATA_ROOT, REPO_ROOT, TARGETS_ROOT
@@ -38,7 +38,7 @@ def _validated_source(word_id: str, accent: str) -> Path:
     )
     if not target or not target.get("validation", {}).get("passed"):
         raise RuntimeError(f"Missing validated source target: {accent}/{word_id}")
-    source = REPO_ROOT / target["path"]
+    source = REPO_ROOT / cast(str, target["path"])
     if not source.is_file():
         raise RuntimeError(f"Validated source file is absent: {source}")
     if hashlib.sha256(source.read_bytes()).hexdigest() != target.get("sha256"):

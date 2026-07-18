@@ -124,6 +124,19 @@ export async function analyzeRecording(audio: Blob, wordId: string, intendedTone
         detected_word: null,
         verdict_copy: null,
         target_validated: false,
+        semantic_status: "uncertain",
+        class_confidence: 0,
+        signal_confidence: 0,
+        meaning_verdict: {
+          status: "uncertain",
+          assertion_level: "none",
+          detected_surface: null,
+          detected_meaning_en: null,
+          detected_word_id: null,
+          tone_mark_label: "",
+        },
+        classifier_version: "retry-v1",
+        classifier_manifest_hash: "",
       };
     }
     throw error;

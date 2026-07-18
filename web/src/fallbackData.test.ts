@@ -1,13 +1,16 @@
-import { demoAnalysis, FALLBACK_ECHO_SENTENCES, FALLBACK_PAYLOAD, pedagogicalContour } from "./fallbackData";
+import { demoAnalysis, FALLBACK_PAYLOAD, pedagogicalContour } from "./fallbackData";
+import { ECHO_SCENES } from "./lib/echoCourse";
 
 describe("committed offline experience", () => {
-  it("starts with the Phương name minimal pair", () => {
-    expect(FALLBACK_PAYLOAD.featured_queue.slice(0, 3)).toEqual(["phuong-name", "phuong-ward", "phuong-phoenix"]);
+  it("starts with the complete six-tone ma lesson", () => {
+    expect(FALLBACK_PAYLOAD.featured_queue.slice(0, 6)).toEqual(["ma-ghost", "ma-but", "ma-mother", "ma-grave", "ma-code", "ma-seedling"]);
   });
 
-  it("ships all six ma meanings and all eight Echo sentences", () => {
+  it("ships all six ma meanings and the four-scene Echo course", () => {
     expect(FALLBACK_PAYLOAD.words.filter((word) => word.id.startsWith("ma-")).map((word) => word.syllable)).toEqual(["ma", "mà", "má", "mả", "mã", "mạ"]);
-    expect(FALLBACK_ECHO_SENTENCES).toHaveLength(8);
+    expect(ECHO_SCENES).toHaveLength(4);
+    expect(ECHO_SCENES.flatMap((scene) => scene.turns)).toHaveLength(26);
+    expect(ECHO_SCENES.flatMap((scene) => scene.turns).filter((turn) => turn.role === "learner")).toHaveLength(13);
   });
 
   it("keeps every pedagogical contour at the 64-point API contract", () => {

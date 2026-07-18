@@ -120,6 +120,12 @@ const WORD_ROWS: Array<[string, string, ToneId, string, string]> = [
 
 const MA_IDS = ["ma-ghost", "ma-but", "ma-mother", "ma-grave", "ma-code", "ma-seedling"];
 const PHUONG_IDS = ["phuong-name", "phuong-ward", "phuong-phoenix"];
+const MISSING_TARGETS = new Set([
+  "north:ma-grave",
+  "north:pho-noodle-soup",
+  "south:ma-grave",
+  "south:phuong-phoenix",
+]);
 
 export const FALLBACK_WORDS: Word[] = WORD_ROWS.map(([id, syllable, tone, meaning_en, usage_note]) => ({
   id,
@@ -132,25 +138,57 @@ export const FALLBACK_WORDS: Word[] = WORD_ROWS.map(([id, syllable, tone, meanin
   minimal_pair_ids: id.startsWith("ma-") ? MA_IDS.filter((value) => value !== id) : id.startsWith("phuong-") ? PHUONG_IDS.filter((value) => value !== id) : [],
   targets: {
     north: {
-      audio_url: `/api/targets/north/${id}.wav`,
+      audio_url: MISSING_TARGETS.has(`north:${id}`) ? "" : `/audio/targets/north/${id}.wav`,
       contour: pedagogicalContour(tone, "north"),
-      validated: false,
+      validated: !MISSING_TARGETS.has(`north:${id}`),
     },
     south: {
-      audio_url: `/api/targets/south/${id}.wav`,
+      audio_url: MISSING_TARGETS.has(`south:${id}`) ? "" : `/audio/targets/south/${id}.wav`,
       contour: pedagogicalContour(tone, "south"),
-      validated: false,
+      validated: !MISSING_TARGETS.has(`south:${id}`),
     },
   },
 }));
 
-export const FEATURED_QUEUE = WORD_ROWS.map(([id]) => id);
+export const FEATURED_QUEUE = [
+  ...MA_IDS,
+  ...PHUONG_IDS,
+  ...WORD_ROWS.map(([id]) => id).filter((id) => !MA_IDS.includes(id) && !PHUONG_IDS.includes(id)),
+];
 
 export const FALLBACK_PAYLOAD: WordsPayload = {
   tones: TONES,
   words: FALLBACK_WORDS,
   featured_queue: FEATURED_QUEUE,
   scoring_modes: { north: "four_family", south: "four_family" },
+  minimal_pair_groups: [
+    {
+      id: "ma-six-tones",
+      ascii_base: "ma",
+      title: "The six meanings of ma",
+      forms: [
+        { tone: "ngang", surface: "ma", word_id: "ma-ghost", meaning_en: "ghost" },
+        { tone: "huyen", surface: "mà", word_id: "ma-but", meaning_en: "but / that" },
+        { tone: "sac", surface: "má", word_id: "ma-mother", meaning_en: "mother" },
+        { tone: "hoi", surface: "mả", word_id: "ma-grave", meaning_en: "grave" },
+        { tone: "nga", surface: "mã", word_id: "ma-code", meaning_en: "code" },
+        { tone: "nang", surface: "mạ", word_id: "ma-seedling", meaning_en: "rice seedling" },
+      ],
+    },
+    {
+      id: "phuong-six-tones",
+      ascii_base: "phuong",
+      title: "The Phương name test",
+      forms: [
+        { tone: "ngang", surface: "Phương", word_id: "phuong-name", meaning_en: "Phương, a woman's name" },
+        { tone: "huyen", surface: "phường", word_id: "phuong-ward", meaning_en: "urban ward" },
+        { tone: "sac", surface: "phướng", word_id: null, meaning_en: null },
+        { tone: "hoi", surface: "phưởng", word_id: null, meaning_en: null },
+        { tone: "nga", surface: "phưỡng", word_id: null, meaning_en: null },
+        { tone: "nang", surface: "phượng", word_id: "phuong-phoenix", meaning_en: "phoenix" },
+      ],
+    },
+  ],
   drills: {
     food: { id: "food", title: "At the table", word_ids: ["com-rice", "ca-fish", "pho-noodle-soup", "sua-milk", "ma-mother", "ma-ghost"] },
     family: { id: "family", title: "Names and family", word_ids: ["phuong-name", "phuong-ward", "phuong-phoenix", "ma-mother", "me-mother", "ban-friend", "nha-home"] },
@@ -239,12 +277,37 @@ export function demoAnalysis(id: "phuong-ward" | "ma-ghost" | "ma-correct", acce
           ? "You meant má, mother. You said ma, a ghost."
           : null,
     target_validated: false,
+    semantic_status: correct ? "family_correct" : "wrong_known_word",
+    class_confidence: confidence,
+    signal_confidence: 0.92,
+    meaning_verdict: {
+      status: correct ? "family_correct" : "wrong_known_word",
+      assertion_level: "family",
+      detected_surface: detectedWord.syllable,
+      detected_meaning_en: detectedWord.meaning_en,
+      detected_word_id: detectedWord.id,
+      tone_mark_label:
+        detectedTone === "ngang"
+          ? "không dấu"
+          : detectedTone === "huyen"
+            ? "dấu huyền"
+            : detectedTone === "sac"
+              ? "dấu sắc"
+              : detectedTone === "hoi"
+                ? "dấu hỏi"
+                : detectedTone === "nga"
+                  ? "dấu ngã"
+                  : "dấu nặng",
+    },
+    classifier_version: "committed-demo-v2",
+    classifier_manifest_hash: "offline-demo-receipt",
   };
 }
 
 export function demoCoach(id: "phuong-ward" | "ma-ghost" | "ma-correct"): CoachResult {
   if (id === "phuong-ward") {
     return {
+      observation: "Your ending fell toward the falling family instead of staying level.",
       coaching_sentence: "Hold your chin steady and carry Phương straight across without letting the ending sink.",
       next_word: "phuong-ward",
       rationale: "Contrast the level name with phường while that accidental fall is fresh.",
@@ -253,6 +316,7 @@ export function demoCoach(id: "phuong-ward" | "ma-ghost" | "ma-correct"): CoachR
   }
   if (id === "ma-ghost") {
     return {
+      observation: "Your pitch stayed level instead of rising through the final half of má.",
       coaching_sentence: "Start má lower, then lift your chin and let the vowel climb all the way through.",
       next_word: "ma-mother",
       rationale: "Repeat má because your rising tone flattened into ngang.",
@@ -260,6 +324,7 @@ export function demoCoach(id: "phuong-ward" | "ma-ghost" | "ma-correct"): CoachR
     };
   }
   return {
+    observation: "Your pitch rose in the same direction as the validated má target.",
     coaching_sentence: "Keep that low start and clean upward sweep; your rise matched the target.",
     next_word: "ma-code",
     rationale: "Move to mã to add a throat catch before a second kind of rise.",

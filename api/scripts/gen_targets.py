@@ -10,11 +10,11 @@ import threading
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import librosa
 import numpy as np
-import soundfile as sf
+import soundfile as sf  # type: ignore[import-untyped]
 from openai import OpenAI
 
 from dau.content import inventory_document, word_surface
@@ -45,7 +45,7 @@ def _validate(
             accent=accent,
             lexical_verified=lexical_verified,
         )
-        return result.as_dict() if hasattr(result, "as_dict") else result
+        return cast(dict[str, Any], result.as_dict() if hasattr(result, "as_dict") else result)
     if hasattr(tones, "analyze_audio"):
         extracted = tones.analyze_audio(path)
         return {
@@ -188,7 +188,7 @@ def _generate_candidate(
     print(
         f"{accent}/{word_surface(word)} {source_mode} take {take}: "
         f"{'PASS' if validation.get('passed') else 'reject'} "
-        f"{','.join(validation.get('reason_codes', []))}"
+        f"{','.join(cast(list[str], validation.get('reason_codes', [])))}"
     )
     return candidate
 

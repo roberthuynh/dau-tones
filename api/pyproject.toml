@@ -55,6 +55,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 python_version = "3.11"
 strict = true
 warn_unused_configs = true
+exclude = ["^dau/_librosa_stubs/"]
 
 [tool.coverage.run]
 branch = true

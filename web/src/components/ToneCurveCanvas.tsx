@@ -11,6 +11,7 @@ type ToneCurveCanvasProps = {
   revealKey?: string | number;
   correct?: boolean;
   ariaLabel: string;
+  targetLabel?: string;
 };
 
 type CanvasSize = { width: number; height: number };
@@ -61,7 +62,7 @@ function strokeCurve(
   context.restore();
 }
 
-export function ToneCurveCanvas({ target, learner, ghost, toneColor, ghostColor = "#ffffff", revealKey = 0, correct = false, ariaLabel }: ToneCurveCanvasProps) {
+export function ToneCurveCanvas({ target, learner, ghost, toneColor, ghostColor = "#ffffff", revealKey = 0, correct = false, ariaLabel, targetLabel = "reference target" }: ToneCurveCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<CanvasSize>({ width: 800, height: 360 });
@@ -136,7 +137,7 @@ export function ToneCurveCanvas({ target, learner, ghost, toneColor, ghostColor 
   return (
     <div ref={wrapperRef} className={`curve-canvas ${correct ? "curve-canvas--correct" : ""}`}>
       <canvas ref={canvasRef} role="img" aria-label={ariaLabel} />
-      <span className="curve-label curve-label--target">reference target</span>
+      <span className="curve-label curve-label--target">{targetLabel}</span>
       {learner ? <span className="curve-label curve-label--learner">what you said</span> : null}
     </div>
   );

@@ -8,6 +8,14 @@ from pydantic import BaseModel, Field, field_validator
 
 ToneId = Literal["ngang", "huyen", "sac", "hoi", "nga", "nang"]
 ToneFamilyId = Literal["level", "falling", "rising", "dipping"]
+SemanticStatus = Literal[
+    "exact_correct",
+    "family_correct",
+    "family_ambiguous",
+    "wrong_known_word",
+    "wrong_no_known_word",
+    "uncertain",
+]
 
 
 class CoachRequest(BaseModel):
@@ -17,6 +25,7 @@ class CoachRequest(BaseModel):
 
 
 class CoachResponse(BaseModel):
+    observation: str = Field(min_length=4, max_length=180)
     coaching_sentence: str = Field(min_length=4, max_length=180)
     next_word: str
     rationale: str = Field(min_length=4, max_length=180)
@@ -40,18 +49,83 @@ class DrillSelection(BaseModel):
 
 
 class EchoSpeakRequest(BaseModel):
+    turn_id: str | None = None
     sentence_id: str | None = None
     text: str | None = Field(default=None, max_length=220)
     accent: Literal["north", "south"] = "north"
+
+
+class EchoFocus(BaseModel):
+    token_index: int = Field(ge=0)
+    token: str
+    tone: ToneId
+    word_id: str | None = None
+    meaning_en: str | None = None
+
+
+class EchoTurn(BaseModel):
+    id: str
+    scene_id: str
+    speaker: Literal["minh", "learner"]
+    role_label: str
+    text: str
+    gloss_en: str
+    turn_index: int = Field(ge=0)
+    learner_turn_number: int | None = None
+    next_turn_id: str | None = None
+    previous_turn_id: str | None = None
+    focuses: list[EchoFocus]
+    focus_word_ids: list[str]
+    audio_urls: dict[Literal["north", "south"], str]
+    literal_stakes: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class EchoScene(BaseModel):
+    id: str
+    order: int = Field(ge=1)
+    title: str
+    title_vi: str
+    description: str
+    art_url: str
+    offline_demo: dict[str, Any]
+    turns: list[EchoTurn]
+
+
+class EchoScenesResponse(BaseModel):
+    schema_version: int
+    locale: str
+    scenes: list[EchoScene]
 
 
 class EchoDiffToken(BaseModel):
     target: str | None = None
     heard: str | None = None
     kind: Literal["match", "tone_only", "lexical", "missing", "extra"]
+    target_index: int | None = None
+    heard_index: int | None = None
     target_word_id: str | None = None
     heard_word_id: str | None = None
+    target_tone: ToneId | None = None
+    heard_tone: ToneId | None = None
+    semantic_status: Literal[
+        "match",
+        "known_word",
+        "no_known_meaning",
+        "lexical_change",
+        "not_applicable",
+    ] = "not_applicable"
     meaning_explanation: str | None = None
+
+
+class EchoDetectedTone(BaseModel):
+    token_index: int
+    target: str
+    heard: str
+    intended_tone: ToneId
+    detected_tone: ToneId
+    target_word_id: str | None = None
+    heard_word_id: str | None = None
+    semantic_status: Literal["known_word", "no_known_meaning"]
 
 
 class AnalysisAlternative(BaseModel):
@@ -66,6 +140,15 @@ class AnalysisWord(BaseModel):
     surface: str
     meaning_en: str
     art_url: str
+
+
+class AnalysisMeaningVerdict(BaseModel):
+    status: SemanticStatus
+    assertion_level: Literal["exact", "family", "none"]
+    detected_surface: str | None = None
+    detected_meaning_en: str | None = None
+    detected_word_id: str | None = None
+    tone_mark_label: str
 
 
 class AnalysisResponse(BaseModel):
@@ -98,13 +181,31 @@ class AnalysisResponse(BaseModel):
     detected_word: AnalysisWord | None = None
     verdict_copy: str | None = None
     target_validated: bool
+    semantic_status: SemanticStatus
+    class_confidence: float = Field(ge=0.0, le=0.95)
+    signal_confidence: float = Field(ge=0.0, le=1.0)
+    meaning_verdict: AnalysisMeaningVerdict
+    classifier_version: str
+    classifier_manifest_hash: str
 
 
 class EchoTranscribeResponse(BaseModel):
     sentence_id: str
+    scene_id: str | None = None
+    turn_id: str
+    next_turn_id: str | None = None
     target_text: str
     transcript: str
     tokens: list[EchoDiffToken]
+    practice_word_ids: list[str]
+    detected_tones: list[EchoDetectedTone]
+    meaning_status: Literal[
+        "exact_match",
+        "known_word_change",
+        "no_known_meaning",
+        "lexical_change",
+        "missing_or_extra",
+    ]
     explanation: str
     literal_explanation: str
     source: str
