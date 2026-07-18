@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { demoAnalysis, demoCoach, toneById, wordById } from "../fallbackData";
 import { useAudioPlayback } from "../hooks/useAudioPlayback";
 import { useRecorder } from "../hooks/useRecorder";
-import { analyzeCommittedDemo, analyzeRecording, generateDrill, getCoach } from "../lib/api";
+import { analyzeCommittedDemo, generateDrill, getCoach } from "../lib/api";
+import { analyzeLocally } from "../lib/localDsp";
 import type { Accent, AnalysisResult, CoachResult, DemoId, SessionToneStat, Word, WordsPayload } from "../types";
 import { ArrowIcon, PlayIcon, SparkIcon, VolumeIcon } from "./Icons";
 import { CoDau } from "./CoDau";
@@ -142,13 +143,13 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
       setCoach(null);
       setError(null);
       try {
-        const analysis = await analyzeRecording(blob, currentWord.id, currentWord.tone, accent);
+        const analysis = await analyzeLocally(blob, currentWord, accent, payload);
         acceptResult(analysis);
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Dấu could not read that recording. Try a single clear word.");
       }
     },
-    [accent, acceptResult, currentWord.id, currentWord.tone],
+    [accent, acceptResult, currentWord, payload],
   );
 
   const recorder = useRecorder({
