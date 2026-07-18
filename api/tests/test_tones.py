@@ -22,6 +22,7 @@ from dau.tones import (
     decode_audio,
     expected_tone_contour,
     extract_pitch_contour,
+    extract_pitch_contour_fast,
     feature_differences,
     isolate_primary_speech,
     tips_from_differences,
@@ -125,6 +126,22 @@ def test_silence_is_a_typed_quality_error() -> None:
         isolate_primary_speech(np.zeros(22_050), 22_050)
     assert captured.value.code is SignalQualityCode.SILENCE
     assert captured.value.as_dict()["code"] == "silence"
+
+
+def test_fast_extractor_preserves_a_rising_shape() -> None:
+    sample_rate = 22_050
+    duration = 0.72
+    time = np.arange(round(sample_rate * duration)) / sample_rate
+    frequency = 145.0 + 95.0 * (time / duration) ** 1.4
+    phase = 2 * np.pi * np.cumsum(frequency) / sample_rate
+    envelope = np.sin(np.linspace(0.0, np.pi, time.size)) ** 2
+    voice = (0.22 * envelope * np.sin(phase)).astype(np.float32)
+
+    contour = extract_pitch_contour_fast(voice, sample_rate)
+
+    assert contour.points.shape == (64,)
+    assert contour.features.end > contour.features.start + 4.0
+    assert contour.quality.voiced_fraction > 0.5
 
 
 def test_pcm_wav_uses_standard_decoder_without_importing_pyav(monkeypatch) -> None:

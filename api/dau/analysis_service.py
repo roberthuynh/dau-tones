@@ -33,6 +33,7 @@ from .tones import (
     contour_from_points,
     decode_audio,
     extract_pitch_contour,
+    extract_pitch_contour_fast,
     feature_differences,
     tips_from_differences,
     tone_family,
@@ -75,14 +76,16 @@ def _extract_with_runtime_guard(
     if _ANALYSIS_RUNTIME_READY.is_set():
         return _extract_audio(audio, timing)
 
-    wait_started = perf_counter()
-    with _ANALYSIS_RUNTIME_LOCK:
-        _record_timing(timing, "runtime_wait", wait_started)
-        if not _ANALYSIS_RUNTIME_READY.is_set():
-            learner = _extract_audio(audio, timing)
-            _ANALYSIS_RUNTIME_READY.set()
-            return learner
-    return _extract_audio(audio, timing)
+    # Never make a learner wait for another instance's pYIN JIT compilation.
+    # The page warms pYIN in the background; a newly scaled instance answers
+    # immediately with deterministic YIN and the same downstream classifier.
+    started = perf_counter()
+    samples, sample_rate = decode_audio(audio)
+    _record_timing(timing, "decode", started)
+    started = perf_counter()
+    learner = extract_pitch_contour_fast(samples, sample_rate)
+    _record_timing(timing, "pitch_fast", started)
+    return learner
 
 
 def warm_analysis_runtime(timing: dict[str, float] | None = None) -> bool:

@@ -264,7 +264,10 @@ def test_signature_audio_demo_runs_through_validated_partial_templates(monkeypat
 
     assert response.status_code == 200
     assert "decode;dur=" in response.headers["server-timing"]
-    assert "pitch;dur=" in response.headers["server-timing"]
+    assert any(
+        label in response.headers["server-timing"]
+        for label in ("pitch;dur=", "pitch_fast;dur=")
+    )
     assert "classify;dur=" in response.headers["server-timing"]
     assert "total;dur=" in response.headers["server-timing"]
     payload = response.json()

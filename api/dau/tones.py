@@ -907,6 +907,127 @@ def extract_pitch_contour(
     )
 
 
+def extract_pitch_contour_fast(
+    samples: np.ndarray,
+    sample_rate: int,
+    *,
+    reject_long_voicing_gaps: bool = True,
+) -> PitchContour:
+    """Extract the same contour contract with YIN and energy-based voicing.
+
+    This path avoids pYIN's first-request JIT cost on a newly scaled hosted
+    instance. Warm instances continue to use the authoritative pYIN extractor;
+    both paths share speech isolation, normalization, features, and templates.
+    """
+
+    waveform = np.asarray(samples, dtype=np.float32).reshape(-1)
+    if sample_rate != SAMPLE_RATE:
+        waveform = _resample_audio(waveform, sample_rate, SAMPLE_RATE)
+        sample_rate = SAMPLE_RATE
+    segment, initial_quality = isolate_primary_speech(waveform, sample_rate)
+    try:
+        from .librosa_compat import librosa
+    except ImportError as error:
+        raise RuntimeError("Pitch extraction requires librosa") from error
+
+    f0 = np.asarray(
+        librosa.yin(
+            segment.astype(np.float64),
+            fmin=F0_MIN_HZ,
+            fmax=F0_MAX_HZ,
+            sr=sample_rate,
+            frame_length=FRAME_LENGTH,
+            hop_length=HOP_LENGTH,
+            center=True,
+        ),
+        dtype=np.float64,
+    )
+    rms = _frame_rms(segment)
+    if rms.size != f0.size:
+        rms = np.interp(
+            np.linspace(0.0, 1.0, f0.size),
+            np.linspace(0.0, 1.0, max(1, rms.size)),
+            rms if rms.size else np.zeros(1, dtype=np.float64),
+        )
+    positive_rms = rms[rms > 1e-6]
+    typical_rms = float(np.median(positive_rms)) if positive_rms.size else 0.0
+    peak_rms = float(np.max(rms)) if rms.size else 0.0
+    low_energy_floor = max(0.006, typical_rms * 0.22)
+    high_energy_floor = max(low_energy_floor, peak_rms * 0.18)
+    low_energy = rms >= low_energy_floor
+    high_indices = np.flatnonzero(rms >= high_energy_floor)
+    if high_indices.size:
+        onset = int(high_indices[0])
+        offset = int(high_indices[-1])
+        while offset + 1 < low_energy.size and low_energy[offset + 1]:
+            offset += 1
+        frame_indices = np.arange(rms.size)
+        energy_voiced = (
+            low_energy & (frame_indices >= onset) & (frame_indices <= offset)
+        )
+    else:
+        energy_voiced = low_energy
+    voiced = np.isfinite(f0) & energy_voiced
+    voiced_fraction = float(np.mean(voiced)) if voiced.size else 0.0
+    if int(np.sum(voiced)) < 5 or voiced_fraction < 0.28:
+        raise SignalQualityError(
+            SignalQualityCode.INSUFFICIENT_VOICING,
+            "I could not track enough of your pitch. Hold the vowel clearly.",
+            details={"voiced_fraction": voiced_fraction, "extractor": "yin"},
+        )
+
+    longest_gap_frames, _ = _longest_internal_gap(voiced)
+    longest_gap_ms = longest_gap_frames * HOP_LENGTH / sample_rate * 1_000.0
+    if reject_long_voicing_gaps and longest_gap_ms > 180.0:
+        raise SignalQualityError(
+            SignalQualityCode.VOICING_GAP,
+            "Your voice broke for too long to grade this take. Try once more.",
+            details={"longest_gap_ms": longest_gap_ms, "extractor": "yin"},
+        )
+
+    tracked_f0 = f0.copy()
+    tracked_f0[~voiced] = np.nan
+    corrected = _remove_octave_spikes(tracked_f0)
+    valid_indices = np.flatnonzero(voiced & np.isfinite(corrected))
+    while valid_indices.size >= 6:
+        first = int(valid_indices[0])
+        neighbor = float(np.median(corrected[valid_indices[1:6]]))
+        if abs(12.0 * math.log2(corrected[first] / neighbor)) <= 7.0:
+            break
+        voiced[first] = False
+        corrected[first] = np.nan
+        valid_indices = np.flatnonzero(voiced & np.isfinite(corrected))
+    valid_indices = np.flatnonzero(voiced & np.isfinite(corrected))
+    full_axis = np.arange(corrected.size)
+    interpolated = np.interp(full_axis, valid_indices, corrected[valid_indices])
+    semitones = 12.0 * np.log2(interpolated / np.median(interpolated[valid_indices]))
+    points = resample_contour(_smooth(semitones), CONTOUR_POINTS)
+    quality = SignalQuality(
+        peak=initial_quality.peak,
+        rms=initial_quality.rms,
+        clipping_fraction=initial_quality.clipping_fraction,
+        active_duration_s=initial_quality.active_duration_s,
+        total_duration_s=initial_quality.total_duration_s,
+        voiced_fraction=voiced_fraction,
+        longest_voicing_gap_ms=longest_gap_ms,
+        island_count=initial_quality.island_count,
+    )
+    features = extract_features(
+        points,
+        duration_s=initial_quality.active_duration_s,
+        voiced_fraction=voiced_fraction,
+        longest_voicing_gap_ms=longest_gap_ms,
+        rms_contour=rms,
+    )
+    return PitchContour(
+        points=points,
+        features=features,
+        quality=quality,
+        raw_f0_hz=f0,
+        raw_voiced=voiced,
+    )
+
+
 def analyze_audio(source: str | Path | bytes | bytearray | BinaryIO) -> PitchContour:
     samples, sample_rate = decode_audio(source)
     return extract_pitch_contour(samples, sample_rate)
