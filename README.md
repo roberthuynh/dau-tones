@@ -18,6 +18,8 @@ cd dau-tones
 
 Wait for `READY http://localhost:5173`, then open that URL. The script installs an uv-managed Python 3.11 environment and locked npm dependencies, warms pYIN, and starts FastAPI on port 8000 plus Vite on port 5173. Node.js 22+ and either `uv` or `curl` are the only host requirements.
 
+No microphone is needed for the judging loop. In Tone Lab, use the three **No mic? Try a real sample** buttons for correct `má`, `má` flattened into `ma`, and the signature `Phương` to `phường` mistake. In Echo, run **Play the ghost-at-dinner demo**, then compare the committed learner sentence with Cedar's validated correction.
+
 No OpenAI key is required for local grading, target playback, committed meaning art, deterministic coaching, analyzer demos, or cached Echo shadowing. With a key, server-only AI coaching and live Echo features turn on automatically:
 
 ```bash
@@ -26,7 +28,7 @@ cp .env.example .env.local
 ./dev.sh
 ```
 
-The same monorepo deploys as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service. The native pYIN, SciPy, LLVM, and PyAV stack uses [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb); the verified 568 MB Python bundle keeps the same DSP and browser-audio decoding in production.
+The same monorepo is live at [dau-tones.vercel.app](https://dau-tones.vercel.app) as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service. The native pYIN, SciPy, LLVM, and PyAV stack uses [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb); the deployed function keeps the same DSP and browser-audio decoding in production.
 
 GitHub Actions is manual-only during the build to preserve the free-plan quota. The same lint, test, build, and offline end-to-end checks run locally before each published milestone.
 
@@ -39,6 +41,8 @@ GitHub Actions is manual-only during the build to preserve the free-plan quota. 
 5. `gpt-image-2` generates the committed word illustrations at build time and one optional literal wrong-sentence reveal at runtime. The browser never receives an OpenAI key.
 
 Audio language models are poor judges of pitch shape, so the DSP judges and the LLM coaches. Pitch grading is deterministic and inspectable; GPT-5.6 handles the work it is better at: concrete instruction, drill choice, and meaning. Stage 6 measures this claim in-repo by asking the sibling Realtime model to name the tones in its own validated speech and comparing it with the leakage-safe DSP evaluation.
+
+Stage 0 is deliberately an all-or-nothing gate. Cedar produced five isolated takes and up to five carrier-phrase takes per word and accent; `gpt-4o-transcribe` checked lexical identity, then the shared DSP checked signal quality and the expected contour. The current receipt accepts 34 of 38 pairs and withholds `targets/manifest.json` until phone recordings replace four exhausted pairs: Northern `mả`, Northern `phở`, Southern `mả`, and Southern `phượng`. The accepted partial receipt can power templates and no-mic demos, but health continues to report the corpus as incomplete and no failed take is shipped as ground truth.
 
 Active model IDs live in one API config module:
 
@@ -64,8 +68,11 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | API | Typed analysis, fallback and GPT coaching, validated drill selection, NFC Echo alignment, cached speech, capability flags, and human error responses | Codex kept every AI client lazy and server-only; Robert required the complete loop to survive with no key. |
 | Meaning art | Nineteen cached `gpt-image-2` illustrations, locked prompts, hashes, and a contact-sheet audit | Robert made wrong-meaning pictures load-bearing; Codex kept generation build-time, one-shot, and fully available offline. |
 | Tone Lab | Canvas contour choreography, microphone silence-stop, meaning verdicts, session summaries, responsive layouts, and the code-native Cô Dấu coach | Robert specified the dark theatre and signature Phương moment; Codex implemented and browser-tested the full loop at desktop and mobile sizes. |
+| Target audit | Five Cedar takes per word/accent, carrier retries, lexical checks, DSP receipts, hash validation, and a hard manifest gate | Codex found and fixed a double voicing rejection in the pYIN pipeline, then stopped at 34/38 instead of weakening four failed gates. Robert will supply the four phone fallbacks. |
+| Echo speech | Sixteen cached shadowing utterances with exact ASR and contour-presence receipts | Robert required Realtime mini as the active model; Codex kept 12 mini takes and stepped up only four `phở`/`nước` utterances whose mini takes failed exact lexical validation. |
+| Offline demos | Three analyzer WAVs and one wrong-sentence Echo WAV, all hash-stamped and committed | Codex replayed the real samples through the analyzer and added the no-key Phương verdict and ghost-at-dinner path. |
 
-More decisions and measured results will be added with each stage.
+Estimated build-time OpenAI spend recorded in the ignored ledger is **$11.53**, below the $45 hard stop. Nineteen meaning images account for $0.95; the remaining spend covers target generation, lexical validation, and Echo speech.
 
 ## Evaluation
 
@@ -81,7 +88,7 @@ The evaluator fits scales, confidence temperature, and abstention inside grouped
 
 ### Confusion matrix
 
-Pending the validated Stage 0 corpus. No synthetic or hand-entered score is presented as a result.
+Pending the four phone fallbacks listed above and the resulting complete manifest. No synthetic or hand-entered score is presented as a result.
 
 ### DSP versus audio-model benchmark
 
