@@ -71,9 +71,7 @@ def validated_targets() -> tuple[dict[str, Any], ...]:
 
     candidates = target_manifest().get("targets", [])
     if not candidates:
-        candidates = _load_json(TARGETS_ROOT / "generation-report.json", {}).get(
-            "targets", []
-        )
+        candidates = _load_json(TARGETS_ROOT / "generation-report.json", {}).get("targets", [])
     resolved: list[dict[str, Any]] = []
     for target in candidates:
         relative_path = target.get("path")

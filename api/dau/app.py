@@ -12,10 +12,15 @@ from typing import Annotated, Any
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
-from openai import OpenAI
 from pydantic import BaseModel, Field
+from starlette.concurrency import run_in_threadpool
 
-from .analysis_service import SignalQualityError, analyze_recording, scoring_mode
+from .analysis_service import (
+    SignalQualityError,
+    analyze_recording,
+    scoring_mode,
+    warm_analysis_runtime,
+)
 from .coach import coach, generate_drill
 from .content import demo_document, echo_document, public_words, reference_corpus_is_complete
 from .echo import align_transcript, literal_explanation, normalize_text
@@ -38,7 +43,7 @@ from .settings import (
 
 app = FastAPI(
     title="Dấu API",
-    summary="Local DSP grading and optional OpenAI coaching for Vietnamese tones.",
+    summary="Deterministic DSP grading and optional OpenAI coaching for Vietnamese tones.",
     version="0.1.0",
 )
 app.add_middleware(
@@ -68,6 +73,14 @@ class EchoRevealRequest(BaseModel):
     explanation: str = Field(min_length=4, max_length=220)
 
 
+def _openai_client(key: str, *, timeout: float) -> Any:
+    """Keep the optional OpenAI SDK off the local DSP import path."""
+
+    from openai import OpenAI
+
+    return OpenAI(api_key=key, timeout=timeout, max_retries=0)
+
+
 def _health() -> dict[str, Any]:
     key = has_openai_key()
     return {
@@ -90,9 +103,25 @@ def _health() -> dict[str, Any]:
     }
 
 
+def _server_timing(timing: dict[str, float]) -> str:
+    return ", ".join(
+        f"{name};dur={duration:.2f}" for name, duration in timing.items() if duration >= 0.0
+    )
+
+
 @router.get("/healthz")
 def healthz() -> dict[str, Any]:
     return _health()
+
+
+@router.post("/analysis/warmup")
+def analysis_warmup() -> JSONResponse:
+    timing: dict[str, float] = {}
+    cold_started = warm_analysis_runtime(timing)
+    return JSONResponse(
+        {"status": "ready", "cold_started": cold_started},
+        headers={"Server-Timing": _server_timing(timing)},
+    )
 
 
 @router.get("/words")
@@ -112,18 +141,25 @@ async def analyze(
         raise HTTPException(
             413, detail={"code": "audio_too_large", "message": "Keep the recording under 10 MB."}
         )
+    timing: dict[str, float] = {}
     try:
-        result = analyze_recording(
+        result = await run_in_threadpool(
+            analyze_recording,
             payload,
             word_id=word,
             intended_tone=intended_tone,
             accent=accent,
+            timing=timing,
         )
-        return JSONResponse(AnalysisResponse.model_validate(result).model_dump(mode="json"))
+        return JSONResponse(
+            AnalysisResponse.model_validate(result).model_dump(mode="json"),
+            headers={"Server-Timing": _server_timing(timing)},
+        )
     except SignalQualityError as error:
         return JSONResponse(
             status_code=422,
             content={"detail": {**error.as_dict(), "needs_retry": True}},
+            headers={"Server-Timing": _server_timing(timing)},
         )
     except ValueError as error:
         raise HTTPException(
@@ -223,7 +259,7 @@ def _ai_explanation(target: str, transcript: str, diff: list[dict[str, Any]], fa
     if not key or all(item.get("kind") == "match" for item in diff):
         return fallback
     try:
-        client = OpenAI(api_key=key, timeout=AI_TIMEOUT_SECONDS, max_retries=0)
+        client = _openai_client(key, timeout=AI_TIMEOUT_SECONDS)
         response = client.responses.parse(
             model=TEXT_MODEL,
             reasoning={"effort": "low"},
@@ -261,14 +297,13 @@ def _generate_reveal(explanation: str) -> bytes:
     key = openai_api_key()
     if not key:
         raise RuntimeError("OPENAI_API_KEY is required for live Echo art")
-    client = OpenAI(api_key=key, timeout=120, max_retries=0)
+    client = _openai_client(key, timeout=120)
     result = client.images.generate(
         model=IMAGE_MODEL,
         prompt=(
             "Flat 2D minimal illustration, warm palette on near-black, single "
             "centered subject, no text, no border. Illustrate this playful literal "
-            "Vietnamese misunderstanding: "
-            + explanation
+            "Vietnamese misunderstanding: " + explanation
         ),
         size="1024x1024",
         quality="medium",
@@ -327,7 +362,7 @@ async def echo_transcribe(
                 413,
                 detail={"code": "audio_too_large", "message": "Keep the recording under 10 MB."},
             )
-        client = OpenAI(api_key=key, timeout=30, max_retries=0)
+        client = _openai_client(key, timeout=30)
         result = client.audio.transcriptions.create(
             model=TRANSCRIPTION_MODEL,
             file=(audio.filename or "echo.webm", payload, audio.content_type or "audio/webm"),

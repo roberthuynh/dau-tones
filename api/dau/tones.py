@@ -478,6 +478,19 @@ def decode_audio(
 ) -> tuple[np.ndarray, int]:
     """Decode WAV, WebM/Opus, MP4/AAC, or Ogg audio without shelling out."""
 
+    # The committed targets and no-mic demos are PCM WAV files. Recognize them
+    # before importing PyAV so the demo path does not pay for a native codec
+    # stack that Python's standard library can decode directly. Browser formats
+    # still take the same PyAV path below.
+    is_wave_bytes = (
+        isinstance(source, (bytes, bytearray))
+        and bytes(source[:12]).startswith(b"RIFF")
+        and bytes(source[8:12]) == b"WAVE"
+    )
+    is_wave_path = isinstance(source, (str, Path)) and Path(source).suffix.lower() == ".wav"
+    if is_wave_bytes or is_wave_path:
+        return _decode_wave(source)
+
     try:
         return _decode_av(source)
     except SignalQualityError as av_error:
@@ -1266,10 +1279,10 @@ def _candidate_rule_failures(
 def _range_adapted_validation_scores(analysis: PitchContour, accent: Accent) -> dict[Tone, float]:
     """Compare target shape after adapting broad priors to its pitch excursion.
 
-    Cedar often realizes emphatic rising tones over a much wider semitone range
-    than the hand-authored prior. This retry changes the prior's amplitude, not
-    its direction or timing; the independent tone rules and separation gate
-    still referee the result.
+    The provider's `cedar` voice often realizes emphatic rising tones over a
+    much wider semitone range than the hand-authored prior. This retry changes
+    the prior's amplitude, not its direction or timing; the independent tone
+    rules and separation gate still referee the result.
     """
 
     scores: dict[Tone, float] = {}

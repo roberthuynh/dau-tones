@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import io
 import math
+import wave
 
 import numpy as np
 import pytest
@@ -17,6 +19,7 @@ from dau.tones import (
     classify_contour,
     constrained_dtw_distance,
     contour_from_points,
+    decode_audio,
     expected_tone_contour,
     extract_pitch_contour,
     feature_differences,
@@ -25,6 +28,16 @@ from dau.tones import (
     tone_family,
     validate_target_candidate,
 )
+
+
+def _wav(samples: np.ndarray, sample_rate: int = 22_050) -> bytes:
+    output = io.BytesIO()
+    with wave.open(output, "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(2)
+        handle.setframerate(sample_rate)
+        handle.writeframes((np.clip(samples, -1.0, 1.0) * 32767).astype("<i2").tobytes())
+    return output.getvalue()
 
 
 def _fixture_analysis(tone: Tone, accent: Accent = Accent.NORTH):
@@ -114,6 +127,21 @@ def test_silence_is_a_typed_quality_error() -> None:
     assert captured.value.as_dict()["code"] == "silence"
 
 
+def test_pcm_wav_uses_standard_decoder_without_importing_pyav(monkeypatch) -> None:
+    time = np.arange(4_410) / 22_050
+    voice = 0.2 * np.sin(2 * np.pi * 180 * time)
+    monkeypatch.setattr(
+        "dau.tones._decode_av",
+        lambda _source: (_ for _ in ()).throw(AssertionError("PyAV should not decode PCM WAV")),
+    )
+
+    samples, sample_rate = decode_audio(_wav(voice))
+
+    assert sample_rate == 22_050
+    assert samples.shape == voice.shape
+    assert np.max(np.abs(samples)) == pytest.approx(0.2, abs=0.001)
+
+
 def test_rejected_target_metrics_are_strict_json_values() -> None:
     validation = validate_target_candidate(b"not a wav", Tone.NGANG)
 
@@ -174,8 +202,7 @@ def test_librosa_stub_fallback_uses_vendored_package_data(monkeypatch) -> None:
     def missing_then_real(package_name: str, filename: str):
         if filename == "/stripped/librosa/__init__.py":
             raise ValueError(
-                "Cannot load imports from non-existent stub "
-                "'/stripped/librosa/__init__.pyi'"
+                "Cannot load imports from non-existent stub '/stripped/librosa/__init__.pyi'"
             )
         return original(package_name, filename)
 

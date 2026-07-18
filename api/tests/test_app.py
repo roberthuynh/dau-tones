@@ -33,6 +33,28 @@ def test_health_exposes_offline_capabilities(monkeypatch) -> None:
     assert payload["reference_corpus_validated"] is False
 
 
+def test_analysis_warmup_reports_timing_and_is_idempotent(monkeypatch) -> None:
+    calls = 0
+
+    def warm(timing: dict[str, float]) -> bool:
+        nonlocal calls
+        calls += 1
+        timing["runtime_wait"] = 0.25
+        timing["pitch_warmup"] = 8.5
+        return calls == 1
+
+    monkeypatch.setattr("dau.app.warm_analysis_runtime", warm)
+
+    first = client.post("/analysis/warmup")
+    second = client.post("/analysis/warmup")
+
+    assert first.status_code == second.status_code == 200
+    assert first.json() == {"status": "ready", "cold_started": True}
+    assert second.json() == {"status": "ready", "cold_started": False}
+    assert "runtime_wait;dur=0.25" in first.headers["server-timing"]
+    assert "pitch_warmup;dur=8.50" in first.headers["server-timing"]
+
+
 def test_words_starts_with_phuong_and_has_64_point_targets() -> None:
     payload = client.get("/words").json()
     assert payload["featured_queue"][:3] == [
@@ -66,9 +88,7 @@ def test_analyze_requires_intended_tone_before_processing_audio() -> None:
         data={"word": "ma-mother", "accent": "north"},
     )
     assert response.status_code == 422
-    assert any(
-        item["loc"][-1] == "intended_tone" for item in response.json()["detail"]
-    )
+    assert any(item["loc"][-1] == "intended_tone" for item in response.json()["detail"])
 
 
 def test_unknown_word_is_rejected_without_analysis() -> None:
@@ -243,6 +263,10 @@ def test_signature_audio_demo_runs_through_validated_partial_templates(monkeypat
     )
 
     assert response.status_code == 200
+    assert "decode;dur=" in response.headers["server-timing"]
+    assert "pitch;dur=" in response.headers["server-timing"]
+    assert "classify;dur=" in response.headers["server-timing"]
+    assert "total;dur=" in response.headers["server-timing"]
     payload = response.json()
     assert payload["tone_detected"] == "huyen"
     assert payload["intended_word_id"] == "phuong-name"

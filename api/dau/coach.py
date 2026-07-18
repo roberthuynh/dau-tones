@@ -6,8 +6,6 @@ import json
 from collections import Counter
 from typing import Any
 
-from openai import OpenAI
-
 from .content import inventory_document, word_by_id
 from .models import TEXT_MODEL
 from .schemas import CoachRequest, CoachResponse, DrillRequest, DrillSelection
@@ -29,6 +27,14 @@ PHYSICAL_TIPS = {
     ),
     "needs_retry": "Try once more in a quiet breath, holding the phone about a hand away.",
 }
+
+
+def _openai_client(key: str) -> Any:
+    """Import the optional model client only on an AI-backed request."""
+
+    from openai import OpenAI
+
+    return OpenAI(api_key=key, timeout=AI_TIMEOUT_SECONDS, max_retries=0)
 
 
 def _tip_codes(verdict: dict[str, Any]) -> list[str]:
@@ -98,7 +104,7 @@ def coach(request: CoachRequest) -> CoachResponse:
         return fallback
     valid_ids = [word["id"] for word in inventory_document().get("words", [])]
     try:
-        client = OpenAI(api_key=key, timeout=AI_TIMEOUT_SECONDS, max_retries=0)
+        client = _openai_client(key)
         response = client.responses.parse(
             model=TEXT_MODEL,
             reasoning={"effort": "low"},
@@ -164,7 +170,7 @@ def generate_drill(request: DrillRequest) -> dict[str, Any]:
     if not key:
         return fallback
     try:
-        client = OpenAI(api_key=key, timeout=AI_TIMEOUT_SECONDS, max_retries=0)
+        client = _openai_client(key)
         response = client.responses.parse(
             model=TEXT_MODEL,
             reasoning={"effort": "low"},
