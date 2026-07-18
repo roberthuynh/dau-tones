@@ -52,10 +52,19 @@ jobs:
               "gpt-realtime-2.1-mini",
               "gpt-realtime-2.1",
           }
-          roots = [pathlib.Path("api"), pathlib.Path("web/src")]
+          # Scan executable product and generation code. Tests intentionally
+          # contain deprecated IDs to prove the guard and must not trip it.
+          roots = [
+              pathlib.Path("api/dau"),
+              pathlib.Path("api/scripts"),
+              pathlib.Path("api/index.py"),
+              pathlib.Path("api/eval.py"),
+              pathlib.Path("web/src"),
+          ]
           found = set()
           for root in roots:
-              for path in root.rglob("*"):
+              paths = [root] if root.is_file() else root.rglob("*")
+              for path in paths:
                   if path.suffix not in {".py", ".ts", ".tsx", ".js", ".jsx"}:
                       continue
                   text = path.read_text(encoding="utf-8")
