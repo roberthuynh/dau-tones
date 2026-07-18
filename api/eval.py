@@ -11,8 +11,10 @@ held-out word. Results describe synthetic reference audio, not learner accuracy.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import unicodedata
 from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass
@@ -124,6 +126,35 @@ def _entry_contour(entry: Mapping[str, Any]) -> np.ndarray | None:
     return resample_contour(np.asarray(raw, dtype=np.float64))
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _word_group(word: str) -> str:
+    """Return the NFC/case-insensitive group key used by every fold."""
+
+    return unicodedata.normalize("NFC", word).casefold().strip()
+
+
+def _fold_training_set(
+    templates: Sequence[ToneTemplate],
+    held_out: ToneTemplate,
+    accent: Accent,
+) -> list[ToneTemplate]:
+    """Exclude the full lexical group and every other accent from a fold."""
+
+    held_out_group = _word_group(held_out.word)
+    return [
+        template
+        for template in templates
+        if template.accent is accent and _word_group(template.word) != held_out_group
+    ]
+
+
 def load_templates(manifest_path: str | Path = DEFAULT_MANIFEST) -> list[ToneTemplate]:
     path = Path(manifest_path).resolve()
     with path.open(encoding="utf-8") as handle:
@@ -151,7 +182,18 @@ def load_templates(manifest_path: str | Path = DEFAULT_MANIFEST) -> list[ToneTem
         source_path = _entry_path(entry, path)
         contour = _entry_contour(entry)
         feature_data = entry.get("features")
-        if isinstance(feature_data, Mapping):
+        if source_path is not None and source_path.exists():
+            expected_hash = entry.get("sha256")
+            actual_hash = _sha256_file(source_path)
+            if expected_hash is not None and expected_hash != actual_hash:
+                raise ValueError(
+                    f"Manifest target {target_id!r} SHA-256 mismatch: "
+                    f"expected {expected_hash}, got {actual_hash}"
+                )
+            analyzed = analyze_audio(source_path)
+            contour = analyzed.points
+            features = analyzed.features
+        elif isinstance(feature_data, Mapping):
             features = ContourFeatures.from_mapping(feature_data)
         elif contour is not None:
             features = extract_features(
@@ -160,10 +202,6 @@ def load_templates(manifest_path: str | Path = DEFAULT_MANIFEST) -> list[ToneTem
                 voiced_fraction=float(entry.get("voiced_fraction", 1.0)),
                 longest_voicing_gap_ms=float(entry.get("longest_voicing_gap_ms", 0.0)),
             )
-        elif source_path is not None and source_path.exists():
-            analyzed = analyze_audio(source_path)
-            contour = analyzed.points
-            features = analyzed.features
         else:
             raise ValueError(
                 f"Manifest target {target_id!r} has neither a contour nor readable audio"
@@ -189,18 +227,51 @@ def load_templates(manifest_path: str | Path = DEFAULT_MANIFEST) -> list[ToneTem
     return templates
 
 
+def corpus_receipt(
+    manifest_path: str | Path,
+    templates: Sequence[ToneTemplate],
+) -> dict[str, Any]:
+    """Bind an evaluation report to the manifest and exact audio bytes it used."""
+
+    path = Path(manifest_path).resolve()
+    cases: list[dict[str, str]] = []
+    for template in templates:
+        if not template.source_path:
+            raise ValueError(f"Evaluation target {template.id!r} has no source audio path")
+        source_path = Path(template.source_path).resolve()
+        if not source_path.is_file():
+            raise ValueError(f"Evaluation target {template.id!r} audio is missing: {source_path}")
+        cases.append(
+            {
+                "target_id": template.id,
+                "accent": template.accent.value,
+                "tone": template.tone.value,
+                "file_sha256": _sha256_file(source_path),
+            }
+        )
+    cases.sort(key=lambda item: (item["accent"], item["target_id"]))
+    canonical_cases = json.dumps(
+        cases,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    return {
+        "manifest_sha256": _sha256_file(path),
+        "cases_sha256": hashlib.sha256(canonical_cases).hexdigest(),
+        "target_count": len(cases),
+    }
+
+
 def _inner_scores(
     templates: Sequence[ToneTemplate],
     accent: Accent,
     mode: ScoringMode,
 ) -> list[tuple[bool, list[float]]]:
     predictions: list[tuple[bool, list[float]]] = []
-    for held_out in templates:
-        training = [
-            template
-            for template in templates
-            if template.word.casefold() != held_out.word.casefold()
-        ]
+    accent_templates = [template for template in templates if template.accent is accent]
+    for held_out in accent_templates:
+        training = _fold_training_set(accent_templates, held_out, accent)
         labels = {
             tone_family(template.tone, accent).value
             if mode is ScoringMode.FOUR_FAMILY
@@ -296,11 +367,7 @@ def grouped_leave_one_word_out(
     accent_templates = [template for template in templates if template.accent is resolved_accent]
     predictions: list[FoldPrediction] = []
     for held_out in accent_templates:
-        training = [
-            template
-            for template in accent_templates
-            if template.word.casefold() != held_out.word.casefold()
-        ]
+        training = _fold_training_set(accent_templates, held_out, resolved_accent)
         if not training:
             continue
         expected_label = (
@@ -440,7 +507,11 @@ def _northern_six_tone_passes(
     return passed, {key: round(value, 6) for key, value in checks.items()}
 
 
-def evaluate(templates: Sequence[ToneTemplate]) -> dict[str, Any]:
+def evaluate(
+    templates: Sequence[ToneTemplate],
+    *,
+    receipt: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     report: dict[str, Any] = {
         "method": "grouped leave-one-word-out over synthetic references",
         "warning": (
@@ -449,6 +520,8 @@ def evaluate(templates: Sequence[ToneTemplate]) -> dict[str, Any]:
         ),
         "accents": {},
     }
+    if receipt is not None:
+        report["corpus"] = dict(receipt)
     for accent in (Accent.NORTH, Accent.SOUTH):
         exact_predictions = grouped_leave_one_word_out(templates, accent, ScoringMode.SIX_TONE)
         exact_labels = [tone.value for tone in TONE_ORDER]
@@ -605,7 +678,8 @@ def main() -> int:
     parser.add_argument("--figure", type=Path, default=DEFAULT_FIGURE)
     arguments = parser.parse_args()
     templates = load_templates(arguments.manifest)
-    report = evaluate(templates)
+    receipt = corpus_receipt(arguments.manifest, templates)
+    report = evaluate(templates, receipt=receipt)
     write_outputs(
         report,
         templates,
