@@ -60,7 +60,7 @@ async function json<T>(path: string, init?: RequestInit, timeoutMs?: number): Pr
 }
 
 export function getHealth(): Promise<HealthPayload> {
-  return json<HealthPayload>("/healthz", undefined, 4_000);
+  return json<HealthPayload>("/healthz", undefined, 12_000);
 }
 
 export function getWords(): Promise<WordsPayload> {

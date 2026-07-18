@@ -63,7 +63,7 @@ export default function App() {
         </div>
       </header>
 
-      {!aiCoaching ? <div className="key-banner" role="status">Add an OpenAI key for AI coaching</div> : null}
+      {health && !aiCoaching ? <div className="key-banner" role="status">Add an OpenAI key for AI coaching</div> : null}
 
       <div id="main-content">
         {tab === "lab" ? (
