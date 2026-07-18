@@ -86,23 +86,29 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-DAU_ENV_ARGS=()
-if [[ -f "$DAU_ROOT/.env.local" ]]; then
-  DAU_ENV_ARGS=(--env-file "$DAU_ROOT/.env.local")
-fi
-
 : > "$DAU_API_LOG"
 : > "$DAU_WEB_LOG"
 
-NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UV" run \
-  --project "$DAU_ROOT/api" \
-  --python 3.11 \
-  uvicorn dau.app:app \
-  --app-dir "$DAU_ROOT/api" \
-  --host 127.0.0.1 \
-  --port 8000 \
-  "${DAU_ENV_ARGS[@]}" \
-  >"$DAU_API_LOG" 2>&1 &
+if [[ -f "$DAU_ROOT/.env.local" ]]; then
+  NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UV" run \
+    --project "$DAU_ROOT/api" \
+    --python 3.11 \
+    uvicorn dau.app:app \
+    --app-dir "$DAU_ROOT/api" \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --env-file "$DAU_ROOT/.env.local" \
+    >"$DAU_API_LOG" 2>&1 &
+else
+  NUMBA_CACHE_DIR="$DAU_CACHE_DIR/numba" "$DAU_UV" run \
+    --project "$DAU_ROOT/api" \
+    --python 3.11 \
+    uvicorn dau.app:app \
+    --app-dir "$DAU_ROOT/api" \
+    --host 127.0.0.1 \
+    --port 8000 \
+    >"$DAU_API_LOG" 2>&1 &
+fi
 DAU_API_PID=$!
 
 npm --prefix "$DAU_ROOT/web" run dev -- \
