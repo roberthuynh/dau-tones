@@ -217,7 +217,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
     <div className={`stage-actions stage-actions--${placement}`}>
       <button className="target-play" type="button" onClick={() => void targetAudio.play(target.audio_url)}>
         <span>{targetAudio.playing ? <VolumeIcon /> : <PlayIcon />}</span>
-        <span><small className="action-step">Step 1 · reference voice</small><strong>{targetAudio.playing ? "Watch Cô Dấu now" : "Listen + watch"}</strong><small>Hear Cô Linh · {accent === "north" ? "Hà Nội" : "Sài Gòn"} · mirror Cô Dấu</small></span>
+        <span><small className="action-step">Step 1 · reference voice</small><strong>{targetAudio.playing ? "Watch Cô Dấu now" : "Listen + watch"}</strong><small>Hear Thầy Minh · {accent === "north" ? "Hà Nội" : "Sài Gòn"} · mirror Cô Dấu</small></span>
       </button>
       <RecordControl state={recorder.state} level={recorder.level} elapsedMs={recorder.elapsedMs} onToggle={recorder.toggle} label="Record your tone" />
     </div>

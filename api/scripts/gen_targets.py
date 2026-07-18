@@ -1,4 +1,4 @@
-"""Generate Cô Linh reference candidates and let DSP referee every target."""
+"""Generate Thầy Minh reference candidates and let DSP referee every target."""
 
 from __future__ import annotations
 

@@ -99,7 +99,7 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
       setGeneratedRevealArt(null);
       setError(null);
       if (!liveTranscription) {
-        setError("Live sentence transcription needs an OpenAI key. Replay your recording beside Cô Linh, or run the committed wrong-tone demo.");
+        setError("Live sentence transcription needs an OpenAI key. Replay your recording beside Thầy Minh, or run the committed wrong-tone demo.");
         return;
       }
       try {
@@ -146,7 +146,7 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
         <div>
           <p className="eyebrow">Echo · sentence mode</p>
           <h1>Tones carry the stakes.</h1>
-          <p>Say the whole thought. Dấu finds the tiny tone change that rewrites it, then Cô Linh says it back for shadowing.</p>
+          <p>Say the whole thought. Dấu finds the tiny tone change that rewrites it, then Thầy Minh says it back for shadowing.</p>
         </div>
         <div className="echo-hero__orb" aria-hidden="true"><span>ý</span><span>nghĩa</span></div>
       </header>
@@ -187,7 +187,7 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
                   <PlayIcon /><span><strong>Your take</strong><small>{recordingUrl ? "ready to replay" : "record first"}</small></span>
                 </button>
                 <button type="button" onClick={() => void playCorrect()}>
-                  {correctAudio.playing ? <VolumeIcon /> : <PlayIcon />}<span><strong>Cô Linh's take</strong><small>correct shadowing</small></span>
+                  {correctAudio.playing ? <VolumeIcon /> : <PlayIcon />}<span><strong>Thầy Minh's take</strong><small>correct shadowing</small></span>
                 </button>
               </div>
             </div>

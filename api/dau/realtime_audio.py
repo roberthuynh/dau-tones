@@ -64,7 +64,7 @@ def synthesize_utterance(
     timeout_seconds: float = 45.0,
     allow_incomplete_audio: bool = False,
 ) -> bytes:
-    """Open one Realtime session, collect one Cô Linh utterance, then close it."""
+    """Open one Realtime session, collect one Thầy Minh utterance, then close it."""
 
     if model not in {SPEECH_MODEL, REFERENCE_MODEL}:
         raise ValueError("Dấu never silently falls back to an unapproved speech model")
