@@ -1,0 +1,39 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "web": {
+      "root": "web/",
+      "framework": "vite"
+    },
+    "api": {
+      "root": "api/",
+      "framework": "fastapi",
+      "entrypoint": "index:app",
+      "memory": 2048,
+      "maxDuration": 300,
+      "includeFiles": [
+        "../targets/**"
+      ],
+      "excludeFiles": [
+        "tests/**",
+        "scripts/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**"
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    }
+  ]
+}

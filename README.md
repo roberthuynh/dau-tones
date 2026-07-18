@@ -8,15 +8,23 @@ Dấu is an open-source practice lab that makes Vietnamese tones visible by draw
 
 ## Quick start
 
-The one-command cold start is being assembled in the next commit. The finished flow will be:
-
 ```bash
 git clone https://github.com/roberthuynh/dau-tones.git
 cd dau-tones
 ./dev.sh
 ```
 
-No OpenAI key will be required for local grading, target playback, committed meaning art, deterministic coaching, analyzer demos, or cached Echo shadowing. With a key, server-only AI coaching and live Echo features turn on automatically.
+Wait for `READY http://localhost:5173`, then open that URL. The script installs an uv-managed Python 3.11 environment and locked npm dependencies, warms pYIN, and starts FastAPI on port 8000 plus Vite on port 5173. Node.js 22+ and either `uv` or `curl` are the only host requirements.
+
+No OpenAI key is required for local grading, target playback, committed meaning art, deterministic coaching, analyzer demos, or cached Echo shadowing. With a key, server-only AI coaching and live Echo features turn on automatically:
+
+```bash
+cp .env.example .env.local
+# Put OPENAI_API_KEY in .env.local. Never expose it through a VITE_ variable.
+./dev.sh
+```
+
+The same monorepo deploys as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service.
 
 ## How it works
 
@@ -45,6 +53,7 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | Stage | What Codex accelerated | Key decision and owner |
 | --- | --- | --- |
 | Repository | Product plan, safety boundaries, offline contract, and incremental publishing | Robert required MIT in commit 1 and direct pushes to `main`; Codex set the verification gates. |
+| Cold start | Locked Python/Node installs, pYIN warming, dual-process supervision, CI, and a one-project Vercel service map | Robert added Vercel deployment; Codex kept local and hosted URLs on the same `/api` contract. |
 | Voice design | Dual-accent target generation and DSP acceptance design | Robert chose Cedar and supplied the exact Sài Gòn and Hà Nội voice prompts. |
 | Grading | Accent-conditioned acoustic families and honest uncertainty | Robert required six visible tones; Codex recommended Northern evaluation-gated six-way grading and Southern four-family auto-verification. |
 

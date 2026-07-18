@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: true
+          cache-dependency-glob: api/uv.lock
+
+      - name: Install web dependencies
+        run: npm --prefix web ci --no-audit --no-fund
+
+      - name: Install API dependencies
+        run: uv sync --project api --python 3.11 --frozen
+
+      - name: Reject unapproved OpenAI model IDs
+        run: |
+          python - <<'PY'
+          import pathlib
+          import re
+
+          allowed = {
+              "gpt-5.6-sol",
+              "gpt-image-2",
+              "gpt-4o-transcribe",
+              "gpt-realtime-2.1-mini",
+              "gpt-realtime-2.1",
+          }
+          roots = [pathlib.Path("api"), pathlib.Path("web/src")]
+          found = set()
+          for root in roots:
+              for path in root.rglob("*"):
+                  if path.suffix not in {".py", ".ts", ".tsx", ".js", ".jsx"}:
+                      continue
+                  text = path.read_text(encoding="utf-8")
+                  found.update(re.findall(r"gpt-[a-z0-9][a-z0-9.\-]*", text))
+          unexpected = sorted(found - allowed)
+          if unexpected:
+              raise SystemExit(f"Unapproved active OpenAI model IDs: {unexpected}")
+          if "gpt-4o-mini-tts" in found:
+              raise SystemExit("Deprecated gpt-4o-mini-tts is forbidden")
+          PY
+
+      - name: Lint API
+        run: uv run --project api ruff check api
+
+      - name: Test API
+        run: |
+          if find api/tests -name 'test_*.py' -print -quit 2>/dev/null | grep -q .; then
+            uv run --project api pytest -q
+          else
+            echo "No API tests committed yet."
+          fi
+
+      - name: Lint web
+        run: npm --prefix web run lint
+
+      - name: Test web
+        run: npm --prefix web run test -- --passWithNoTests
+
+      - name: Build web
+        run: npm --prefix web run build
