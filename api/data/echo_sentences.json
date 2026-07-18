@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "locale": "vi-VN",
+  "accent_ids": [
+    "north",
+    "south"
+  ],
+  "sentences": [
+    {
+      "id": "xin-chao",
+      "text": "Xin chào!",
+      "gloss_en": "Hello!",
+      "theme": "greetings",
+      "focus_word_ids": [],
+      "shadow_audio": {
+        "north": "targets/echo/north/xin-chao.wav",
+        "south": "targets/echo/south/xin-chao.wav"
+      },
+      "literal_stakes": []
+    },
+    {
+      "id": "cam-on-ban",
+      "text": "Cảm ơn bạn.",
+      "gloss_en": "Thank you.",
+      "theme": "greetings",
+      "focus_word_ids": [
+        "ban-friend"
+      ],
+      "shadow_audio": {
+        "north": "targets/echo/north/cam-on-ban.wav",
+        "south": "targets/echo/south/cam-on-ban.wav"
+      },
+      "literal_stakes": []
+    },
+    {
+      "id": "ban-khoe-khong",
+      "text": "Bạn khỏe không?",
+      "gloss_en": "How are you?",
+      "theme": "greetings",
+      "focus_word_ids": [
+        "ban-friend"
+      ],
+      "shadow_audio": {
+        "north": "targets/echo/north/ban-khoe-khong.wav",
+        "south": "targets/echo/south/ban-khoe-khong.wav"
+      },
+      "literal_stakes": []
+    },
+    {
+      "id": "me-toi-ten-la-phuong",
+      "text": "Mẹ tôi tên là Phương.",
+      "gloss_en": "My mother's name is Phương.",
+      "theme": "family",
+      "focus_word_ids": [
+        "me-mother",
+        "phuong-name"
+      ],
+      "shadow_audio": {
+        "north": "targets/echo/north/me-toi-ten-la-phuong.wav",
+        "south": "targets/echo/south/me-toi-ten-la-phuong.wav"
+      },
+      "literal_stakes": [
+        {
+          "target_token": "Phương",
+          "heard_token": "phường",
+          "intended_word_id": "phuong-name",
+          "heard_word_id": "phuong-ward",
+          "explanation": "You said phường, an urban ward, instead of Phương, the name. The sentence now sounds like your mother's name is Ward."
+        }
+      ]
+    },
+    {
+      "id": "invite-mom-to-dinner",
+      "text": "Tối nay con mời má đi ăn cơm.",
+      "gloss_en": "Tonight, I'm inviting Mom to dinner.",
+      "theme": "family",
+      "focus_word_ids": [
+        "ma-mother",
+        "com-rice"
+      ],
+      "shadow_audio": {
+        "north": "targets/echo/north/invite-mom-to-dinner.wav",
+        "south": "targets/echo/south/invite-mom-to-dinner.wav"
+      },
+      "literal_stakes": [
+        {
+          "target_token": "má",
+          "heard_token": "ma",
+          "intended_word_id": "ma-mother",
+          "heard_word_id": "ma-ghost",
+          "explanation": "You said ma, a ghost, instead of má, mother. You invited a ghost to dinner."
+        }
+      ]
+    },
+    {
+      "id": "order-pho",
+      "text": "Cho tôi một tô phở.",
+      "gloss_en": "Please give me a bowl of phở.",
+      "theme": "food",
+      "focus_word_ids": [
+        "pho-noodle-soup"
+      ],
+      "shadow_audio": {
+        "north": "targets/echo/north/order-pho.wav",
+        "south": "targets/echo/south/order-pho.wav"
+      },
+      "literal_stakes": []
+    },
+    {
+      "id": "order-water",
+      "text": "Cho tôi một ly nước.",
+      "gloss_en": "Please give me a glass of water.",
+      "theme": "food",
+      "focus_word_ids": [],
+      "shadow_audio": {
+        "north": "targets/echo/north/order-water.wav",
+        "south": "targets/echo/south/order-water.wav"
+      },
+      "literal_stakes": []
+    },
+    {
+      "id": "find-restroom",
+      "text": "Nhà vệ sinh ở đâu?",
+      "gloss_en": "Where is the restroom?",
+      "theme": "travel",
+      "focus_word_ids": [
+        "nha-home"
+      ],
+      "shadow_audio": {
+        "north": "targets/echo/north/find-restroom.wav",
+        "south": "targets/echo/south/find-restroom.wav"
+      },
+      "literal_stakes": []
+    }
+  ]
+}

@@ -1,0 +1,616 @@
+{
+  "schema_version": 1,
+  "locale": "vi-VN",
+  "default_accent": "north",
+  "target_generation": {
+    "voice": "cedar",
+    "candidates_per_word": 5,
+    "carrier_phrase_candidates_on_failure": 5,
+    "accents": [
+      {
+        "id": "north",
+        "name_vi": "Bắc (Hà Nội)",
+        "name_en": "Northern (Hà Nội)",
+        "prompt": "Always speak natural Vietnamese with a neutral Northern Vietnamese (Hà Nội) accent. Use clear, casual everyday vocabulary. Speak warmly at a moderate pace. Avoid sounding like a foreigner reading Vietnamese. Pronounce Vietnamese names, tones, numbers, and place names carefully.",
+        "default_scoring_mode": "six_tone_when_validated"
+      },
+      {
+        "id": "south",
+        "name_vi": "Nam (Sài Gòn)",
+        "name_en": "Southern (Sài Gòn)",
+        "prompt": "Always speak natural Vietnamese with a modern Southern Vietnamese (Sài Gòn) accent. Use clear, casual everyday vocabulary. Speak warmly at a moderate pace. Avoid sounding like a foreigner reading Vietnamese. Pronounce Vietnamese names, tones, numbers, and place names carefully.",
+        "default_scoring_mode": "four_family"
+      }
+    ]
+  },
+  "tone_order": [
+    "ngang",
+    "huyen",
+    "sac",
+    "hoi",
+    "nga",
+    "nang"
+  ],
+  "tones": [
+    {
+      "id": "ngang",
+      "name_vi": "ngang",
+      "name_en": "level",
+      "mark_en": "no tone mark",
+      "css_variable": "--tone-ngang",
+      "color": "#D8C7A0",
+      "shape": "level",
+      "four_way_family": {
+        "north": "level",
+        "south": "level"
+      },
+      "physical_cue": "Keep your chin still and carry the vowel straight across."
+    },
+    {
+      "id": "huyen",
+      "name_vi": "huyền",
+      "name_en": "falling",
+      "mark_en": "grave accent",
+      "css_variable": "--tone-huyen",
+      "color": "#4D72C9",
+      "shape": "gentle fall",
+      "four_way_family": {
+        "north": "falling",
+        "south": "falling"
+      },
+      "physical_cue": "Start comfortably and let your chin settle as the pitch falls."
+    },
+    {
+      "id": "sac",
+      "name_vi": "sắc",
+      "name_en": "rising",
+      "mark_en": "acute accent",
+      "css_variable": "--tone-sac",
+      "color": "#FF6B5E",
+      "shape": "clear rise",
+      "four_way_family": {
+        "north": "rising",
+        "south": "rising"
+      },
+      "physical_cue": "Start lower, lift your chin, and let the vowel rise cleanly."
+    },
+    {
+      "id": "hoi",
+      "name_vi": "hỏi",
+      "name_en": "dipping",
+      "mark_en": "hook above",
+      "css_variable": "--tone-hoi",
+      "color": "#9B7AE8",
+      "shape": "dip with recovery",
+      "four_way_family": {
+        "north": "dipping",
+        "south": "dipping"
+      },
+      "physical_cue": "Let your chin dip through the middle, then recover slightly."
+    },
+    {
+      "id": "nga",
+      "name_vi": "ngã",
+      "name_en": "broken rising",
+      "mark_en": "tilde",
+      "css_variable": "--tone-nga",
+      "color": "#35C1B4",
+      "shape": "broken rise",
+      "four_way_family": {
+        "north": "rising",
+        "south": "dipping"
+      },
+      "physical_cue": "Briefly catch the sound in your throat, then release it upward."
+    },
+    {
+      "id": "nang",
+      "name_vi": "nặng",
+      "name_en": "low stopped",
+      "mark_en": "dot below",
+      "css_variable": "--tone-nang",
+      "color": "#F4A641",
+      "shape": "short low fall",
+      "four_way_family": {
+        "north": "falling",
+        "south": "falling"
+      },
+      "physical_cue": "Drop low, shorten the vowel, and stop it firmly in your throat."
+    }
+  ],
+  "words": [
+    {
+      "id": "ma-ghost",
+      "syllable": "ma",
+      "ascii_base": "ma",
+      "tone": "ngang",
+      "meaning_en": "ghost",
+      "alternate_meanings_en": [
+        "spirit",
+        "demon"
+      ],
+      "usage_note": "The ordinary noun ma refers to a ghost or spirit.",
+      "art_concept": "a friendly translucent Vietnamese folktale ghost floating above a small pool of warm light",
+      "minimal_pair_group": "ma-six-tones",
+      "minimal_pair_ids": [
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "target_audio": {
+        "north": "targets/north/ma-ghost.wav",
+        "south": "targets/south/ma-ghost.wav"
+      }
+    },
+    {
+      "id": "ma-but",
+      "syllable": "mà",
+      "ascii_base": "ma",
+      "tone": "huyen",
+      "meaning_en": "but / that",
+      "alternate_meanings_en": [
+        "which",
+        "yet"
+      ],
+      "usage_note": "Mà commonly links contrasting clauses as but, or introduces a relative clause as that or which.",
+      "art_concept": "two contrasting geometric shapes joined by one soft curved ribbon to suggest a connecting word",
+      "minimal_pair_group": "ma-six-tones",
+      "minimal_pair_ids": [
+        "ma-ghost",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "target_audio": {
+        "north": "targets/north/ma-but.wav",
+        "south": "targets/south/ma-but.wav"
+      }
+    },
+    {
+      "id": "ma-mother",
+      "syllable": "má",
+      "ascii_base": "ma",
+      "tone": "sac",
+      "meaning_en": "mother",
+      "alternate_meanings_en": [
+        "Mom",
+        "cheek"
+      ],
+      "usage_note": "Má is a warm, everyday word for mother in Southern Vietnamese; it can also mean cheek in other contexts.",
+      "art_concept": "a warm Vietnamese mother smiling in a coral blouse with a small bowl of fruit",
+      "minimal_pair_group": "ma-six-tones",
+      "minimal_pair_ids": [
+        "ma-ghost",
+        "ma-but",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "target_audio": {
+        "north": "targets/north/ma-mother.wav",
+        "south": "targets/south/ma-mother.wav"
+      }
+    },
+    {
+      "id": "ma-grave",
+      "syllable": "mả",
+      "ascii_base": "ma",
+      "tone": "hoi",
+      "meaning_en": "grave",
+      "alternate_meanings_en": [
+        "tomb",
+        "burial place"
+      ],
+      "usage_note": "Mả refers to a grave or burial place.",
+      "art_concept": "a quiet grassy grave mound with one incense holder and soft violet twilight",
+      "minimal_pair_group": "ma-six-tones",
+      "minimal_pair_ids": [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "target_audio": {
+        "north": "targets/north/ma-grave.wav",
+        "south": "targets/south/ma-grave.wav"
+      }
+    },
+    {
+      "id": "ma-code",
+      "syllable": "mã",
+      "ascii_base": "ma",
+      "tone": "nga",
+      "meaning_en": "code",
+      "alternate_meanings_en": [
+        "identifier",
+        "appearance"
+      ],
+      "usage_note": "Mã often means a code or identifier; it can also refer to outward appearance in compounds.",
+      "art_concept": "a single glowing grid of interlocking code tiles with a teal scan beam and no symbols",
+      "minimal_pair_group": "ma-six-tones",
+      "minimal_pair_ids": [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-seedling"
+      ],
+      "target_audio": {
+        "north": "targets/north/ma-code.wav",
+        "south": "targets/south/ma-code.wav"
+      }
+    },
+    {
+      "id": "ma-seedling",
+      "syllable": "mạ",
+      "ascii_base": "ma",
+      "tone": "nang",
+      "meaning_en": "rice seedling",
+      "alternate_meanings_en": [
+        "young rice plant"
+      ],
+      "usage_note": "Mạ is a young rice plant grown for transplanting into a paddy.",
+      "art_concept": "a vivid young rice seedling rooted in a small mirror of flooded amber paddy water",
+      "minimal_pair_group": "ma-six-tones",
+      "minimal_pair_ids": [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code"
+      ],
+      "target_audio": {
+        "north": "targets/north/ma-seedling.wav",
+        "south": "targets/south/ma-seedling.wav"
+      }
+    },
+    {
+      "id": "phuong-name",
+      "syllable": "Phương",
+      "ascii_base": "phuong",
+      "tone": "ngang",
+      "meaning_en": "Phương, a woman's name",
+      "alternate_meanings_en": [
+        "direction"
+      ],
+      "usage_note": "Phương is presented here as a woman's name. The homograph phương can also mean direction; the compass art is a memory cue, not a claim about the name's etymology.",
+      "art_concept": "a single elegant brass compass with a warm coral needle, used as a memory cue for the name Phương",
+      "minimal_pair_group": "phuong-name-test",
+      "minimal_pair_ids": [
+        "phuong-ward",
+        "phuong-phoenix"
+      ],
+      "target_audio": {
+        "north": "targets/north/phuong-name.wav",
+        "south": "targets/south/phuong-name.wav"
+      }
+    },
+    {
+      "id": "phuong-ward",
+      "syllable": "phường",
+      "ascii_base": "phuong",
+      "tone": "huyen",
+      "meaning_en": "urban ward",
+      "alternate_meanings_en": [
+        "city ward"
+      ],
+      "usage_note": "Phường is an urban administrative ward in Vietnam.",
+      "art_concept": "a welcoming Vietnamese urban ward office facade with a civic seal shape but no letters or numbers",
+      "minimal_pair_group": "phuong-name-test",
+      "minimal_pair_ids": [
+        "phuong-name",
+        "phuong-phoenix"
+      ],
+      "target_audio": {
+        "north": "targets/north/phuong-ward.wav",
+        "south": "targets/south/phuong-ward.wav"
+      }
+    },
+    {
+      "id": "phuong-phoenix",
+      "syllable": "phượng",
+      "ascii_base": "phuong",
+      "tone": "nang",
+      "meaning_en": "phoenix",
+      "alternate_meanings_en": [
+        "royal poinciana"
+      ],
+      "usage_note": "Phượng means phoenix and also names the flame tree in compounds such as hoa phượng.",
+      "art_concept": "a graceful amber and coral phoenix bird folding its wings around one glowing feather",
+      "minimal_pair_group": "phuong-name-test",
+      "minimal_pair_ids": [
+        "phuong-name",
+        "phuong-ward"
+      ],
+      "target_audio": {
+        "north": "targets/north/phuong-phoenix.wav",
+        "south": "targets/south/phuong-phoenix.wav"
+      }
+    },
+    {
+      "id": "com-rice",
+      "syllable": "cơm",
+      "ascii_base": "com",
+      "tone": "ngang",
+      "meaning_en": "cooked rice / meal",
+      "alternate_meanings_en": [
+        "meal"
+      ],
+      "usage_note": "Cơm means cooked rice and, by extension, a meal.",
+      "art_concept": "a single ceramic bowl of steaming white rice with warm wood grain beneath it",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/com-rice.wav",
+        "south": "targets/south/com-rice.wav"
+      }
+    },
+    {
+      "id": "nha-home",
+      "syllable": "nhà",
+      "ascii_base": "nha",
+      "tone": "huyen",
+      "meaning_en": "home / house",
+      "alternate_meanings_en": [
+        "family household"
+      ],
+      "usage_note": "Nhà can mean a house, a home, or one's household depending on context.",
+      "art_concept": "a small warmly lit Vietnamese home with an open veranda and one potted plant",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/nha-home.wav",
+        "south": "targets/south/nha-home.wav"
+      }
+    },
+    {
+      "id": "ca-fish",
+      "syllable": "cá",
+      "ascii_base": "ca",
+      "tone": "sac",
+      "meaning_en": "fish",
+      "alternate_meanings_en": [],
+      "usage_note": "Cá is the everyday noun for fish.",
+      "art_concept": "one bright coral river fish turning upward through a dark blue ripple",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/ca-fish.wav",
+        "south": "targets/south/ca-fish.wav"
+      }
+    },
+    {
+      "id": "la-leaf",
+      "syllable": "lá",
+      "ascii_base": "la",
+      "tone": "sac",
+      "meaning_en": "leaf",
+      "alternate_meanings_en": [],
+      "usage_note": "Lá is the common word for a plant leaf.",
+      "art_concept": "one fresh tropical leaf with a coral-lit edge and a single dew drop",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/la-leaf.wav",
+        "south": "targets/south/la-leaf.wav"
+      }
+    },
+    {
+      "id": "pho-noodle-soup",
+      "syllable": "phở",
+      "ascii_base": "pho",
+      "tone": "hoi",
+      "meaning_en": "phở noodle soup",
+      "alternate_meanings_en": [
+        "Vietnamese noodle soup"
+      ],
+      "usage_note": "Phở is the Vietnamese rice-noodle soup.",
+      "art_concept": "a single steaming bowl of phở with rice noodles, herbs, lime, and a violet ceramic rim",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/pho-noodle-soup.wav",
+        "south": "targets/south/pho-noodle-soup.wav"
+      }
+    },
+    {
+      "id": "cua-door",
+      "syllable": "cửa",
+      "ascii_base": "cua",
+      "tone": "hoi",
+      "meaning_en": "door",
+      "alternate_meanings_en": [
+        "entrance"
+      ],
+      "usage_note": "Cửa means a door, opening, or entrance depending on the compound.",
+      "art_concept": "one half-open wooden door casting a violet curve of welcoming light onto the floor",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/cua-door.wav",
+        "south": "targets/south/cua-door.wav"
+      }
+    },
+    {
+      "id": "sua-milk",
+      "syllable": "sữa",
+      "ascii_base": "sua",
+      "tone": "nga",
+      "meaning_en": "milk",
+      "alternate_meanings_en": [],
+      "usage_note": "Sữa is the everyday word for milk.",
+      "art_concept": "one rounded glass bottle of milk with a teal ribbon of liquid and no label",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/sua-milk.wav",
+        "south": "targets/south/sua-milk.wav"
+      }
+    },
+    {
+      "id": "mu-hat",
+      "syllable": "mũ",
+      "ascii_base": "mu",
+      "tone": "nga",
+      "meaning_en": "hat",
+      "alternate_meanings_en": [
+        "cap"
+      ],
+      "usage_note": "Mũ is a general word for a hat or cap.",
+      "art_concept": "one soft teal bucket hat tipped at a jaunty angle under a warm spotlight",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/mu-hat.wav",
+        "south": "targets/south/mu-hat.wav"
+      }
+    },
+    {
+      "id": "me-mother",
+      "syllable": "mẹ",
+      "ascii_base": "me",
+      "tone": "nang",
+      "meaning_en": "mother",
+      "alternate_meanings_en": [
+        "Mom"
+      ],
+      "usage_note": "Mẹ is the widely used Vietnamese word for mother.",
+      "art_concept": "a kind Vietnamese mother waving with one hand under a warm amber kitchen light",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/me-mother.wav",
+        "south": "targets/south/me-mother.wav"
+      }
+    },
+    {
+      "id": "ban-friend",
+      "syllable": "bạn",
+      "ascii_base": "ban",
+      "tone": "nang",
+      "meaning_en": "friend",
+      "alternate_meanings_en": [
+        "you, among peers"
+      ],
+      "usage_note": "Bạn means friend and is also a common peer-to-peer pronoun for you.",
+      "art_concept": "a centered pair of hands meeting in a friendly high-five with a small amber spark",
+      "minimal_pair_group": null,
+      "minimal_pair_ids": [],
+      "target_audio": {
+        "north": "targets/north/ban-friend.wav",
+        "south": "targets/south/ban-friend.wav"
+      }
+    }
+  ],
+  "minimal_pair_groups": [
+    {
+      "id": "ma-six-tones",
+      "ascii_base": "ma",
+      "label": "The six meanings of ma",
+      "word_ids": [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "verdict_template": "You meant {intended_syllable}, {intended_meaning}. You said {detected_syllable}, {detected_meaning}."
+    },
+    {
+      "id": "phuong-name-test",
+      "ascii_base": "phuong",
+      "label": "The Phương name test",
+      "word_ids": [
+        "phuong-name",
+        "phuong-ward",
+        "phuong-phoenix"
+      ],
+      "verdict_template": "You meant {intended_syllable}, {intended_meaning}. You said {detected_syllable}, {detected_meaning}."
+    }
+  ],
+  "verdict_overrides": [
+    {
+      "intended_word_id": "phuong-name",
+      "detected_word_id": "phuong-ward",
+      "copy": "You meant Phương, the name. You said phường, an urban ward."
+    },
+    {
+      "intended_word_id": "phuong-name",
+      "detected_word_id": "phuong-phoenix",
+      "copy": "You meant Phương, the name. You said phượng, a phoenix."
+    },
+    {
+      "intended_word_id": "ma-mother",
+      "detected_word_id": "ma-ghost",
+      "copy": "You meant má, mother. You said ma, a ghost."
+    }
+  ],
+  "featured_queue": [
+    "phuong-name",
+    "phuong-ward",
+    "phuong-phoenix",
+    "ma-ghost",
+    "ma-but",
+    "ma-mother",
+    "ma-grave",
+    "ma-code",
+    "ma-seedling",
+    "com-rice",
+    "nha-home",
+    "ca-fish",
+    "la-leaf",
+    "pho-noodle-soup",
+    "cua-door",
+    "sua-milk",
+    "mu-hat",
+    "me-mother",
+    "ban-friend"
+  ],
+  "themed_drills": [
+    {
+      "id": "food",
+      "title": "At the table",
+      "description": "Practice the tones that separate family words from everyday food words.",
+      "word_ids": [
+        "com-rice",
+        "ca-fish",
+        "pho-noodle-soup",
+        "sua-milk",
+        "ma-mother",
+        "ma-ghost"
+      ]
+    },
+    {
+      "id": "family",
+      "title": "Names and family",
+      "description": "Keep Phương's name level and contrast two common words for mother.",
+      "word_ids": [
+        "phuong-name",
+        "phuong-ward",
+        "phuong-phoenix",
+        "ma-mother",
+        "me-mother",
+        "ban-friend",
+        "nha-home"
+      ]
+    },
+    {
+      "id": "travel",
+      "title": "Around town",
+      "description": "Practice useful place, meal, and social words across the tone families.",
+      "word_ids": [
+        "phuong-ward",
+        "nha-home",
+        "cua-door",
+        "pho-noodle-soup",
+        "com-rice",
+        "ban-friend",
+        "la-leaf"
+      ]
+    }
+  ]
+}

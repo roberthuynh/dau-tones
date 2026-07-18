@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "note": "Fixture paths are stable contracts for the committed offline demo recordings produced during corpus generation.",
+  "analyzer_demos": [
+    {
+      "id": "ma-mother-correct",
+      "title": "A clean rising má",
+      "description": "A correct sắc-tone sample for judges without a microphone.",
+      "recording_path": "targets/demos/analyze/ma-mother-correct.wav",
+      "accent": "south",
+      "intended_word_id": "ma-mother",
+      "expected_detected_word_id": "ma-mother",
+      "expected_detected_tone": "sac",
+      "expected_correct": true,
+      "expected_verdict": "That rise landed on má, mother."
+    },
+    {
+      "id": "ma-mother-said-ghost",
+      "title": "Má flattened into ma",
+      "description": "The learner intends mother but produces the level-tone word for ghost.",
+      "recording_path": "targets/demos/analyze/ma-mother-said-ghost.wav",
+      "accent": "south",
+      "intended_word_id": "ma-mother",
+      "expected_detected_word_id": "ma-ghost",
+      "expected_detected_tone": "ngang",
+      "expected_correct": false,
+      "expected_verdict": "You meant má, mother. You said ma, a ghost."
+    },
+    {
+      "id": "phuong-name-said-ward",
+      "title": "The Phương name test",
+      "description": "The learner intends the level-tone name but lets it fall into phường.",
+      "recording_path": "targets/demos/analyze/phuong-name-said-ward.wav",
+      "accent": "north",
+      "intended_word_id": "phuong-name",
+      "expected_detected_word_id": "phuong-ward",
+      "expected_detected_tone": "huyen",
+      "expected_correct": false,
+      "expected_verdict": "You meant Phương, the name. You said phường, an urban ward."
+    }
+  ],
+  "echo_demos": [
+    {
+      "id": "invite-mom-said-ghost",
+      "title": "A ghost at dinner",
+      "sentence_id": "invite-mom-to-dinner",
+      "recording_path": "targets/demos/echo/invite-mom-said-ghost.wav",
+      "accent": "south",
+      "committed_transcript": "Tối nay con mời ma đi ăn cơm.",
+      "expected_divergences": [
+        {
+          "kind": "tone_only",
+          "token_index": 4,
+          "target_token": "má",
+          "heard_token": "ma",
+          "intended_word_id": "ma-mother",
+          "heard_word_id": "ma-ghost"
+        }
+      ],
+      "expected_explanation": "You said ma, a ghost, instead of má, mother. You invited a ghost to dinner."
+    }
+  ]
+}
