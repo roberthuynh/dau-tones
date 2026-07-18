@@ -30,7 +30,7 @@ cp .env.example .env.local
 ./dev.sh
 ```
 
-The same monorepo is live at [dau-tones.vercel.app](https://dau-tones.vercel.app) as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service. The native pYIN, SciPy, LLVM, and PyAV stack uses [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb); the deployed function keeps the same DSP and browser-audio decoding in production.
+The same monorepo is live at [dau.huynhrobert.com](https://dau.huynhrobert.com) as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service. The native pYIN, SciPy, LLVM, and PyAV stack uses [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb); the deployed function keeps the same DSP and browser-audio decoding in production.
 
 GitHub Actions is manual-only during the build to preserve the free-plan quota. The same lint, test, build, and offline end-to-end checks run locally before each published milestone.
 

@@ -4,6 +4,5 @@ api/.venv/
 api/.pytest_cache/
 api/.ruff_cache/
 targets/candidates/
-targets/generation-report.json
 web/node_modules/
 web/dist/
