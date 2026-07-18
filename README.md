@@ -18,7 +18,7 @@ cd dau-tones
 
 Wait for `READY http://localhost:5173`, then open that URL. The script installs an uv-managed Python 3.11 environment and locked npm dependencies, warms pYIN, and starts FastAPI on port 8000 plus Vite on port 5173. Node.js 22+ and either `uv` or `curl` are the only host requirements.
 
-No microphone is needed for the judging loop. In Tone Lab, use the three **No mic? Try a real sample** buttons for correct `má`, `má` flattened into `ma`, and the signature `Phương` to `phường` mistake. In Echo, run **Play the ghost-at-dinner demo**, then compare the committed learner sentence with Cedar's validated correction.
+No microphone is needed for the judging loop. In Tone Lab, use the three **No mic? Try a real sample** buttons for correct `má`, `má` flattened into `ma`, and the signature `Phương` to `phường` mistake. In Echo, run **Try “a ghost at dinner”**, then compare the committed learner sentence with Cedar's validated correction.
 
 **Cold-start receipt, 2026-07-18:** a fresh clone on macOS with `OPENAI_API_KEY` unset printed `READY` in about 56 seconds. The check loaded all 19 words, replayed the Phương sample through `/api/analyze`, returned the ghost-at-dinner tone diff, and streamed committed Echo speech.
 
@@ -44,7 +44,7 @@ GitHub Actions is manual-only during the build to preserve the free-plan quota. 
 
 Audio language models are poor judges of pitch shape, so the DSP judges and the LLM coaches. Pitch grading is deterministic and inspectable; GPT-5.6 handles the work it is better at: concrete instruction, drill choice, and meaning. Stage 6 measures this claim in-repo by asking the sibling Realtime model to name the tones in its own validated speech and comparing it with the leakage-safe DSP evaluation.
 
-Stage 0 is deliberately an all-or-nothing gate. Cedar produced five isolated takes and up to five carrier-phrase takes per word and accent; `gpt-4o-transcribe` checked lexical identity, then the shared DSP checked signal quality and the expected contour. The current receipt accepts 34 of 38 pairs and withholds `targets/manifest.json` until phone recordings replace four exhausted pairs: Northern `mả`, Northern `phở`, Southern `mả`, and Southern `phượng`. The accepted partial receipt can power templates and no-mic demos, but health continues to report the corpus as incomplete and no failed take is shipped as ground truth.
+Stage 0 is deliberately an all-or-nothing gate. Cedar produced five isolated takes and up to five carrier-phrase takes per word and accent; `gpt-4o-transcribe` checked lexical identity, then the shared DSP checked signal quality and the expected contour. The current receipt accepts 34 of 38 pairs and withholds `targets/manifest.json` until phone recordings replace four exhausted pairs: Northern `mả`, Northern `phở`, Southern `mả`, and Southern `phượng`. The accepted partial receipt can power templates and no-mic demos, but health continues to report the corpus as incomplete and no failed take is shipped as ground truth. The phone fallback importer normalizes each recording to mono PCM WAV, reruns both lexical and DSP checks, audits all 38 hashes, and writes the report and manifest as one rollback-safe transaction.
 
 Active model IDs live in one API config module:
 
@@ -101,4 +101,4 @@ Pending the four phone fallbacks listed above and the resulting complete manifes
 
 ## License
 
-Dấu is released under the [MIT License](LICENSE). Be Vietnam Pro will be self-hosted under its SIL Open Font License, included beside the font files.
+Dấu is released under the [MIT License](LICENSE). Be Vietnam Pro is self-hosted under its SIL Open Font License, included beside the font files.
