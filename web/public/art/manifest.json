@@ -1,0 +1,196 @@
+{
+  "model": "gpt-image-2",
+  "style_prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail.",
+  "images": [
+    {
+      "word_id": "ma-ghost",
+      "surface": "ma",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a friendly translucent Vietnamese folktale ghost floating above a small pool of warm light. Vietnamese vocabulary meaning: ghost.",
+      "prompt_sha256": "ff183193e599e660d0f7d26784071042c166179576e6e293fa1b0980c07cf96f",
+      "file_sha256": "3d84a3bd20087f7b35a523eec548c5dfab82bfb014f7a76ec643edfbae6f850b"
+    },
+    {
+      "word_id": "ma-but",
+      "surface": "mà",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: two contrasting geometric shapes joined by one soft curved ribbon to suggest a connecting word. Vietnamese vocabulary meaning: but / that.",
+      "prompt_sha256": "6ed1bb287a74faaf5f9215a074c97e507052f1607344e95a18b9d39cc0d42433",
+      "file_sha256": "c0be1c5c59897779417fd540a0661970745e0d7bc7af75aa03d74f242115cc01"
+    },
+    {
+      "word_id": "ma-mother",
+      "surface": "má",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a warm Vietnamese mother smiling in a coral blouse with a small bowl of fruit. Vietnamese vocabulary meaning: mother.",
+      "prompt_sha256": "d59bb92f45ee2dae6e94d9945e84b1d9df6d32adfd90607cf1c9c359fe3657eb",
+      "file_sha256": "ac0d5b1c150e4adffc9932df0e99c29364dc6321e1bb1295cfacf440e7937455"
+    },
+    {
+      "word_id": "ma-grave",
+      "surface": "mả",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a quiet grassy grave mound with one incense holder and soft violet twilight. Vietnamese vocabulary meaning: grave.",
+      "prompt_sha256": "f0e7ccd83c76cf0a085ad9cbdd8d9332834a1133dae7d0f3b6bdf69c5dc9da6d",
+      "file_sha256": "71de3836055db9b4d73c83e301823c241987d1c29c71da7c2d80d4f9f363f57a"
+    },
+    {
+      "word_id": "ma-code",
+      "surface": "mã",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a single glowing grid of interlocking code tiles with a teal scan beam and no symbols. Vietnamese vocabulary meaning: code.",
+      "prompt_sha256": "d0b84b6664cd0bdc9256c31672eeee9b6a2fb907d6f84a9ccd1d946e1062c0e4",
+      "file_sha256": "34402d455d4cd40cf2382ec209d8889c21870924d89efebda641ad8646682d44"
+    },
+    {
+      "word_id": "ma-seedling",
+      "surface": "mạ",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a vivid young rice seedling rooted in a small mirror of flooded amber paddy water. Vietnamese vocabulary meaning: rice seedling.",
+      "prompt_sha256": "2b64c8a8f9d55c3e46b1ecaa4bdfe75a0279c92b5dc3e25f42eb89f4eff5c477",
+      "file_sha256": "c826d9e4afc133d776ff4bd0404937d8c0bb72bf79d43d0b74f422b999ff6fd7"
+    },
+    {
+      "word_id": "phuong-name",
+      "surface": "Phương",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a single elegant brass compass with a warm coral needle, used as a memory cue for the name Phương. Vietnamese vocabulary meaning: Phương, a woman's name.",
+      "prompt_sha256": "f299912fcfc013ee564cbd3c7e1029a1e18975a1c462866117f9dabd99bc41b3",
+      "file_sha256": "a1cbb8064e5fa35461e3cedb362aef4805ad81d2505c5b5dd78d2b8d3bc40321"
+    },
+    {
+      "word_id": "phuong-ward",
+      "surface": "phường",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a welcoming Vietnamese urban ward office facade with a civic seal shape but no letters or numbers. Vietnamese vocabulary meaning: urban ward.",
+      "prompt_sha256": "4948adfc878a7bf6117999925977352aefbfc2ed447b5082c0c3aa10fdd20378",
+      "file_sha256": "6234c08bd94de61086055999fc9ad43f7b00ff895b308dc6af777e4fe7cbce8d"
+    },
+    {
+      "word_id": "phuong-phoenix",
+      "surface": "phượng",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a graceful amber and coral phoenix bird folding its wings around one glowing feather. Vietnamese vocabulary meaning: phoenix.",
+      "prompt_sha256": "48a3a3802cbac25f05a074378738f016928189f1d18bf94eee88bdb2e1712dd1",
+      "file_sha256": "84dbc707bd90e2f12f107c75fda673d68d96cbbc41f0fb2c6a5e87842f2ebf06"
+    },
+    {
+      "word_id": "com-rice",
+      "surface": "cơm",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a single ceramic bowl of steaming white rice with warm wood grain beneath it. Vietnamese vocabulary meaning: cooked rice / meal.",
+      "prompt_sha256": "d72b00a9861deae11bbba600c5e18b68e917de2bf7e3dd8e8f8d282617b2aea5",
+      "file_sha256": "c8b87e02aaaf52df685853a90b678065b31fefdf7593ea2c3bbb150a50480277"
+    },
+    {
+      "word_id": "nha-home",
+      "surface": "nhà",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a small warmly lit Vietnamese home with an open veranda and one potted plant. Vietnamese vocabulary meaning: home / house.",
+      "prompt_sha256": "4a8d18bde397f8891a48e9e1bcd83ec16e14f1c259c4e5eb91f095507b1a2bc6",
+      "file_sha256": "4f839931c00594e24e9e62ec126d2d05bd6995397c8dd6b37dd49fd8adc71975"
+    },
+    {
+      "word_id": "ca-fish",
+      "surface": "cá",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: one bright coral river fish turning upward through a dark blue ripple. Vietnamese vocabulary meaning: fish.",
+      "prompt_sha256": "735845b0e9da1e519b33bc20c816a64d6793d200ffc9e04455f63cd4546c173a",
+      "file_sha256": "5462e4adf45ba9df067a139e368d966f6c9478befbdb3b934e19ebad357fbf7b"
+    },
+    {
+      "word_id": "la-leaf",
+      "surface": "lá",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: one fresh tropical leaf with a coral-lit edge and a single dew drop. Vietnamese vocabulary meaning: leaf.",
+      "prompt_sha256": "4d1b23eeba759bb6d2da2d9d80f56a42787abadc56dac5f5da004139c447b6ae",
+      "file_sha256": "0ceae7f84dde3e56263eef3df3bceaddf6df69026f3dadde50cde8be63689c2b"
+    },
+    {
+      "word_id": "pho-noodle-soup",
+      "surface": "phở",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a single steaming bowl of phở with rice noodles, herbs, lime, and a violet ceramic rim. Vietnamese vocabulary meaning: phở noodle soup.",
+      "prompt_sha256": "0206b714ad7c9b193c1a6f282375395cb888fd445469150a318e2b41809cabf0",
+      "file_sha256": "d0319169e450a059e9fa2a70c8cf99342539f9ca50e1a425e0d3b2fc26fb9f17"
+    },
+    {
+      "word_id": "cua-door",
+      "surface": "cửa",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: one half-open wooden door casting a violet curve of welcoming light onto the floor. Vietnamese vocabulary meaning: door.",
+      "prompt_sha256": "7995107c14a52d960f44d26dc59ba1db4ef8efb1434dddc2ef3c76b1df7fe662",
+      "file_sha256": "a8a427ebc1da94885fae225428a11f41e3267220dd492e465db89f9b52d31044"
+    },
+    {
+      "word_id": "sua-milk",
+      "surface": "sữa",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: one rounded glass bottle of milk with a teal ribbon of liquid and no label. Vietnamese vocabulary meaning: milk.",
+      "prompt_sha256": "225d39bf2bee71d209bf9eef2d99d09ce1d2c418e8ae7879760ba2e59820ec43",
+      "file_sha256": "eeb43994cdbcb028b700cf64f83e4ea3f2b2afeeb4ddd96d1e3d0e6ac0516527"
+    },
+    {
+      "word_id": "mu-hat",
+      "surface": "mũ",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: one soft teal bucket hat tipped at a jaunty angle under a warm spotlight. Vietnamese vocabulary meaning: hat.",
+      "prompt_sha256": "cf8e8f3ec1e71ab2d744acfc9fd990a897fc72a1d5e3653e4d100c441a93f4ee",
+      "file_sha256": "190479d39cbd6347a31fe286053a5e34b6d5185ae0fd6dae0da2c75138d26e35"
+    },
+    {
+      "word_id": "me-mother",
+      "surface": "mẹ",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a kind Vietnamese mother waving with one hand under a warm amber kitchen light. Vietnamese vocabulary meaning: mother.",
+      "prompt_sha256": "c2c5726323982bddef0f48b9a1f036498f8bde74ddc70a52a8bbe4d87a545b0c",
+      "file_sha256": "bbe95b8cb8b3690ac7cbd7781db3449fcb1a1af1385d78219352f7b3843bbb6b"
+    },
+    {
+      "word_id": "ban-friend",
+      "surface": "bạn",
+      "model": "gpt-image-2",
+      "size": "1024x1024",
+      "quality": "medium",
+      "prompt": "Flat 2D minimal illustration, warm palette on near-black, single centered subject, no text, no letters, no numbers, no border. Strong silhouette, generous negative space, high contrast, readable as a small square thumbnail. Subject concept: a centered pair of hands meeting in a friendly high-five with a small amber spark. Vietnamese vocabulary meaning: friend.",
+      "prompt_sha256": "c3e7cb63efb3ba54c6081b3b1faf254e9b3295f7ae59c252b329125e69972d0e",
+      "file_sha256": "05560a03a6f602a20379224c45f237384ac77390718a6f64aef319fb0df745bc"
+    }
+  ]
+}
