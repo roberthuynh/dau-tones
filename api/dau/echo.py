@@ -66,7 +66,7 @@ def align_transcript(target: str, heard: str) -> list[dict[str, Any]]:
                 and heard_token
                 and strip_tone_marks(target_token) == strip_tone_marks(heard_token)
             ):
-                kind = "tone"
+                kind = "tone_only"
             target_word = lookup.get(target_token or "")
             heard_word = lookup.get(heard_token or "")
             item: dict[str, Any] = {
@@ -76,7 +76,7 @@ def align_transcript(target: str, heard: str) -> list[dict[str, Any]]:
                 "target_word_id": (target_word or {}).get("id"),
                 "heard_word_id": (heard_word or {}).get("id"),
             }
-            if kind == "tone" and target_word and heard_word:
+            if kind == "tone_only" and target_word and heard_word:
                 item["meaning_explanation"] = (
                     f"You said {word_surface(heard_word)} ({heard_word['meaning_en']}) "
                     f"instead of {word_surface(target_word)} ({target_word['meaning_en']})."

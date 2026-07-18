@@ -15,7 +15,7 @@ def test_tone_only_alignment_preserves_literal_meanings() -> None:
         {
             "target": "má",
             "heard": "ma",
-            "kind": "tone",
+            "kind": "tone_only",
             "target_word_id": "ma-mother",
             "heard_word_id": "ma-ghost",
             "meaning_explanation": "You said ma (ghost) instead of má (mother).",
@@ -27,7 +27,7 @@ def test_tone_only_alignment_preserves_literal_meanings() -> None:
 def test_phuong_name_alignment_is_case_insensitive() -> None:
     diff = align_transcript("Mẹ tôi tên là Phương.", "Mẹ tôi tên là phường.")
     changed = [item for item in diff if item["kind"] != "match"]
-    assert changed[0]["kind"] == "tone"
+    assert changed[0]["kind"] == "tone_only"
     assert changed[0]["target_word_id"] == "phuong-name"
     assert changed[0]["heard_word_id"] == "phuong-ward"
 

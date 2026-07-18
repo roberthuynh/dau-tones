@@ -104,7 +104,7 @@ def test_offline_echo_demo_closes_transcript_loop(monkeypatch) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["source"] == "fixture"
-    assert any(item["kind"] == "tone" for item in payload["diff"])
+    assert any(item["kind"] == "tone_only" for item in payload["diff"])
     assert "ghost" in payload["explanation"]
 
 
