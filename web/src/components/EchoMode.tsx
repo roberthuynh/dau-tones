@@ -123,16 +123,13 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
     }
   };
 
-  const runDemo = async () => {
+  const runDemo = () => {
     const demoSentence = sentences.find((item) => item.id === "invite-mom-to-dinner");
     if (demoSentence) selectSentence(demoSentence.id);
     setGeneratedRevealArt(null);
     setError(null);
-    try {
-      setResult(await transcribeEchoDemo("invite-mom-to-dinner", "invite-mom-said-ghost"));
-    } catch {
-      setResult(ECHO_DEMO);
-    }
+    setResult(ECHO_DEMO);
+    void transcribeEchoDemo("invite-mom-to-dinner", "invite-mom-said-ghost").catch(() => undefined);
   };
 
   const explanation = result?.explanation;
@@ -203,7 +200,7 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
           <div className="echo-demo-callout">
             <span><SparkIcon /> No key or no Vietnamese?</span>
             <p>Run the committed dinner demo to see a single accent mark invite the wrong guest.</p>
-            <button type="button" onClick={() => void runDemo()}>Try “a ghost at dinner” <ArrowIcon /></button>
+            <button type="button" onClick={runDemo}>Try “a ghost at dinner” <ArrowIcon /></button>
           </div>
         </section>
 
