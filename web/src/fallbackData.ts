@@ -150,7 +150,7 @@ export const FALLBACK_PAYLOAD: WordsPayload = {
   tones: TONES,
   words: FALLBACK_WORDS,
   featured_queue: FEATURED_QUEUE,
-  scoring_modes: { north: "six_tone", south: "four_family" },
+  scoring_modes: { north: "four_family", south: "four_family" },
   drills: {
     food: { id: "food", title: "At the table", word_ids: ["com-rice", "ca-fish", "pho-noodle-soup", "sua-milk", "ma-mother", "ma-ghost"] },
     family: { id: "family", title: "Names and family", word_ids: ["phuong-name", "phuong-ward", "phuong-phoenix", "ma-mother", "me-mother", "ban-friend", "nha-home"] },
