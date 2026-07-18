@@ -6,7 +6,7 @@ Dấu is an open-source practice lab that makes Vietnamese tones visible by draw
 
 **Demo video:** [Build Week submission video coming soon](https://github.com/roberthuynh/dau-tones)
 
-![Dấu Tone Lab showing the Phương to phường meaning verdict](web/public/screenshots/tone-lab-phuong.png)
+![Dấu Tone Lab showing the Phương to phường meaning verdict](web/public/screenshots/tone-lab-phuong.jpg)
 
 ## Quick start
 
