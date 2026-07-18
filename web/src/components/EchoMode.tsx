@@ -99,7 +99,7 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
       setGeneratedRevealArt(null);
       setError(null);
       if (!liveTranscription) {
-        setError("Live sentence transcription needs an OpenAI key. Replay your recording beside Cedar, or run the committed wrong-tone demo.");
+        setError("Live sentence transcription needs an OpenAI key. Replay your recording beside Cô Linh, or run the committed wrong-tone demo.");
         return;
       }
       try {
@@ -149,7 +149,7 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
         <div>
           <p className="eyebrow">Echo · sentence mode</p>
           <h1>Tones carry the stakes.</h1>
-          <p>Say the whole thought. Dấu finds the tiny tone change that rewrites it, then Cedar says it back for shadowing.</p>
+          <p>Say the whole thought. Dấu finds the tiny tone change that rewrites it, then Cô Linh says it back for shadowing.</p>
         </div>
         <div className="echo-hero__orb" aria-hidden="true"><span>ý</span><span>nghĩa</span></div>
       </header>
@@ -175,13 +175,22 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
           <div className="echo-practice-row">
             <CoDau compact contour={targetContour} tone={toneId} word={sentence.text} progress={correctAudio.progress} playing={correctAudio.playing} />
             <div className="echo-record-zone">
-              <RecordControl state={recorder.state} level={recorder.level} elapsedMs={recorder.elapsedMs} onToggle={recorder.toggle} label="Speak the sentence" />
+              <RecordControl
+                state={recorder.state}
+                level={recorder.level}
+                elapsedMs={recorder.elapsedMs}
+                onToggle={recorder.toggle}
+                label="Record the sentence"
+                idleHint="Tap once, speak naturally, then pause"
+                processingLabel="Checking your tone marks"
+                processingHint="Transcribing the words exactly as heard"
+              />
               <div className="echo-playback-pair">
                 <button type="button" disabled={!recordingUrl} onClick={() => recordingUrl && void new Audio(recordingUrl).play()}>
                   <PlayIcon /><span><strong>Your take</strong><small>{recordingUrl ? "ready to replay" : "record first"}</small></span>
                 </button>
                 <button type="button" onClick={() => void playCorrect()}>
-                  {correctAudio.playing ? <VolumeIcon /> : <PlayIcon />}<span><strong>Cedar's take</strong><small>correct shadowing</small></span>
+                  {correctAudio.playing ? <VolumeIcon /> : <PlayIcon />}<span><strong>Cô Linh's take</strong><small>correct shadowing</small></span>
                 </button>
               </div>
             </div>

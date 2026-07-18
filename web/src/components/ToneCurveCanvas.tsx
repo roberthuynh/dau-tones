@@ -136,7 +136,7 @@ export function ToneCurveCanvas({ target, learner, ghost, toneColor, ghostColor 
   return (
     <div ref={wrapperRef} className={`curve-canvas ${correct ? "curve-canvas--correct" : ""}`}>
       <canvas ref={canvasRef} role="img" aria-label={ariaLabel} />
-      <span className="curve-label curve-label--target">native target</span>
+      <span className="curve-label curve-label--target">reference target</span>
       {learner ? <span className="curve-label curve-label--learner">what you said</span> : null}
     </div>
   );

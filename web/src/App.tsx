@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FALLBACK_ECHO_SENTENCES, FALLBACK_PAYLOAD } from "./fallbackData";
-import { getEchoSentences, getHealth, getWords } from "./lib/api";
+import { getEchoSentences, getHealth, getWords, warmAnalysis } from "./lib/api";
 import type { Accent, EchoSentence, HealthPayload, WordsPayload } from "./types";
 import { EchoMode } from "./components/EchoMode";
 import { ToneLab } from "./components/ToneLab";
@@ -24,9 +24,17 @@ export default function App() {
   const [sentences, setSentences] = useState<EchoSentence[]>(FALLBACK_ECHO_SENTENCES);
   const [health, setHealth] = useState<HealthPayload | null>(null);
   const [apiOnline, setApiOnline] = useState(true);
+  const [analysisWarm, setAnalysisWarm] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    // Compile pYIN while the learner reads the first prompt. This is deliberately
+    // fire-and-forget so readiness data and the interface never wait on warmup.
+    void warmAnalysis()
+      .then(() => {
+        if (!cancelled) setAnalysisWarm(true);
+      })
+      .catch(() => undefined);
     void Promise.allSettled([getHealth(), getWords(), getEchoSentences()]).then(([healthResult, wordsResult, echoResult]) => {
       if (cancelled) return;
       if (healthResult.status === "fulfilled") {
@@ -57,9 +65,12 @@ export default function App() {
             Echo <span>sentences</span>
           </button>
         </nav>
-        <div className="header-status" title={apiOnline ? "Local pitch analysis is ready" : "API offline, samples still work"}>
+        <div
+          className="header-status"
+          title={apiOnline ? (analysisWarm ? "Pitch engine is warm" : "Pitch engine is warming in the background") : "API offline, samples still work"}
+        >
           <span className={apiOnline ? "online" : "offline"} />
-          {apiOnline ? "DSP ready" : "demo mode"}
+          {apiOnline ? (analysisWarm ? "DSP ready" : "warming pitch") : "demo mode"}
         </div>
       </header>
 
@@ -74,7 +85,7 @@ export default function App() {
       </div>
 
       <footer className="app-footer">
-        <span>Dấu is open source · local pitch grading</span>
+        <span>Dấu is open source · deterministic pitch grading</span>
         <span>DSP judges. GPT-5.6 coaches.</span>
       </footer>
     </div>

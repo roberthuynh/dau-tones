@@ -9,6 +9,7 @@ import type {
 } from "../types";
 
 const API_PREFIX = "/api";
+let analysisWarmup: Promise<void> | null = null;
 
 export class ApiError extends Error {
   status?: number;
@@ -61,6 +62,11 @@ async function json<T>(path: string, init?: RequestInit, timeoutMs?: number): Pr
 
 export function getHealth(): Promise<HealthPayload> {
   return json<HealthPayload>("/healthz", undefined, 12_000);
+}
+
+export function warmAnalysis(): Promise<void> {
+  analysisWarmup ??= request("/analysis/warmup", { method: "POST" }, 60_000).then(() => undefined);
+  return analysisWarmup;
 }
 
 export function getWords(): Promise<WordsPayload> {

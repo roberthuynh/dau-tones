@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { demoAnalysis, demoCoach, toneById, wordById } from "../fallbackData";
 import { useAudioPlayback } from "../hooks/useAudioPlayback";
 import { useRecorder } from "../hooks/useRecorder";
@@ -71,6 +71,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
   const [theme, setTheme] = useState<"food" | "family" | "travel">("family");
   const [drillMessage, setDrillMessage] = useState("Featured: the Phương name test");
   const [revealKey, setRevealKey] = useState(0);
+  const coachRequestRef = useRef(0);
   const currentWord = wordById(selectedId, payload.words) ?? payload.words[0];
   const target = currentWord.targets[accent];
   const intendedTone = toneById(currentWord.tone, payload.tones);
@@ -84,6 +85,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
   }, [stats]);
 
   const selectWord = (wordId: string) => {
+    coachRequestRef.current += 1;
     setSelectedId(wordId);
     setResult(null);
     setCoach(null);
@@ -92,6 +94,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
 
   const changeAccent = (nextAccent: Accent) => {
     if (nextAccent === accent) return;
+    coachRequestRef.current += 1;
     setResult(null);
     setCoach(null);
     setError(null);
@@ -99,7 +102,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
   };
 
   const acceptResult = useCallback(
-    async (analysis: AnalysisResult, knownCoach?: CoachResult) => {
+    (analysis: AnalysisResult, knownCoach?: CoachResult, intendedWord = currentWord) => {
       setResult(analysis);
       setRevealKey((value) => value + 1);
       setHistory((items) => [...items.slice(-22), analysis]);
@@ -118,24 +121,29 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
         setCoach(knownCoach);
         return;
       }
-      try {
-        const response = await getCoach(analysis, history, accent);
-        setCoach(response);
-      } catch {
-        setCoach(fallbackCoach(analysis, currentWord, payload));
-      }
+      // Show useful local coaching with the DSP result. The AI refinement runs
+      // independently so it never extends the pitch-analysis wait.
+      const requestId = coachRequestRef.current + 1;
+      coachRequestRef.current = requestId;
+      setCoach(fallbackCoach(analysis, intendedWord, payload));
+      void getCoach(analysis, history, accent)
+        .then((response) => {
+          if (coachRequestRef.current === requestId) setCoach(response);
+        })
+        .catch(() => undefined);
     },
     [accent, currentWord, history, payload],
   );
 
   const onRecording = useCallback(
     async (blob: Blob) => {
+      coachRequestRef.current += 1;
       setResult(null);
       setCoach(null);
       setError(null);
       try {
         const analysis = await analyzeRecording(blob, currentWord.id, currentWord.tone, accent);
-        await acceptResult(analysis);
+        acceptResult(analysis);
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Dấu could not read that recording. Try a single clear word.");
       }
@@ -143,7 +151,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
     [accent, acceptResult, currentWord.id, currentWord.tone],
   );
 
-  const recorder = useRecorder({ onRecording });
+  const recorder = useRecorder({ onRecording, silenceMs: 650, hardStopMs: 5_000 });
 
   const runDemo = async (demoId: DemoId) => {
     const intendedId = demoId === "phuong-ward" ? "phuong-name" : "ma-mother";
@@ -153,10 +161,10 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
     const intended = wordById(intendedId, payload.words)!;
     try {
       const analysis = await analyzeCommittedDemo(apiDemoId, intended.id, intended.tone, accent);
-      await acceptResult(analysis);
+      acceptResult(analysis, undefined, intended);
     } catch {
       const analysis = demoAnalysis(demoId, accent);
-      await acceptResult(analysis, demoCoach(demoId));
+      acceptResult(analysis, demoCoach(demoId), intended);
     }
   };
 
@@ -202,6 +210,16 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
     return { attempts, correct, accuracy: attempts ? Math.round((correct / attempts) * 100) : 0 };
   }, [stats]);
 
+  const renderStageActions = (placement: "desktop" | "mobile") => (
+    <div className={`stage-actions stage-actions--${placement}`}>
+      <button className="target-play" type="button" onClick={() => void targetAudio.play(target.audio_url)}>
+        <span>{targetAudio.playing ? <VolumeIcon /> : <PlayIcon />}</span>
+        <span><small className="action-step">Step 1 · reference voice</small><strong>{targetAudio.playing ? "Watch Cô Dấu now" : "Listen + watch"}</strong><small>Hear Cô Linh · {accent === "north" ? "Hà Nội" : "Sài Gòn"} · mirror Cô Dấu</small></span>
+      </button>
+      <RecordControl state={recorder.state} level={recorder.level} elapsedMs={recorder.elapsedMs} onToggle={recorder.toggle} label="Record your tone" />
+    </div>
+  );
+
   return (
     <main className="tone-lab page-enter">
       <section className="lab-toolbar" aria-label="Practice controls">
@@ -244,18 +262,24 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
               ghostColor={detectedTone?.color}
               revealKey={revealKey}
               correct={result?.correct}
-              ariaLabel={result ? `Native ${intendedTone.name_vi} curve overlaid with your detected ${detectedTone?.name_vi} curve` : `Native ${intendedTone.name_vi} pitch target`}
+              ariaLabel={result ? `Reference ${intendedTone.name_vi} curve overlaid with your detected ${detectedTone?.name_vi} curve` : `Reference ${intendedTone.name_vi} pitch target`}
             />
             <CoDau contour={targetCurve} tone={currentWord.tone} word={currentWord.syllable} progress={targetAudio.progress} playing={targetAudio.playing} />
+            {renderStageActions("mobile")}
+            {recorder.state === "processing" && !result ? (
+              <div className="analysis-overlay" role="status" aria-live="polite">
+                <span className="analysis-overlay__orbit" aria-hidden="true"><i /></span>
+                <div>
+                  <small>Deterministic pitch engine</small>
+                  <strong>Reading your pitch</strong>
+                  <p>Extracting your voice shape, then comparing all 64 points.</p>
+                  <span className="analysis-overlay__steps" aria-hidden="true"><i>pitch</i><i>shape</i><i>tone</i></span>
+                </div>
+              </div>
+            ) : null}
           </div>
 
-          <div className="stage-actions">
-            <button className="target-play" type="button" onClick={() => void targetAudio.play(target.audio_url)}>
-              <span>{targetAudio.playing ? <VolumeIcon /> : <PlayIcon />}</span>
-              <span><strong>{targetAudio.playing ? "Playing native target" : "Hear the target"}</strong><small>Cedar · {accent === "north" ? "Hà Nội" : "Sài Gòn"}</small></span>
-            </button>
-            <RecordControl state={recorder.state} level={recorder.level} elapsedMs={recorder.elapsedMs} onToggle={recorder.toggle} />
-          </div>
+          {renderStageActions("desktop")}
 
           {recorder.error || error || targetAudio.error ? (
             <div className="inline-error" role="alert">
@@ -275,11 +299,18 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
         <aside className={`verdict-column ${result ? "verdict-column--shown" : ""}`} aria-live="polite">
           {!result ? (
             <div className="first-visit">
-              <span className="first-visit__number">01</span>
-              <h2>Make one tone visible.</h2>
-              <p>Hear the native word, say it once, then compare the shape your voice drew.</p>
-              <div className="first-visit__line"><span /> <small>target</small></div>
-              <div className="first-visit__line first-visit__line--color"><span /> <small>you</small></div>
+              <span className="first-visit__number">Your first tone</span>
+              <h2>Watch it. Mirror it. Say it.</h2>
+              <p>Cô Dấu turns pitch into a physical gesture. Follow her chin and mouth, then record one clear word.</p>
+              <ol className="first-visit__steps">
+                <li><span>1</span><div><strong>Listen + watch</strong><small>Mirror Cô Dấu’s head and lips.</small></div></li>
+                <li><span>2</span><div><strong>Record your tone</strong><small>One tap. Say the word. Then pause.</small></div></li>
+                <li><span>3</span><div><strong>See what landed</strong><small>Your curve and meaning appear together.</small></div></li>
+              </ol>
+              <div className="first-visit__key">
+                <span className="first-visit__line"><i /> <small>reference target</small></span>
+                <span className="first-visit__line first-visit__line--color"><i /> <small>your voice</small></span>
+              </div>
             </div>
           ) : result.needs_retry ? (
             <div className="retry-verdict">
@@ -293,7 +324,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
               <div className="verdict-kicker"><span>✓</span> Tone landed</div>
               <MeaningArt word={currentWord} className="correct-verdict__art" eager />
               <h2><ToneSyllable text={currentWord.syllable} tone={currentWord.tone} /> means {currentWord.meaning_en}.</h2>
-              <p>Your curve moved with the native target.</p>
+              <p>Your curve moved with the reference target.</p>
               <div className="streak-pill"><strong>{streak}</strong><span>tone streak</span></div>
             </div>
           ) : (
@@ -317,7 +348,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
                   </div>
                 ) : null}
               </div>
-              <div className="confidence-line"><span style={{ width: `${Math.round(result.confidence * 100)}%` }} /><small>{Math.round(result.confidence * 100)}% contour match</small></div>
+              <div className="confidence-line"><span style={{ width: `${Math.round(result.confidence * 100)}%` }} /><small>{Math.round(result.confidence * 100)}% tone confidence</small></div>
             </div>
           )}
 

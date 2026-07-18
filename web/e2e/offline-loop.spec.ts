@@ -58,6 +58,8 @@ test("offline learner closes the word and Echo loops without external requests",
 
   await page.goto("/");
   await expect(page.getByText("demo mode", { exact: true })).toBeVisible();
+  await expect(page.locator(".stage-actions--desktop").getByText(/Cô Linh · Hà Nội/)).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("Cedar");
   await expect(page.getByRole("img", { name: "Illustration of Phương, a woman's name" })).toBeVisible();
   await expect(page.locator(".co-dau__mouth")).toHaveAttribute("data-vowel-shape", "rounded");
   await expect(page.locator(".co-dau__arrow")).toBeVisible();
