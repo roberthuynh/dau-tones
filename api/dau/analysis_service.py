@@ -10,7 +10,7 @@ from .content import (
     generic_contour,
     inventory_document,
     target_for,
-    target_manifest,
+    validated_targets,
     word_by_id,
     word_surface,
 )
@@ -50,7 +50,7 @@ def templates_for(accent: str) -> tuple[ToneTemplate, ...]:
     resolved = canonical_accent(accent)
     templates: list[ToneTemplate] = []
     words = {word["id"]: word for word in inventory_document().get("words", [])}
-    for target in target_manifest().get("targets", []):
+    for target in validated_targets():
         if target.get("accent") != resolved.value or len(target.get("contour", [])) != 64:
             continue
         word = words.get(target.get("word_id"), {})

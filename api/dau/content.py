@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from functools import lru_cache
@@ -60,6 +61,38 @@ def target_manifest() -> dict[str, Any]:
     return _load_json(TARGETS_ROOT / "manifest.json", {"targets": []})
 
 
+@lru_cache(maxsize=1)
+def validated_targets() -> tuple[dict[str, Any], ...]:
+    """Return only hash-checked targets that passed, even during a blocked build.
+
+    The final manifest remains all-or-nothing. A blocked generation receipt can
+    still improve local templates and demos without promoting any failed take.
+    """
+
+    candidates = target_manifest().get("targets", [])
+    if not candidates:
+        candidates = _load_json(TARGETS_ROOT / "generation-report.json", {}).get(
+            "targets", []
+        )
+    resolved: list[dict[str, Any]] = []
+    for target in candidates:
+        relative_path = target.get("path")
+        if not isinstance(relative_path, str) or not target.get("validation", {}).get(
+            "passed", False
+        ):
+            continue
+        path = REPO_ROOT / relative_path
+        expected_hash = target.get("sha256")
+        if (
+            not path.is_file()
+            or not isinstance(expected_hash, str)
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash
+        ):
+            continue
+        resolved.append(target)
+    return tuple(resolved)
+
+
 def reference_corpus_is_complete() -> bool:
     """Return true only when every inventory/accent target passed validation."""
 
@@ -113,7 +146,7 @@ def generic_contour(tone: str, accent: str = "north") -> list[float]:
 
 
 def target_for(word_id: str, accent: str) -> dict[str, Any] | None:
-    targets = target_manifest().get("targets", [])
+    targets = validated_targets()
     return next(
         (
             item
@@ -171,3 +204,4 @@ def clear_content_caches() -> None:
     echo_document.cache_clear()
     demo_document.cache_clear()
     target_manifest.cache_clear()
+    validated_targets.cache_clear()

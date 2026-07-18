@@ -109,6 +109,30 @@ def test_offline_echo_demo_closes_transcript_loop(monkeypatch) -> None:
     assert "ghost" in payload["explanation"]
 
 
+def test_signature_audio_demo_runs_through_validated_partial_templates(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    sample = client.get("/demos/phuong-name-said-ward.wav")
+    assert sample.status_code == 200
+
+    response = client.post(
+        "/analyze",
+        files={"audio": ("phuong-ward.wav", sample.content, "audio/wav")},
+        data={
+            "word": "phuong-name",
+            "intended_tone": "ngang",
+            "accent": "north",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["tone_detected"] == "huyen"
+    assert payload["detected_word"]["id"] == "phuong-ward"
+    assert payload["verdict_copy"] == (
+        "You meant Phương, the name. You said phường, an urban ward."
+    )
+
+
 def test_arbitrary_offline_echo_explains_requirement(monkeypatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     response = client.post(

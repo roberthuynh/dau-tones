@@ -12,7 +12,8 @@
       "expected_detected_word_id": "ma-mother",
       "expected_detected_tone": "sac",
       "expected_correct": true,
-      "expected_verdict": "That rise landed on má, mother."
+      "expected_verdict": "That rise landed on má, mother.",
+      "sha256": "2f3d6ee65dc27b44a888a151b7df28a0f2e9911d58b018c3d163219173e26e7c"
     },
     {
       "id": "ma-mother-said-ghost",
@@ -24,7 +25,8 @@
       "expected_detected_word_id": "ma-ghost",
       "expected_detected_tone": "ngang",
       "expected_correct": false,
-      "expected_verdict": "You meant má, mother. You said ma, a ghost."
+      "expected_verdict": "You meant má, mother. You said ma, a ghost.",
+      "sha256": "bf9a22a074d1b55e9633ad8b2b4b0a6797426c2ddc1433dc8a4d41f09b63ad50"
     },
     {
       "id": "phuong-name-said-ward",
@@ -36,7 +38,8 @@
       "expected_detected_word_id": "phuong-ward",
       "expected_detected_tone": "huyen",
       "expected_correct": false,
-      "expected_verdict": "You meant Phương, the name. You said phường, an urban ward."
+      "expected_verdict": "You meant Phương, the name. You said phường, an urban ward.",
+      "sha256": "94726b861a028f14671ce3a22460f1602d05eae5108f28787cb1ad36f522ca5d"
     }
   ],
   "echo_demos": [
@@ -57,7 +60,45 @@
           "heard_word_id": "ma-ghost"
         }
       ],
-      "expected_explanation": "You said ma, a ghost, instead of má, mother. You invited a ghost to dinner."
+      "expected_explanation": "You said ma, a ghost, instead of má, mother. You invited a ghost to dinner.",
+      "generation": {
+        "model": "gpt-realtime-2.1-mini",
+        "voice": "cedar",
+        "validation": {
+          "selected": {
+            "passed": true,
+            "transcript": "Tối nay con mời ma đi ăn cơm.",
+            "lexical_verified": true,
+            "contour_quality": {
+              "passed": true,
+              "duration_s": 2.3,
+              "peak": 0.645599,
+              "rms": 0.076543,
+              "clipping_fraction": 0.0,
+              "voiced_fraction": 0.768519
+            }
+          },
+          "attempts": [
+            {
+              "model": "gpt-realtime-2.1-mini",
+              "validation": {
+                "passed": true,
+                "transcript": "Tối nay con mời ma đi ăn cơm.",
+                "lexical_verified": true,
+                "contour_quality": {
+                  "passed": true,
+                  "duration_s": 2.3,
+                  "peak": 0.645599,
+                  "rms": 0.076543,
+                  "clipping_fraction": 0.0,
+                  "voiced_fraction": 0.768519
+                }
+              }
+            }
+          ]
+        }
+      },
+      "sha256": "28881816fff1ec82f411b426b68e3c8c0a034e8060901f78820f95febd28093e"
     }
   ]
 }
