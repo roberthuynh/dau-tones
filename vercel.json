@@ -6,20 +6,15 @@
       "framework": "vite"
     },
     "api": {
-      "root": "api/",
+      "root": ".",
       "framework": "fastapi",
-      "entrypoint": "index:app",
-      "memory": 2048,
-      "maxDuration": 300,
-      "includeFiles": [
-        "../targets/**"
-      ],
-      "excludeFiles": [
-        "tests/**",
-        "scripts/**",
-        "**/__pycache__/**",
-        "**/.pytest_cache/**"
-      ]
+      "entrypoint": "api.index:app",
+      "functions": {
+        "api/index.py": {
+          "memory": 2048,
+          "maxDuration": 300
+        }
+      }
     }
   },
   "rewrites": [

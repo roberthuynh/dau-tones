@@ -526,7 +526,6 @@ dependencies = [
     { name = "librosa" },
     { name = "numpy" },
     { name = "openai" },
-    { name = "pillow" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
@@ -542,6 +541,7 @@ dependencies = [
 dev = [
     { name = "matplotlib" },
     { name = "mypy" },
+    { name = "pillow" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
@@ -556,7 +556,6 @@ requires-dist = [
     { name = "librosa", specifier = ">=0.11,<1" },
     { name = "numpy", specifier = ">=2.1,<3" },
     { name = "openai", specifier = ">=1.97,<3" },
-    { name = "pillow", specifier = ">=11,<13" },
     { name = "pydantic", specifier = ">=2.11,<3" },
     { name = "pydantic-settings", specifier = ">=2.10,<3" },
     { name = "python-dotenv", specifier = ">=1.1,<2" },
@@ -571,6 +570,7 @@ requires-dist = [
 dev = [
     { name = "matplotlib", specifier = ">=3.10,<4" },
     { name = "mypy", specifier = ">=1.17,<2" },
+    { name = "pillow", specifier = ">=11,<13" },
     { name = "pytest", specifier = ">=8.4,<10" },
     { name = "pytest-asyncio", specifier = ">=1.1,<2" },
     { name = "pytest-cov", specifier = ">=6.2,<8" },

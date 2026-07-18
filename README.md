@@ -26,7 +26,7 @@ cp .env.example .env.local
 ./dev.sh
 ```
 
-The same monorepo deploys as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service.
+The same monorepo deploys as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service. The native pYIN, SciPy, LLVM, and PyAV stack uses [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb); the verified 568 MB Python bundle keeps the same DSP and browser-audio decoding in production.
 
 GitHub Actions is manual-only during the build to preserve the free-plan quota. The same lint, test, build, and offline end-to-end checks run locally before each published milestone.
 
@@ -57,7 +57,7 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | Stage | What Codex accelerated | Key decision and owner |
 | --- | --- | --- |
 | Repository | Product plan, safety boundaries, offline contract, and incremental publishing | Robert required MIT in commit 1 and direct pushes to `main`; Codex set the verification gates. |
-| Cold start | Locked Python/Node installs, pYIN warming, dual-process supervision, CI, and a one-project Vercel service map | Robert added Vercel deployment; Codex kept local and hosted URLs on the same `/api` contract. |
+| Cold start | Locked Python/Node installs, pYIN warming, dual-process supervision, manual CI, and a one-project Vercel service map | Robert added Vercel deployment; Codex kept local and hosted URLs on the same `/api` contract and preserved the full DSP stack with Large Functions. |
 | Voice design | Dual-accent target generation and DSP acceptance design | Robert chose Cedar and supplied the exact Sài Gòn and Hà Nội voice prompts. |
 | Grading | Accent-conditioned acoustic families and honest uncertainty | Robert required six visible tones; Codex recommended Northern evaluation-gated six-way grading and Southern four-family auto-verification. |
 | DSP engine | Browser-media decoding, speech-island checks, pYIN, speaker-relative contours, constrained DTW, feature distance, confidence, abstention, and grouped-fold evaluation | Codex made intended tone unavailable to detection and capped confidence at 0.95; Robert chose the dual-accent product behavior. |
