@@ -32,7 +32,7 @@ function loadStats(): Record<string, SessionToneStat> {
 }
 
 function resultDetectedWord(result: AnalysisResult, intended: Word, words: Word[]): Word | undefined {
-  const byExplicitId = wordById(result.detected_word_id, words);
+  const byExplicitId = wordById(result.detected_word?.id ?? result.detected_word_id ?? undefined, words);
   if (byExplicitId) return byExplicitId;
   const candidates = [intended, ...words.filter((word) => intended.minimal_pair_ids?.includes(word.id))];
   return candidates.find((word) => word.tone === result.tone_detected);
@@ -49,7 +49,8 @@ function fallbackCoach(result: AnalysisResult, intended: Word, payload: WordsPay
   };
 }
 
-function verdictCopy(intended: Word, detected: Word | undefined): string {
+function verdictCopy(result: AnalysisResult, intended: Word, detected: Word | undefined): string {
+  if (result.verdict_copy) return result.verdict_copy;
   if (!detected) return "Your contour landed on a different tone family.";
   if (intended.id === "phuong-name" && detected.id === "phuong-ward") return "You meant Phương, the name. You said phường, an urban ward.";
   if (intended.id === "ma-mother" && detected.id === "ma-ghost") return "You meant má, mother. You said ma, a ghost.";
@@ -226,8 +227,11 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
             <p className="eyebrow">{drillMessage}</p>
             <h1 id="practice-word"><ToneSyllable text={currentWord.syllable} tone={currentWord.tone} /></h1>
             <div className="word-meta">
-              <span><strong>{intendedTone.name_vi}</strong> · {intendedTone.name_en}</span>
-              <span className="word-meta__meaning">{currentWord.meaning_en}</span>
+              <MeaningArt word={currentWord} className="word-meta__art" eager />
+              <span className="word-meta__copy">
+                <span><strong>{intendedTone.name_vi}</strong> · {intendedTone.name_en}</span>
+                <span className="word-meta__meaning">{currentWord.meaning_en}</span>
+              </span>
             </div>
           </div>
 
@@ -242,7 +246,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
               correct={result?.correct}
               ariaLabel={result ? `Native ${intendedTone.name_vi} curve overlaid with your detected ${detectedTone?.name_vi} curve` : `Native ${intendedTone.name_vi} pitch target`}
             />
-            <CoDau contour={targetCurve} tone={currentWord.tone} progress={targetAudio.progress} playing={targetAudio.playing} />
+            <CoDau contour={targetCurve} tone={currentWord.tone} word={currentWord.syllable} progress={targetAudio.progress} playing={targetAudio.playing} />
           </div>
 
           <div className="stage-actions">
@@ -281,7 +285,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
             <div className="retry-verdict">
               <p className="eyebrow">One more take</p>
               <h2>I heard your voice, but not enough pitch to call the meaning.</h2>
-              <p>{typeof result.signal_quality === "string" ? result.signal_quality : result.signal_quality?.message || "Say one word in a quiet room and hold the vowel for a beat."}</p>
+              <p>{"message" in result.signal_quality ? result.signal_quality.message : "Say one word in a quiet room and hold the vowel for a beat."}</p>
               <button type="button" className="button button--primary" onClick={recorder.toggle}>Try again</button>
             </div>
           ) : result.correct ? (
@@ -295,7 +299,7 @@ export function ToneLab({ payload, accent, onAccentChange, apiOnline }: ToneLabP
           ) : (
             <div className="wrong-verdict">
               <p className="eyebrow">Tone changed the meaning</p>
-              <h2>{verdictCopy(currentWord, detectedWord)}</h2>
+              <h2>{verdictCopy(result, currentWord, detectedWord)}</h2>
               <div className="meaning-contrast">
                 <div>
                   <MeaningArt word={currentWord} eager />

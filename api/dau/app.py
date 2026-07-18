@@ -9,7 +9,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Annotated, Any
 
-from fastapi import APIRouter, BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from openai import OpenAI
@@ -21,7 +21,13 @@ from .content import demo_document, echo_document, public_words, reference_corpu
 from .echo import align_transcript, literal_explanation, normalize_text
 from .models import IMAGE_MODEL, TEXT_MODEL, TRANSCRIPTION_MODEL
 from .realtime_audio import synthesize_utterance
-from .schemas import CoachRequest, DrillRequest, EchoSpeakRequest
+from .schemas import (
+    AnalysisResponse,
+    CoachRequest,
+    DrillRequest,
+    EchoSpeakRequest,
+    EchoTranscribeResponse,
+)
 from .settings import (
     AI_TIMEOUT_SECONDS,
     MAX_UPLOAD_BYTES,
@@ -51,9 +57,14 @@ app.add_middleware(
 router = APIRouter()
 REVEAL_CACHE: dict[str, dict[str, Any]] = {}
 REVEAL_LOCK = Lock()
+REVEAL_GENERATION_LOCKS: dict[str, Lock] = {}
 
 
 class EchoExplanation(BaseModel):
+    explanation: str = Field(min_length=4, max_length=220)
+
+
+class EchoRevealRequest(BaseModel):
     explanation: str = Field(min_length=4, max_length=220)
 
 
@@ -89,11 +100,11 @@ def words() -> dict[str, Any]:
     return public_words()
 
 
-@router.post("/analyze")
+@router.post("/analyze", response_model=AnalysisResponse)
 async def analyze(
     audio: Annotated[UploadFile, File()],
     word: Annotated[str, Form()],
-    intended_tone: Annotated[str | None, Form()] = None,
+    intended_tone: Annotated[str, Form()],
     accent: Annotated[str, Form()] = "north",
 ) -> JSONResponse:
     payload = await audio.read(MAX_UPLOAD_BYTES + 1)
@@ -108,7 +119,7 @@ async def analyze(
             intended_tone=intended_tone,
             accent=accent,
         )
-        return JSONResponse(result)
+        return JSONResponse(AnalysisResponse.model_validate(result).model_dump(mode="json"))
     except SignalQualityError as error:
         return JSONResponse(
             status_code=422,
@@ -242,36 +253,36 @@ def _ai_explanation(target: str, transcript: str, diff: list[dict[str, Any]], fa
         return fallback
 
 
-def _generate_reveal(reveal_id: str, explanation: str) -> None:
+def _reveal_cache_id(explanation: str) -> str:
+    return hashlib.sha256(f"echo-reveal-v1:{normalize_text(explanation)}".encode()).hexdigest()[:16]
+
+
+def _generate_reveal(explanation: str) -> bytes:
     key = openai_api_key()
     if not key:
-        return
-    try:
-        client = OpenAI(api_key=key, timeout=120, max_retries=0)
-        result = client.images.generate(
-            model=IMAGE_MODEL,
-            prompt=(
-                "Flat 2D minimal illustration, warm palette on near-black, single "
-                "centered subject, "
-                "no text, no border. Illustrate this playful literal Vietnamese misunderstanding: "
-                + explanation
-            ),
-            size="1024x1024",
-            quality="medium",
-            output_format="png",
-            n=1,
-        )
-        data = base64.b64decode(result.data[0].b64_json)
-        with REVEAL_LOCK:
-            REVEAL_CACHE[reveal_id] = {"status": "ready", "image": data}
-    except Exception:
-        with REVEAL_LOCK:
-            REVEAL_CACHE[reveal_id] = {"status": "failed"}
+        raise RuntimeError("OPENAI_API_KEY is required for live Echo art")
+    client = OpenAI(api_key=key, timeout=120, max_retries=0)
+    result = client.images.generate(
+        model=IMAGE_MODEL,
+        prompt=(
+            "Flat 2D minimal illustration, warm palette on near-black, single "
+            "centered subject, no text, no border. Illustrate this playful literal "
+            "Vietnamese misunderstanding: "
+            + explanation
+        ),
+        size="1024x1024",
+        quality="medium",
+        output_format="png",
+        n=1,
+    )
+    encoded = result.data[0].b64_json
+    if not encoded:
+        raise RuntimeError("The image model returned no PNG data")
+    return base64.b64decode(encoded)
 
 
-@router.post("/echo/transcribe")
+@router.post("/echo/transcribe", response_model=EchoTranscribeResponse)
 async def echo_transcribe(
-    background_tasks: BackgroundTasks,
     sentence_id: Annotated[str, Form()],
     demo_id: Annotated[str | None, Form()] = None,
     audio: Annotated[UploadFile | None, File()] = None,
@@ -335,22 +346,82 @@ async def echo_transcribe(
     explanation = _ai_explanation(sentence["text"], transcript, diff, fallback)
     reveal_id = None
     if has_openai_key() and any(item.get("kind") != "match" for item in diff):
-        reveal_id = hashlib.sha256(
-            f"{sentence_id}:{normalize_text(transcript)}".encode()
-        ).hexdigest()[:16]
-        with REVEAL_LOCK:
-            status = REVEAL_CACHE.setdefault(reveal_id, {"status": "pending"})
-        if status.get("status") == "pending":
-            background_tasks.add_task(_generate_reveal, reveal_id, explanation)
-    return {
-        "sentence_id": sentence_id,
-        "target": sentence["text"],
-        "transcript": normalize_text(transcript),
-        "diff": diff,
-        "explanation": explanation,
-        "source": source,
-        "reveal_id": reveal_id,
-    }
+        reveal_id = _reveal_cache_id(fallback)
+    return EchoTranscribeResponse(
+        sentence_id=sentence_id,
+        target_text=sentence["text"],
+        transcript=normalize_text(transcript),
+        tokens=diff,
+        explanation=explanation,
+        literal_explanation=fallback,
+        source=source,
+        reveal_id=reveal_id,
+        target=sentence["text"],
+        diff=diff,
+    ).model_dump(mode="json")
+
+
+@router.post("/echo/reveals/{reveal_id}")
+def generate_echo_reveal(reveal_id: str, request: EchoRevealRequest) -> Response:
+    """Return one reveal directly so serverless instance changes cannot strand polling."""
+
+    if reveal_id != _reveal_cache_id(request.explanation):
+        raise HTTPException(
+            400,
+            detail={
+                "code": "invalid_reveal",
+                "message": "That reveal no longer matches the transcript feedback.",
+            },
+        )
+    if not has_openai_key():
+        raise HTTPException(
+            503,
+            detail={
+                "code": "reveal_requires_key",
+                "message": "The text feedback is ready, but live meaning art needs an OpenAI key.",
+            },
+        )
+
+    with REVEAL_LOCK:
+        cached = REVEAL_CACHE.get(reveal_id)
+        generation_lock = REVEAL_GENERATION_LOCKS.setdefault(reveal_id, Lock())
+    if cached and cached.get("status") == "ready":
+        data = cached["image"]
+    else:
+        with generation_lock:
+            with REVEAL_LOCK:
+                cached = REVEAL_CACHE.get(reveal_id)
+            if cached and cached.get("status") == "ready":
+                data = cached["image"]
+            else:
+                with REVEAL_LOCK:
+                    REVEAL_CACHE[reveal_id] = {"status": "pending"}
+                try:
+                    data = _generate_reveal(request.explanation)
+                except Exception as error:
+                    with REVEAL_LOCK:
+                        REVEAL_CACHE[reveal_id] = {"status": "failed"}
+                    raise HTTPException(
+                        502,
+                        detail={
+                            "code": "reveal_failed",
+                            "message": (
+                                "The literal meaning picture is unavailable. "
+                                "The transcript feedback still works."
+                            ),
+                        },
+                    ) from error
+                with REVEAL_LOCK:
+                    REVEAL_CACHE[reveal_id] = {"status": "ready", "image": data}
+
+    return Response(
+        data,
+        media_type="image/png",
+        headers={
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "ETag": f'"{reveal_id}"',
+        },
+    )
 
 
 @router.get("/echo/reveals/{reveal_id}")

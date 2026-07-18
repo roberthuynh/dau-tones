@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ECHO_DEMO, pedagogicalContour, toneById, wordById } from "../fallbackData";
 import { useAudioPlayback } from "../hooks/useAudioPlayback";
 import { useRecorder } from "../hooks/useRecorder";
-import { getEchoSpeech, getReveal, transcribeEcho, transcribeEchoDemo } from "../lib/api";
+import { getEchoSpeech, getOrCreateReveal, transcribeEcho, transcribeEchoDemo } from "../lib/api";
 import type { Accent, EchoDiffToken, EchoResult, EchoSentence, ToneId, Word, WordsPayload } from "../types";
 import { CoDau } from "./CoDau";
 import { ArrowIcon, PlayIcon, SparkIcon, VolumeIcon } from "./Icons";
@@ -18,8 +18,7 @@ type EchoModeProps = {
 };
 
 function responseTokens(result: EchoResult): EchoDiffToken[] {
-  const alternate = result as EchoResult & { diff?: EchoDiffToken[]; alignment?: EchoDiffToken[] };
-  return result.tokens ?? alternate.diff ?? alternate.alignment ?? [];
+  return result.tokens;
 }
 
 function sentenceTone(sentence: EchoSentence): ToneId {
@@ -69,22 +68,23 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
   };
 
   useEffect(() => {
-    if (!result?.reveal_id) return;
+    const revealId = result?.reveal_id;
+    const revealExplanation = result?.literal_explanation;
+    if (!revealId || !revealExplanation) return;
     let cancelled = false;
-    let attempts = 0;
-    const poll = async () => {
-      attempts += 1;
+    let objectUrl: string | null = null;
+    const generate = async () => {
       try {
-        const reveal = await getReveal(result.reveal_id!);
-        if (!cancelled && reveal.image_url) setGeneratedRevealArt(reveal.image_url);
-        else if (!cancelled && reveal.status === "pending" && attempts < 8) window.setTimeout(() => void poll(), 1_500);
+        objectUrl = await getOrCreateReveal(revealId, revealExplanation);
+        if (!cancelled) setGeneratedRevealArt(objectUrl);
       } catch {
         // The text diff is the full fallback when live art fails.
       }
     };
-    void poll();
+    void generate();
     return () => {
       cancelled = true;
+      if (objectUrl?.startsWith("blob:")) URL.revokeObjectURL(objectUrl);
     };
   }, [result]);
 
@@ -135,8 +135,8 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
     }
   };
 
-  const explanation = result?.explanation ?? result?.literal_explanation;
-  const revealArt = result?.reveal_art_url ?? generatedRevealArt;
+  const explanation = result?.explanation;
+  const revealArt = generatedRevealArt;
   const progressLabel = useMemo(() => {
     if (!result) return "Speak it, then see where the meaning moved.";
     const differences = tokens.filter((token) => token.kind !== "match").length;
@@ -173,7 +173,7 @@ export function EchoMode({ accent, sentences, payload, liveTranscription }: Echo
           </div>
 
           <div className="echo-practice-row">
-            <CoDau compact contour={targetContour} tone={toneId} progress={correctAudio.progress} playing={correctAudio.playing} />
+            <CoDau compact contour={targetContour} tone={toneId} word={sentence.text} progress={correctAudio.progress} playing={correctAudio.playing} />
             <div className="echo-record-zone">
               <RecordControl state={recorder.state} level={recorder.level} elapsedMs={recorder.elapsedMs} onToggle={recorder.toggle} label="Speak the sentence" />
               <div className="echo-playback-pair">

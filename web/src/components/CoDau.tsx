@@ -1,21 +1,30 @@
 import { contourAt } from "../lib/curve";
+import { vowelShapeForWord, type VowelShape } from "../lib/vowel";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import type { ToneId } from "../types";
 
 type CoDauProps = {
   contour: number[];
   tone: ToneId;
+  word?: string;
   progress?: number;
   playing?: boolean;
   compact?: boolean;
 };
 
-export function CoDau({ contour, tone, progress = 0, playing = false, compact = false }: CoDauProps) {
+const MOUTH_PATHS: Record<VowelShape, string> = {
+  open: "M81 98c5 8 16 8 21 0c-4 5-17 5-21 0Z",
+  rounded: "M86 99c0-4 3-6 6-6s6 2 6 6-3 7-6 7-6-3-6-7Z",
+  spread: "M80 99c7 4 18 4 25 0",
+};
+
+export function CoDau({ contour, tone, word = "a", progress = 0, playing = false, compact = false }: CoDauProps) {
   const reducedMotion = useReducedMotion();
   const pitch = contourAt(contour, reducedMotion ? 0.62 : progress);
   const angle = Math.max(-13, Math.min(13, -pitch * 3.1));
   const glottal = tone === "nga" || tone === "nang";
   const arrow = tone === "ngang" ? "→" : tone === "huyen" || tone === "nang" ? "↘" : tone === "sac" ? "↗" : tone === "hoi" ? "⌄" : "↗";
+  const vowelShape = vowelShapeForWord(word);
 
   return (
     <div className={`co-dau ${compact ? "co-dau--compact" : ""} ${playing ? "co-dau--playing" : ""}`} aria-label={`Cô Dấu demonstrates the ${tone} tone with a head gesture`}>
@@ -38,7 +47,16 @@ export function CoDau({ contour, tone, progress = 0, playing = false, compact = 
             <ellipse cx="108" cy="77" rx="2.2" ry="3.2" fill="#241711" />
           </g>
           <path d="M91 79c-2 6-2 10 2 11" stroke="#bc8067" strokeWidth="1.8" strokeLinecap="round" />
-          <path className="co-dau__mouth" d="M81 99c6 5 15 5 21 0" stroke="#9e4b50" strokeWidth="3" strokeLinecap="round" />
+          <path
+            className="co-dau__mouth"
+            data-vowel-shape={vowelShape}
+            d={MOUTH_PATHS[vowelShape]}
+            fill={vowelShape === "spread" ? "none" : "rgba(158, 75, 80, 0.18)"}
+            stroke="#9e4b50"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
           <path d="M59 62c-6 11-7 30-1 47" stroke="#17120f" strokeWidth="9" strokeLinecap="round" />
           <path d="M126 56c8 13 8 35 1 54" stroke="#17120f" strokeWidth="9" strokeLinecap="round" />
         </g>

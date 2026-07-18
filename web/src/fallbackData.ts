@@ -184,20 +184,61 @@ export function demoAnalysis(id: "phuong-ward" | "ma-ghost" | "ma-correct", acce
   const detectedTone: ToneId = id === "phuong-ward" ? "huyen" : id === "ma-ghost" ? "ngang" : "sac";
   const intendedWordId = id === "phuong-ward" ? "phuong-name" : "ma-mother";
   const detectedWordId = id === "phuong-ward" ? "phuong-ward" : id === "ma-ghost" ? "ma-ghost" : "ma-mother";
+  const intendedWord = wordById(intendedWordId)!;
+  const detectedWord = wordById(detectedWordId)!;
+  const intendedFamily = intendedTone === "ngang" ? "level" : "rising";
+  const detectedFamily = detectedTone === "ngang" ? "level" : detectedTone === "huyen" ? "falling" : "rising";
+  const correct = id === "ma-correct";
+  const confidence = correct ? 0.91 : 0.88;
+  const tips = id === "phuong-ward" ? ["ended_too_low", "fell_instead_of_level"] : id === "ma-ghost" ? ["no_final_rise", "too_flat"] : [];
+  const asAnalysisWord = (word: Word) => ({
+    id: word.id,
+    surface: word.syllable,
+    meaning_en: word.meaning_en,
+    art_url: word.art_url,
+  });
   return {
     tone_detected: detectedTone,
     tone_intended: intendedTone,
     intended_word_id: intendedWordId,
     detected_word_id: detectedWordId,
-    correct: id === "ma-correct",
-    confidence: id === "ma-correct" ? 0.91 : 0.88,
+    correct,
+    confidence,
     learner_contour: variedContour(detectedTone, accent, id === "phuong-ward" ? "fall" : id === "ma-ghost" ? "flat" : "close"),
     target_contour: pedagogicalContour(intendedTone, accent),
     detected_contour: pedagogicalContour(detectedTone, accent),
-    tips_features: id === "phuong-ward" ? { end: "ended too low", slope: "fell instead of staying level" } : id === "ma-ghost" ? { rise: "no final rise", slope: "too flat" } : {},
-    grading_mode: accent === "south" ? "four_family" : "six_tone",
-    exact_verified: accent === "north",
+    tips_features: { codes: tips, numeric: {} },
+    grading_mode: "four_family",
+    exact_verified: false,
     family_verified: true,
+    alternatives: [{ tone: detectedTone, family: detectedFamily, score: 0.12, confidence }],
+    needs_retry: false,
+    signal_quality: {
+      peak: 0.62,
+      rms: 0.18,
+      clipping_fraction: 0,
+      active_duration_s: 0.72,
+      total_duration_s: 1.02,
+      voiced_fraction: 0.91,
+      longest_voicing_gap_ms: 0,
+      island_count: 1,
+    },
+    tone_family: detectedFamily,
+    intended_family: intendedFamily,
+    exact_tone_match: detectedTone === intendedTone,
+    family_correct: detectedFamily === intendedFamily,
+    verification_level: "family",
+    tone_alternatives: [{ tone: detectedTone, family: detectedFamily, score: 0.12, probability: confidence }],
+    word: intendedWordId,
+    intended_word: asAnalysisWord(intendedWord),
+    detected_word: asAnalysisWord(detectedWord),
+    verdict_copy:
+      id === "phuong-ward"
+        ? "You meant Phương, the name. You said phường, an urban ward."
+        : id === "ma-ghost"
+          ? "You meant má, mother. You said ma, a ghost."
+          : null,
+    target_validated: false,
   };
 }
 
@@ -226,21 +267,28 @@ export function demoCoach(id: "phuong-ward" | "ma-ghost" | "ma-correct"): CoachR
   };
 }
 
+const ECHO_DEMO_TOKENS: EchoResult["tokens"] = [
+  { target: "Tối", heard: "Tối", kind: "match" },
+  { target: "nay", heard: "nay", kind: "match" },
+  { target: "con", heard: "con", kind: "match" },
+  { target: "mời", heard: "mời", kind: "match" },
+  { target: "má", heard: "ma", kind: "tone_only", target_word_id: "ma-mother", heard_word_id: "ma-ghost" },
+  { target: "đi", heard: "đi", kind: "match" },
+  { target: "ăn", heard: "ăn", kind: "match" },
+  { target: "cơm", heard: "cơm", kind: "match" },
+];
+
 export const ECHO_DEMO: EchoResult = {
+  sentence_id: "invite-mom-to-dinner",
   transcript: "Tối nay con mời ma đi ăn cơm.",
   target_text: "Tối nay con mời má đi ăn cơm.",
-  tokens: [
-    { target: "Tối", heard: "Tối", kind: "match" },
-    { target: "nay", heard: "nay", kind: "match" },
-    { target: "con", heard: "con", kind: "match" },
-    { target: "mời", heard: "mời", kind: "match" },
-    { target: "má", heard: "ma", kind: "tone_only", target_word_id: "ma-mother", heard_word_id: "ma-ghost" },
-    { target: "đi", heard: "đi", kind: "match" },
-    { target: "ăn", heard: "ăn", kind: "match" },
-    { target: "cơm.", heard: "cơm.", kind: "match" },
-  ],
+  tokens: ECHO_DEMO_TOKENS,
   explanation: "You said ma, a ghost, instead of má, mother. You invited a ghost to dinner.",
+  literal_explanation: "You said ma, a ghost, instead of má, mother. You invited a ghost to dinner.",
+  reveal_id: null,
   source: "committed demo",
+  target: "Tối nay con mời má đi ăn cơm.",
+  diff: ECHO_DEMO_TOKENS,
 };
 
 export function toneById(id: ToneId, tones: Tone[] = TONES): Tone {

@@ -122,13 +122,13 @@ def analyze_recording(
     audio: bytes,
     *,
     word_id: str,
-    intended_tone: str | None,
+    intended_tone: str,
     accent: str,
 ) -> dict[str, Any]:
     intended = word_by_id(word_id)
     if intended is None:
         raise ValueError(f"Unknown practice word: {word_id}")
-    if intended_tone and intended_tone != intended["tone"]:
+    if intended_tone != intended["tone"]:
         raise ValueError("intended_tone does not match the committed inventory word")
     resolved_accent = canonical_accent(accent)
     mode = scoring_mode(resolved_accent.value)
@@ -150,6 +150,13 @@ def analyze_recording(
     family_match = result.family is tone_family(intended["tone"], resolved_accent)
     correct = exact_match if mode is ScoringMode.SIX_TONE else family_match
     detected = None if result.needs_retry else _detected_word(intended, result.tone.value)
+    detected_target = (
+        target_for(detected["id"], resolved_accent.value) if detected is not None else None
+    )
+    detected_contour = (
+        (detected_target or {}).get("contour")
+        or (generic_contour(result.tone.value, resolved_accent.value) if detected else None)
+    )
     verification_level = (
         "uncertain"
         if result.needs_retry
@@ -158,17 +165,35 @@ def analyze_recording(
     return {
         "tone_detected": result.tone.value,
         "tone_intended": intended["tone"],
+        "intended_word_id": intended["id"],
+        "detected_word_id": detected["id"] if detected else None,
         "correct": correct,
         "confidence": result.confidence,
         "learner_contour": learner.as_dict()["contour"],
         "target_contour": [round(float(value), 5) for value in target.points],
+        "detected_contour": (
+            [round(float(value), 5) for value in detected_contour]
+            if detected_contour is not None
+            else None
+        ),
         "tips_features": {"codes": codes, "numeric": numeric_diff},
         "grading_mode": "six_tone" if mode is ScoringMode.SIX_TONE else "four_family",
+        "exact_verified": result.exact_verified and not result.needs_retry,
+        "family_verified": not result.needs_retry,
         "tone_family": result.family.value,
         "intended_family": tone_family(intended["tone"], resolved_accent).value,
         "exact_tone_match": exact_match,
         "family_correct": family_match,
         "verification_level": verification_level,
+        "alternatives": [
+            {
+                "tone": item.tone.value,
+                "family": item.family.value,
+                "score": round(item.score, 6),
+                "confidence": round(item.probability, 6),
+            }
+            for item in result.alternatives
+        ],
         "tone_alternatives": [item.as_dict() for item in result.alternatives],
         "needs_retry": result.needs_retry,
         "signal_quality": learner.as_dict()["quality"],

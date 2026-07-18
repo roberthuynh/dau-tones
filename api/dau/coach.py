@@ -49,12 +49,16 @@ def _next_word(request: CoachRequest) -> tuple[str, str]:
     document = inventory_document()
     featured = document.get("featured_queue", [])
     current = str(request.verdict.get("word") or request.verdict.get("word_id") or "phuong")
-    errors = [
-        str(item.get("intended_tone"))
-        for item in request.history[-12:]
-        if item.get("correct") is False and item.get("intended_tone")
-    ]
-    tone = Counter(errors).most_common(1)[0][0] if errors else request.verdict.get("tone_intended")
+    errors: list[str] = []
+    for item in request.history[-12:]:
+        history_tone = item.get("tone_intended") or item.get("intended_tone")
+        if item.get("correct") is False and history_tone:
+            errors.append(str(history_tone))
+    tone = (
+        Counter(errors).most_common(1)[0][0]
+        if errors
+        else request.verdict.get("tone_intended") or request.verdict.get("intended_tone")
+    )
     candidates = [
         word["id"]
         for word in document.get("words", [])
