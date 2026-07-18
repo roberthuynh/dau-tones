@@ -26,6 +26,8 @@ cp .env.example .env.local
 
 The same monorepo deploys as one Vercel project: the Vite service owns `/`, the FastAPI service owns `/api`, and the secret remains scoped to the Python service.
 
+GitHub Actions is manual-only during the build to preserve the free-plan quota. The same lint, test, build, and offline end-to-end checks run locally before each published milestone.
+
 ## How it works
 
 1. `gpt-realtime-2.1` speaks five Cedar candidates for every target in Northern and Southern Vietnamese. The same DSP used for learners rejects acoustically invalid candidates before one take can become ground truth.
@@ -57,6 +59,7 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | Voice design | Dual-accent target generation and DSP acceptance design | Robert chose Cedar and supplied the exact Sài Gòn and Hà Nội voice prompts. |
 | Grading | Accent-conditioned acoustic families and honest uncertainty | Robert required six visible tones; Codex recommended Northern evaluation-gated six-way grading and Southern four-family auto-verification. |
 | DSP engine | Browser-media decoding, speech-island checks, pYIN, speaker-relative contours, constrained DTW, feature distance, confidence, abstention, and grouped-fold evaluation | Codex made intended tone unavailable to detection and capped confidence at 0.95; Robert chose the dual-accent product behavior. |
+| API | Typed analysis, fallback and GPT coaching, validated drill selection, NFC Echo alignment, cached speech, capability flags, and human error responses | Codex kept every AI client lazy and server-only; Robert required the complete loop to survive with no key. |
 
 More decisions and measured results will be added with each stage.
 
