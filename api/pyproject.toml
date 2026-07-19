@@ -60,3 +60,7 @@ exclude = ["^dau/_librosa_stubs/"]
 [tool.coverage.run]
 branch = true
 source = ["dau"]
+
+[tool.coverage.report]
+fail_under = 75
+show_missing = true

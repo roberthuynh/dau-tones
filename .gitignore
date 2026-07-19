@@ -20,6 +20,7 @@ htmlcov/
 node_modules/
 .vite/
 web/dist/
+web/coverage/
 web/test-results/
 web/playwright-report/
 
@@ -39,3 +40,5 @@ tmp/imagegen/
 .idea/
 .vscode/
 *.swp
+.env*
+!.env.example

@@ -1,97 +1,99 @@
-name: CI (manual)
+name: Release gate
 
 on:
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: release-gate-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   verify:
+    name: Verify product and receipts
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
 
-      - name: Set up uv and Python
+      - name: Set up Python 3.11 and uv
         uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.11"
           enable-cache: true
           cache-dependency-glob: api/uv.lock
 
-      - name: Install web dependencies
+      - name: Install locked production-boundary dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install locked web dependencies
         run: npm --prefix web ci --no-audit --no-fund
 
-      - name: Install API dependencies
+      - name: Install locked API dependencies
         run: uv sync --project api --python 3.11 --frozen
 
-      - name: Reject unapproved OpenAI model IDs
+      - name: Guard secrets and active model IDs
+        run: uv run --project api --frozen python -m scripts.release_guards
+
+      - name: Audit production npm dependencies
         run: |
-          python - <<'PY'
-          import pathlib
-          import re
+          npm audit --audit-level=high
+          npm --prefix web audit --audit-level=high
 
-          allowed = {
-              "gpt-5.6-sol",
-              "gpt-image-2",
-              "gpt-4o-transcribe",
-              "gpt-realtime-2.1-mini",
-              "gpt-realtime-2.1",
-          }
-          # Scan executable product and generation code. Tests intentionally
-          # contain deprecated IDs to prove the guard and must not trip it.
-          roots = [
-              pathlib.Path("api/dau"),
-              pathlib.Path("api/scripts"),
-              pathlib.Path("api/index.py"),
-              pathlib.Path("api/eval.py"),
-              pathlib.Path("web/src"),
-          ]
-          found = set()
-          for root in roots:
-              paths = [root] if root.is_file() else root.rglob("*")
-              for path in paths:
-                  if path.suffix not in {".py", ".ts", ".tsx", ".js", ".jsx"}:
-                      continue
-                  text = path.read_text(encoding="utf-8")
-                  found.update(re.findall(r"gpt-[a-z0-9][a-z0-9.\-]*", text))
-          unexpected = sorted(found - allowed)
-          if unexpected:
-              raise SystemExit(f"Unapproved active OpenAI model IDs: {unexpected}")
-          if "gpt-4o-mini-tts" in found:
-              raise SystemExit("Deprecated gpt-4o-mini-tts is forbidden")
-          PY
-
-      - name: Lint API
-        run: uv run --project api ruff check api
-
-      - name: Test API
+      - name: Export and audit production Python dependencies
         run: |
-          if find api/tests -name 'test_*.py' -print -quit 2>/dev/null | grep -q .; then
-            uv run --project api pytest -q
-          else
-            echo "No API tests committed yet."
-          fi
+          uv export --project api --frozen --no-dev --no-emit-project --format requirements-txt --output-file /tmp/dau-requirements.txt
+          uvx --from pip-audit==2.10.1 pip-audit --strict --requirement /tmp/dau-requirements.txt
 
-      - name: Lint web
+      - name: Validate committed course and media receipts
+        run: |
+          uv run --project api --frozen python -m scripts.validate_echo_course --json
+          uv run --project api --frozen python -m scripts.validate_release --json
+
+      - name: Ruff
+        run: uv run --project api --frozen ruff check api
+
+      - name: Strict product mypy
+        run: uv run --project api --frozen mypy --strict api/dau/*.py api/index.py api/eval.py api/scripts/*.py
+
+      - name: API tests and coverage floor
+        run: uv run --project api --frozen pytest -q api/tests --cov=api/dau --cov-branch --cov-report=term-missing
+
+      - name: Web lint
         run: npm --prefix web run lint
 
-      - name: Test web
-        run: npm --prefix web run test -- --passWithNoTests
+      - name: Production-boundary typecheck
+        run: npm run typecheck
 
-      - name: Build web
+      - name: Web tests and coverage floors
+        run: npm --prefix web run test:coverage
+
+      - name: Production web build
         run: npm --prefix web run build
+
+      - name: Regenerate committed browser data
+        run: npm --prefix web run generate
+
+      - name: Require generated artifacts to be clean
+        run: git diff --exit-code
+
+      - name: Install Playwright Chromium
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+
+      - name: Offline Playwright journey
+        run: npm --prefix web run test:e2e

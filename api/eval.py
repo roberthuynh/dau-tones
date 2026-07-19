@@ -526,8 +526,12 @@ def evaluate(
         exact_predictions = grouped_leave_one_word_out(templates, accent, ScoringMode.SIX_TONE)
         exact_labels = [tone.value for tone in TONE_ORDER]
         exact_metrics = _metrics(exact_predictions, exact_labels)
+        gate: dict[str, float | str]
         if accent is Accent.NORTH:
-            six_tone_passed, gate = _northern_six_tone_passes(exact_predictions, exact_metrics)
+            six_tone_passed, northern_gate = _northern_six_tone_passes(
+                exact_predictions, exact_metrics
+            )
+            gate = dict(northern_gate)
             selected_mode = ScoringMode.SIX_TONE if six_tone_passed else ScoringMode.FOUR_FAMILY
         else:
             selected_mode = ScoringMode.FOUR_FAMILY
