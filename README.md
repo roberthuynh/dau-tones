@@ -6,9 +6,9 @@ Dấu is an open-source practice lab that makes Vietnamese tones visible by draw
 
 **Demo video:** [Build Week submission video coming soon](https://github.com/roberthuynh/dau-tones)
 
-![Dấu Tone Shapes with the complete six-tone ma rail and Cô Dấu teaching panel](web/public/screenshots/tone-shapes-ma.webp)
+![Dấu Tone Shapes tracing a validated má target beside the enlarged Cô Dấu teaching and coaching rail](web/public/screenshots/tone-shapes-ma.webp)
 
-![Dấu Dialogue Practice showing the linked Meet the family scene](web/public/screenshots/dialogue-practice.webp)
+![Dấu Dialogue Practice showing the linked Meet the family scene and a mother-to-ghost tone change](web/public/screenshots/dialogue-practice.webp)
 
 ## Quick start
 
@@ -24,7 +24,7 @@ Start in **1 Tone Shapes**. The top rail puts `ma`, `mà`, `má`, `mả`, `mã`,
 
 Continue to **2 Dialogue Practice** for four linked scenes: **Meet the family**, **Family dinner**, **At the phở shop**, and **Around the ward**. The course contains 26 alternating turns and 13 substantial learner replies, preserves the scene, turn, and focus word in the URL, and links each changed token back to Tone Shapes. All 52 Northern and Southern scene WAVs passed lexical and signal checks, all seven story illustrations are committed, and one wrong-tone replay per scene closes the no-key feedback loop.
 
-**Cold-start receipt, 2026-07-19, commit `070ad2e`:** a fresh public clone on Apple Silicon macOS with `OPENAI_API_KEY` explicitly unset printed `READY` in 88 seconds after installing its own Python 3.11.15 runtime and locked dependencies. The check loaded all 19 words and six `ma` forms, returned four scenes with 26 turns, streamed a validated target plus a Dialogue WAV, and passed the full offline Tone Shapes and Dialogue Practice Playwright flow at all six release viewports.
+**Cold-start receipt, 2026-07-19, commit `44c6940`:** a fresh public clone on Apple Silicon macOS with `OPENAI_API_KEY` explicitly unset printed `READY` in about 35 seconds after installing its own Python 3.11.15 runtime and locked dependencies. Health reported local DSP ready with the honest Northern and Southern four-family profiles; the check loaded all 19 words and six `ma` forms, returned four scenes with 26 turns, streamed a validated target plus a Dialogue WAV, and passed all three offline Playwright stories in 6.5 seconds across all six release viewports.
 
 No OpenAI key is required for browser grading, available validated target playback, committed word and scene art, deterministic coaching, analyzer demos, all 52 correct dialogue utterances, learner replay, or the four committed wrong-tone scene fixtures. With a key, server-only AI coaching and live Dialogue transcription, explanations, and optional mistake art turn on automatically:
 
@@ -37,6 +37,15 @@ cp .env.example .env.local
 The same monorepo is live at [dau.huynhrobert.com](https://dau.huynhrobert.com) as one Vercel project: Vite owns `/`, FastAPI owns `/api`, and the OpenAI secret remains scoped to Python. Live learner pitch grading stays in a browser Worker. Validated target and Dialogue WAVs are copied to `web/public/audio/` and served with immutable static URLs, so practice playback never waits for a Python function. The native pYIN, SciPy, LLVM, and PyAV stack remains server-side for corpus validation, evaluation, and compatibility analyzer receipts, using [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb).
 
 GitHub Actions is manual-only during the build to preserve the free-plan quota. The same lint, test, build, and offline end-to-end checks run locally before each published milestone.
+
+## 90-second demo guide
+
+1. Open **Tone Shapes**, choose `má`, and press **Listen + watch**. Point out that the validated native contour traces left to right while Cô Dấu mirrors the physical rise.
+2. Run **✓ correct má** for the green acoustic-family verdict, measured local coaching, and visible next-drill reason. Then run **má → ma · ghost** to reveal mother versus ghost with both illustrations.
+3. Run **Phương → phường · ward** for the signature name mistake and its level-versus-falling coaching cue.
+4. Open **Dialogue Practice**, choose **No key or no Vietnamese?**, and show the ghost-at-dinner transcript diff, literal scene art, learner/correct replay, and the link back to Tone Shapes.
+5. Press **Practice again** to prove the learner can repeat the same line without losing the scene, focus word, or accent; then use **Continue scene** to advance the story.
+6. End on the Evaluation tables: the browser DSP currently supports 90.9% held-out acoustic-family accuracy, while the complete DSP-versus-audio-model receipt remains gated on four real phone references rather than weakened synthetic targets.
 
 ## How it works
 
@@ -73,7 +82,7 @@ The latency boundary is deliberate. The main thread decodes the recording, trans
 4. `gpt-5.6-sol` runs only on FastAPI for structured coaching, next-drill selection, and Dialogue meaning explanations. The deterministic coach returns `observation`, one physical correction, `next_word`, and `rationale` immediately; GPT refinement can replace it asynchronously without delaying the verdict.
 5. `gpt-4o-transcribe` runs server-side for keyed Dialogue transcription. `gpt-realtime-2.1-mini` generates one bounded Thầy Minh or learner-model utterance per scene turn, and `gpt-image-2` generates committed story art plus optional live mistake art. Static generation is build-time; the browser never receives an OpenAI key.
 
-Cô Dấu is the visual teacher, not the reference voice. In Tone Shapes she occupies the right teaching rail with a large face, lips, mouth close-up, throat cue, and contour-driven chin motion. In Dialogue Practice she follows the current focus word rather than guessing one tone for an entire sentence. Thầy Minh supplies the male reference speech and the partner lines.
+Cô Dấu is the visual teacher, not the reference voice. In Tone Shapes she occupies the right teaching rail with a large face, lips, mouth close-up, throat cue, and contour-driven chin motion. In Dialogue Practice she demonstrates the selected focus word's contour throughout the line rather than assigning one guessed tone to the whole sentence; exact word-level timing is a future media-receipt improvement. Thầy Minh supplies the male reference speech and the partner lines.
 
 The semantic layer is independent from the acoustic score. It emits six explicit states: `exact_correct`, `family_correct`, `family_ambiguous`, `wrong_known_word`, `wrong_no_known_word`, and `uncertain`. Only a supported exact or family assertion may name an accidental meaning. A same-family ambiguity is amber; low signal or a weak class margin asks for another take.
 
@@ -92,9 +101,9 @@ Active model IDs live in one API config module:
 | Job | Model |
 | --- | --- |
 | Coaching, drills, explanations | `gpt-5.6-sol` |
-| Meaning and Echo reveal art | `gpt-image-2` |
-| Echo transcription | `gpt-4o-transcribe` |
-| Echo speech | `gpt-realtime-2.1-mini` |
+| Meaning and Dialogue reveal art | `gpt-image-2` |
+| Dialogue transcription | `gpt-4o-transcribe` |
+| Dialogue speech | `gpt-realtime-2.1-mini` |
 | Reference targets and benchmark | `gpt-realtime-2.1` |
 
 ## Built with Codex
@@ -121,8 +130,10 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | Echo speech prototype | Sixteen cached shadowing utterances with exact ASR and contour-presence receipts | Robert required Realtime mini as the active model; Codex kept 12 mini takes and stepped up only four `phở`/`nước` utterances whose mini takes failed exact lexical validation. This receipt predates the 52-file Dialogue course. |
 | Offline demos | Three analyzer WAVs and one wrong-tone replay for every Dialogue scene, all hash-stamped and committed | Codex used validated Realtime speech where it passed and sample-accurate, DSP-verified pitch transformations for the two cases that could not be elicited reliably. |
 | Acceptance audit | Typed API contracts, history-aware fallback coaching, direct Echo art delivery, hero meaning art, vowel-aware Cô Dấu poses, and a network-blocked Playwright loop | Codex found the contract drift and serverless polling race, then made one offline browser test close the signature verdict, next-drill reasoning, Echo diff, cached speech, keyboard, reduced-motion, and PNG-summary paths. |
-| Release proof | A public fresh clone, no-key one-command launch, static target and Dialogue playback, six responsive viewports, keyed coaching, and keyed transcription | Codex measured `READY` at 88 seconds and reran the complete offline journey from commit `070ad2e`; Robert keeps final corpus promotion gated on four real phone recordings. |
+| Release proof | A public fresh clone, no-key one-command launch, static target and Dialogue playback, six responsive viewports, keyed coaching, and keyed transcription | Codex measured `READY` at about 35 seconds and reran three complete offline stories from commit `44c6940`; Robert keeps final corpus promotion gated on four real phone recordings. |
 | Evaluation receipt | Fold-partition tests, WAV/hash verification, cache invalidation, atomic benchmark progress, and a receipt-matched DSP/Realtime comparison | Robert required an in-repo proof instead of a claim; Codex bound both evaluators to the same manifest and audio hashes and still withheld every metric until the four phone fallbacks pass. |
+| Reference playback | A glowing target trace, synchronized playhead, playback progress, stronger coach hierarchy, and distinct intended/detected curve colors | Robert expected **Listen + watch** to visibly trace the reference and flagged coaching as too quiet; Codex shipped and browser-tested both changes without moving grading back onto the network. |
+| Submission pass | Same-line Dialogue retry, mutually exclusive learner/reference playback, visible API-degraded mode, refreshed screenshots, and six-viewport Dialogue result coverage | Robert asked to repeat a completed line before advancing; Codex preserved the exact scene, turn, accent, and focus while clearing only that take and its completion state. |
 
 Estimated build-time OpenAI spend recorded in the ignored ledger is **$15.07**, below the $45 hard stop. The additional four-scene course, including 52 validated utterances, retries, lexical checks, and seven generated images, added about **$3.54** to the earlier $11.53 receipt.
 
