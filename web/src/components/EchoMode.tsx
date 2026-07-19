@@ -80,6 +80,7 @@ export function EchoMode({
   const [courseComplete, setCourseComplete] = useState(false);
   const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const recordingUrlRef = useRef<string | null>(null);
+  const learnerAudioRef = useRef<HTMLAudioElement | null>(null);
   const [result, setResult] = useState<EchoCourseResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [generatedRevealArt, setGeneratedRevealArt] = useState<string | null>(null);
@@ -87,6 +88,13 @@ export function EchoMode({
   const playback = useEchoTurnPlayback();
   const playTurnAudio = playback.playTurn;
   const stopPlayback = playback.stop;
+
+  const stopLearnerPlayback = useCallback(() => {
+    if (!learnerAudioRef.current) return;
+    learnerAudioRef.current.pause();
+    learnerAudioRef.current.currentTime = 0;
+    learnerAudioRef.current = null;
+  }, []);
 
   const scene = scenes.find((item) => item.id === sceneId) ?? scenes[0];
   const activeTurn = scene.turns.find((item) => item.id === turnId && item.role === "learner") ?? nextLearnerTurn(scene) ?? scene.turns[0];
@@ -101,13 +109,14 @@ export function EchoMode({
   const sceneLearnerIndex = sceneLearners.findIndex((item) => item.id === activeTurn.id);
 
   const clearTake = useCallback(() => {
+    stopLearnerPlayback();
     if (isOwnedEchoObjectUrl(recordingUrlRef.current)) URL.revokeObjectURL(recordingUrlRef.current!);
     recordingUrlRef.current = null;
     setRecordingUrl(null);
     setResult(null);
     setGeneratedRevealArt(null);
     setError(null);
-  }, []);
+  }, [stopLearnerPlayback]);
 
   const updateLocation = useCallback((nextSceneId: string, nextTurnId: string, focus?: string) => {
     if (typeof window === "undefined") return;
@@ -176,8 +185,9 @@ export function EchoMode({
   }, [result]);
 
   useEffect(() => () => {
+    stopLearnerPlayback();
     if (isOwnedEchoObjectUrl(recordingUrlRef.current)) URL.revokeObjectURL(recordingUrlRef.current!);
-  }, []);
+  }, [stopLearnerPlayback]);
 
   const processRecording = useCallback(async (blob: Blob) => {
     if (isOwnedEchoObjectUrl(recordingUrlRef.current)) URL.revokeObjectURL(recordingUrlRef.current!);
@@ -214,14 +224,23 @@ export function EchoMode({
   });
 
   const playCorrect = () => {
+    stopLearnerPlayback();
     setError(null);
     void playTurnAudio(activeTurn, accent);
   };
 
   const playLearner = () => {
     if (!recordingUrl) return;
+    stopPlayback();
+    stopLearnerPlayback();
     setError(null);
-    void new Audio(recordingUrl).play().catch(() => {
+    const audio = new Audio(recordingUrl);
+    learnerAudioRef.current = audio;
+    audio.addEventListener("ended", () => {
+      if (learnerAudioRef.current === audio) learnerAudioRef.current = null;
+    }, { once: true });
+    void audio.play().catch(() => {
+      if (learnerAudioRef.current === audio) learnerAudioRef.current = null;
       setError("Dấu could not replay that take. Record it once more, or use the committed demo.");
     });
   };
@@ -262,6 +281,20 @@ export function EchoMode({
     stopPlayback();
     clearTake();
     setCourseComplete(true);
+  };
+
+  const retryActiveLine = () => {
+    stopPlayback();
+    clearTake();
+    setCompletedTurnIds((current) => {
+      const next = new Set(current);
+      next.delete(activeTurn.id);
+      return next;
+    });
+    setStarted(true);
+    setCourseComplete(false);
+    const activeFocus = focusForTurn(activeTurn, focusKey);
+    updateLocation(scene.id, activeTurn.id, activeFocus.word_id ?? activeFocus.token);
   };
 
   const practiceWord = (wordId: string) => {
@@ -403,6 +436,7 @@ export function EchoMode({
                 onPlayLearner={playLearner}
                 onPlayCorrect={playCorrect}
                 onPracticeWord={practiceWord}
+                onRetry={retryActiveLine}
                 onContinue={continueCourse}
                 continuingLabel={continueLabel}
               />

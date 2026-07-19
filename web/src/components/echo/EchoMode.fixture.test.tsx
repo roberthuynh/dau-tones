@@ -64,9 +64,19 @@ describe("EchoMode committed fixture replay", () => {
     fireEvent.click(screen.getByRole("button", { name: /No key or no Vietnamese/i }));
     const replay = screen.getByRole("button", { name: /Your take/i }) as HTMLButtonElement;
     expect(replay.disabled).toBe(false);
+    const activeBubble = screen.getByRole("list", { name: /Meet the family dialogue/i }).querySelector('[aria-current="step"]');
+    expect(activeBubble?.classList.contains("is-complete")).toBe(true);
     fireEvent.click(replay);
     expect(audio).toHaveBeenCalledWith("/audio/demos/echo/meet-family-said-ghost.wav");
     expect(play).toHaveBeenCalledOnce();
+
+    fireEvent.click(screen.getByRole("button", { name: /Correct take/i }));
+    expect(pause).toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Practice again" }));
+    expect(screen.getByRole("button", { name: "Record your reply" })).toBeTruthy();
+    expect(screen.queryByText("Here is exactly what changed.")).toBeNull();
+    expect(activeBubble?.classList.contains("is-complete")).toBe(false);
 
     fireEvent.click(screen.getByRole("button", { name: /Family dinner/i }));
     unmount();

@@ -23,6 +23,7 @@ type EchoResultPanelProps = {
   onPlayLearner: () => void;
   onPlayCorrect: () => void;
   onPracticeWord: (wordId: string) => void;
+  onRetry: () => void;
   onContinue: () => void;
   continuingLabel: string;
 };
@@ -97,6 +98,7 @@ export function EchoResultPanel({
   onPlayLearner,
   onPlayCorrect,
   onPracticeWord,
+  onRetry,
   onContinue,
   continuingLabel,
 }: EchoResultPanelProps) {
@@ -129,7 +131,10 @@ export function EchoResultPanel({
         <button type="button" disabled={!recordingUrl} onClick={onPlayLearner}><PlayIcon /><span><strong>Your take</strong><small>{recordingUrl ? "replay what you said" : "recording unavailable"}</small></span></button>
         <button type="button" onClick={onPlayCorrect}><VolumeIcon /><span><strong>Correct take</strong><small>shadow Thầy Minh</small></span></button>
       </div>
-      <button type="button" className="echo-course__continue" onClick={onContinue}>{continuingLabel} <ArrowIcon /></button>
+      <div className="echo-course__result-actions">
+        <button type="button" className="echo-course__retry-line" onClick={onRetry}><span aria-hidden="true">↺</span> Practice again</button>
+        <button type="button" className="echo-course__continue" onClick={onContinue}>{continuingLabel} <ArrowIcon /></button>
+      </div>
     </section>
   );
 }

@@ -6,6 +6,7 @@ import { EchoResultPanel } from "./EchoResultPanel";
 
 function renderResult(result: EchoCourseResult) {
   const onPracticeWord = vi.fn();
+  const onRetry = vi.fn();
   const onContinue = vi.fn();
   render(
     <EchoResultPanel
@@ -16,11 +17,12 @@ function renderResult(result: EchoCourseResult) {
       onPlayLearner={vi.fn()}
       onPlayCorrect={vi.fn()}
       onPracticeWord={onPracticeWord}
+      onRetry={onRetry}
       onContinue={onContinue}
       continuingLabel="Continue scene"
     />,
   );
-  return { onPracticeWord, onContinue };
+  return { onPracticeWord, onRetry, onContinue };
 }
 
 describe("EchoResultPanel", () => {
@@ -38,9 +40,11 @@ describe("EchoResultPanel", () => {
     const fixture = fixtureAsResult(ECHO_SCENES[0]);
     const targetTokens = fixture.target_text.split(/\s+/).map((token) => ({ target: token, heard: token, kind: "match" as const }));
     const correct: EchoCourseResult = { ...fixture, transcript: fixture.target_text, tokens: targetTokens, diff: targetTokens, explanation: "", literal_explanation: "" };
-    const { onContinue } = renderResult(correct);
+    const { onRetry, onContinue } = renderResult(correct);
 
     expect(screen.getByText("Every tone mark landed.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Practice again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
     fireEvent.click(screen.getByRole("button", { name: "Continue scene" }));
     expect(onContinue).toHaveBeenCalledOnce();
   });

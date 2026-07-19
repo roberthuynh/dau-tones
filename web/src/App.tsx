@@ -145,7 +145,11 @@ export default function App() {
         </div>
       </header>
 
-      {!aiCoaching ? <div className="key-banner" role="status">Add an OpenAI key for AI coaching</div> : null}
+      {!apiOnline ? (
+        <div className="key-banner key-banner--offline" role="status">API offline · local pitch grading and committed lessons still work</div>
+      ) : !aiCoaching ? (
+        <div className="key-banner" role="status">Add an OpenAI key for AI coaching</div>
+      ) : null}
 
       <div id="main-content">
         {journey === "tones" ? (

@@ -36,7 +36,7 @@ test("offline learner closes the Tone Shapes and Dialogue Practice loops", async
   const externalRequests = await installOfflineHarness(page, baseURL!);
 
   await page.goto("/");
-  await expect(page.getByText("Add an OpenAI key for AI coaching", { exact: true })).toBeVisible();
+  await expect(page.getByText("API offline · local pitch grading and committed lessons still work", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "ma", exact: true })).toBeVisible();
   await expect(page.getByText("Northern profile: four acoustic families; the closest exact form remains visible.")).toBeVisible();
   await expect(page.getByRole("navigation", { name: "The six tones of ma" }).getByRole("button")).toHaveCount(6);
@@ -87,6 +87,11 @@ test("offline learner closes the Tone Shapes and Dialogue Practice loops", async
   await expect(page.getByText("dấu sắc · mother", { exact: true })).toBeVisible();
   await expect(page.getByText("không dấu · ghost", { exact: true })).toBeVisible();
 
+  await page.getByRole("button", { name: "Practice again", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Record your reply" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Here is exactly what changed." })).toBeHidden();
+  await page.getByRole("button", { name: /No key or no Vietnamese/ }).click();
+
   await page.getByRole("button", { name: /Your take/ }).click();
   await page.getByRole("button", { name: /Correct take/ }).click();
   await expect.poll(() => page.evaluate(() => (window as typeof window & { __dauAudioPlayCount?: number }).__dauAudioPlayCount ?? 0)).toBeGreaterThanOrEqual(2);
@@ -131,5 +136,28 @@ test("the six-tone workbench stays usable at every release viewport", async ({ p
         expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 1);
       }
     }
+  }
+});
+
+test("Dialogue Practice result actions stay usable at every release viewport", async ({ page, baseURL }) => {
+  await installOfflineHarness(page, baseURL!);
+  const viewports = [
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+    { width: 1024, height: 768 },
+    { width: 768, height: 1024 },
+    { width: 390, height: 844 },
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto("/?mode=dialogue");
+    await expect(page.getByRole("heading", { name: "Use the tone in a real conversation." })).toBeVisible();
+    await page.getByRole("button", { name: /No key or no Vietnamese/ }).click();
+    await expect(page.getByRole("button", { name: "Practice again", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Continue scene", exact: true })).toBeVisible();
+    await expect(page.getByRole("img", { name: /Cô Dấu demonstrating/ })).toBeVisible();
+    await expect(page.locator("body")).toHaveJSProperty("scrollWidth", viewport.width);
   }
 });

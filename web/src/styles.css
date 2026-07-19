@@ -2407,6 +2407,12 @@ a:focus-visible {
   font-size: 10px;
 }
 
+.key-banner--offline {
+  color: #e6c69b;
+  background: linear-gradient(90deg, rgba(244, 166, 65, 0.06), #171512, rgba(244, 166, 65, 0.06));
+  border-bottom-color: rgba(244, 166, 65, 0.22);
+}
+
 .tone-lab {
   width: min(1760px, 100%);
   padding: 0 clamp(20px, 2.5vw, 46px) 24px;
