@@ -194,6 +194,16 @@ export type CoachResult = {
   next_word: string;
   rationale: string;
   source: "gpt-5.6-sol" | "rules";
+  refinement_status?:
+    | "complete"
+    | "cache_hit"
+    | "no_key"
+    | "rate_limited"
+    | "daily_paused"
+    | "busy"
+    | "timeout"
+    | "failed";
+  fallback_reason?: string | null;
 };
 
 export type HealthPayload = {
@@ -206,6 +216,7 @@ export type HealthPayload = {
     echo_transcription?: boolean;
     echo_speech?: boolean;
     live_art?: boolean;
+    paid_guard_ready?: boolean;
   };
 };
 

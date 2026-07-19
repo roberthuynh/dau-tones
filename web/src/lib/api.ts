@@ -10,7 +10,76 @@ import type {
 
 const API_PREFIX = "/api";
 const ANALYSIS_TIMEOUT_MS = 6_000;
+// The server allows GPT-5.6 up to 18 seconds; keep two seconds for transport
+// so the browser receives its deterministic fallback instead of aborting first.
+export const COACH_REFINEMENT_TIMEOUT_MS = 22_000;
 let analysisWarmup: Promise<void> | null = null;
+
+type EndpointErrorCopy = {
+  timeout: string;
+  unavailable: string;
+};
+
+function endpointErrorCopy(path: string): EndpointErrorCopy {
+  if (path === "/coach") {
+    return {
+      timeout: "GPT-5.6 coaching took too long. Your instant local coach is still ready.",
+      unavailable: "GPT-5.6 coaching is unavailable right now. Your instant local coach is still ready.",
+    };
+  }
+  if (path === "/drills/generate") {
+    return {
+      timeout: "The new drill took too long. Dấu will use the committed practice sequence.",
+      unavailable: "The new drill service is unavailable. Dấu will use the committed practice sequence.",
+    };
+  }
+  if (path === "/echo/transcribe") {
+    return {
+      timeout: "Dialogue transcription took too long. Your recording is still ready to replay beside the correct take.",
+      unavailable: "Dialogue transcription is unavailable right now. Your recording is still ready to replay beside the correct take.",
+    };
+  }
+  if (path === "/echo/speak") {
+    return {
+      timeout: "Correct Dialogue playback took too long. Try the committed take again.",
+      unavailable: "Correct Dialogue playback is unavailable. Read the line, then continue with your reply.",
+    };
+  }
+  if (path.startsWith("/echo/reveals/")) {
+    return {
+      timeout: "The optional mistake illustration took too long. Your transcript feedback is still complete.",
+      unavailable: "The optional mistake illustration is unavailable. Your transcript feedback is still complete.",
+    };
+  }
+  if (path === "/analyze") {
+    return {
+      timeout: "The compatibility analysis took too long. Try one short, clear word.",
+      unavailable: "The compatibility analyzer is unavailable. Browser pitch grading and the scored samples still work.",
+    };
+  }
+  if (path.startsWith("/demos/")) {
+    return {
+      timeout: "That scored sample took too long to load. Try another sample.",
+      unavailable: "That scored sample is unavailable. Live browser grading still works.",
+    };
+  }
+  if (path === "/words") {
+    return {
+      timeout: "The lesson library took too long to refresh. The committed lessons are still available.",
+      unavailable: "The lesson library could not refresh. The committed lessons are still available.",
+    };
+  }
+  if (path === "/healthz") {
+    return {
+      timeout: "The coaching API health check took too long. Local pitch grading still works.",
+      unavailable: "The coaching API is offline. Local pitch grading and committed lessons still work.",
+    };
+  }
+  return {
+    timeout: "That request took too long. Please try again.",
+    unavailable: "Dấu could not reach that service. Please try again.",
+  };
+}
 
 export class ApiError extends Error {
   status?: number;
@@ -27,10 +96,11 @@ export class ApiError extends Error {
 async function request(path: string, init?: RequestInit, timeoutMs = 12_000): Promise<Response> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+  const errorCopy = endpointErrorCopy(path);
   try {
     const response = await fetch(`${API_PREFIX}${path}`, { ...init, signal: controller.signal });
     if (!response.ok) {
-      let detail = `Request failed (${response.status})`;
+      let detail = errorCopy.unavailable;
       let structuredDetail: { code?: string; message?: string; needs_retry?: boolean } | undefined;
       try {
         const payload = (await response.json()) as { detail?: string | { message?: string } };
@@ -46,11 +116,11 @@ async function request(path: string, init?: RequestInit, timeoutMs = 12_000): Pr
     }
     return response;
   } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw new ApiError("The analysis took too long. Please try one short, clear word.");
+    if (typeof error === "object" && error !== null && "name" in error && error.name === "AbortError") {
+      throw new ApiError(errorCopy.timeout);
     }
     if (error instanceof ApiError) throw error;
-    throw new ApiError("Dấu could not reach the local API. Start it with ./dev.sh, or use a sample below.");
+    throw new ApiError(errorCopy.unavailable);
   } finally {
     window.clearTimeout(timeout);
   }
@@ -157,7 +227,7 @@ export function getCoach(verdict: AnalysisResult, history: AnalysisResult[], acc
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ verdict, history: history.slice(-12), accent }),
     },
-    14_000,
+    COACH_REFINEMENT_TIMEOUT_MS,
   );
 }
 
@@ -244,17 +314,13 @@ async function rememberReveal(revealId: string, image: Blob): Promise<void> {
   }
 }
 
-export async function getOrCreateReveal(revealId: string, explanation: string): Promise<string> {
+export async function getOrCreateReveal(revealId: string): Promise<string> {
   const existing = await cachedReveal(revealId);
   if (existing) return URL.createObjectURL(existing);
 
   const response = await request(
     `/echo/reveals/${encodeURIComponent(revealId)}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ explanation }),
-    },
+    { method: "POST" },
     130_000,
   );
   const image = await response.blob();

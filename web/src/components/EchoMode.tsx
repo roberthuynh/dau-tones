@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "../echo-scenes.css";
 import { pedagogicalContour, toneById } from "../fallbackData";
+import type { RequestMicrophoneAccess } from "../hooks/useMicrophonePrivacy";
 import { useRecorder } from "../hooks/useRecorder";
 import { getOrCreateReveal, transcribeEcho } from "../lib/api";
 import {
@@ -38,7 +39,10 @@ type EchoModeProps = {
   onPracticeWord?: (wordId: string) => void;
   initialSceneId?: string;
   initialTurnId?: string;
+  onRequestMicrophone?: RequestMicrophoneAccess;
 };
+
+const requestMicrophoneDirectly: RequestMicrophoneAccess = (_intent, action) => { void action(); };
 
 function initialCourseLocation(scenes: EchoScene[], initialSceneId?: string, initialTurnId?: string) {
   const search = typeof window === "undefined" ? "" : window.location.search;
@@ -71,6 +75,7 @@ export function EchoMode({
   onPracticeWord,
   initialSceneId,
   initialTurnId,
+  onRequestMicrophone = requestMicrophoneDirectly,
 }: EchoModeProps) {
   const initial = useMemo(() => initialCourseLocation(scenes, initialSceneId, initialTurnId), [initialSceneId, initialTurnId, scenes]);
   const [sceneId, setSceneId] = useState(initial.sceneId);
@@ -170,11 +175,10 @@ export function EchoMode({
 
   useEffect(() => {
     const revealId = result?.reveal_id;
-    const explanation = result?.literal_explanation;
-    if (!revealId || !explanation) return;
+    if (!revealId) return;
     let cancelled = false;
     let objectUrl: string | null = null;
-    void getOrCreateReveal(revealId, explanation).then((url) => {
+    void getOrCreateReveal(revealId).then((url) => {
       objectUrl = url;
       if (!cancelled) setGeneratedRevealArt(url);
     }).catch(() => undefined);
@@ -222,6 +226,13 @@ export function EchoMode({
     minimumMs: 1_000,
     processingTimeoutMs: 40_000,
   });
+  const handleRecordToggle = () => {
+    if (recorder.state === "recording") {
+      recorder.stop();
+      return;
+    }
+    if (recorder.state === "idle") onRequestMicrophone("dialogue", recorder.start);
+  };
 
   const playCorrect = () => {
     stopLearnerPlayback();
@@ -399,7 +410,7 @@ export function EchoMode({
                       state={recorder.state}
                       level={recorder.level}
                       elapsedMs={recorder.elapsedMs}
-                      onToggle={recorder.toggle}
+                      onToggle={handleRecordToggle}
                       label="Record your reply"
                       idleHint="Tap once, say the full line, then pause"
                       processingLabel="Reading the tone marks"

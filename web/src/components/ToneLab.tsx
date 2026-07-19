@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { demoAnalysis, demoCoach, toneById, wordById } from "../fallbackData";
 import { useAudioPlayback } from "../hooks/useAudioPlayback";
+import type { RequestMicrophoneAccess } from "../hooks/useMicrophonePrivacy";
 import { useRecorder } from "../hooks/useRecorder";
 import { generateDrill, getCoach } from "../lib/api";
 import { playFeedbackSound } from "../lib/feedbackSound";
@@ -9,7 +10,6 @@ import { familyLabel, signedSemitones, toneSurfaceForWord, TONE_MARK_LABEL } fro
 import type {
   Accent,
   AnalysisResult,
-  CoachResult,
   DemoId,
   SemanticStatus,
   SessionToneStat,
@@ -18,6 +18,7 @@ import type {
 } from "../types";
 import { ArrowIcon, PlayIcon, SparkIcon, VolumeIcon } from "./Icons";
 import { CoDau } from "./CoDau";
+import { CoachPanel, type CoachRefinementStatus, type RichCoach } from "./CoachPanel";
 import { MaToneRail } from "./MaToneRail";
 import { MeaningArt } from "./MeaningArt";
 import { RecordControl } from "./RecordControl";
@@ -29,18 +30,19 @@ type ToneLabProps = {
   payload: WordsPayload;
   accent: Accent;
   apiOnline: boolean;
+  aiCoaching?: boolean;
   soundEnabled: boolean;
   initialWordId?: string;
   onWordChange?: (wordId: string) => void;
   onSessionUpdate?: (summary: { attempts: number; correct: number; accuracy: number; streak: number }) => void;
   onUseInDialogue?: (wordId: string) => void;
+  onRequestMicrophone?: RequestMicrophoneAccess;
 };
-
-type RichCoach = CoachResult & { observation?: string };
 
 const SESSION_KEY = "dau-session-v2";
 const MA_IDS = ["ma-ghost", "ma-but", "ma-mother", "ma-grave", "ma-code", "ma-seedling"];
 const PHUONG_IDS = ["phuong-name", "phuong-ward", "phuong-phoenix"];
+const requestMicrophoneDirectly: RequestMicrophoneAccess = (_intent, action) => { void action(); };
 
 const PHYSICAL_TIPS: Record<string, string> = {
   started_too_high: "Drop your starting point, then move into the tone without pushing.",
@@ -237,47 +239,24 @@ function VerdictPanel({ result, currentWord, detectedWord, payload, streak, onRe
   );
 }
 
-type CoachPanelProps = {
-  coach: RichCoach | null;
-  currentWord: Word;
-  payload: WordsPayload;
-  onNext: () => void;
-  onUseInDialogue?: (wordId: string) => void;
-};
-
-function CoachPanel({ coach, currentWord, payload, onNext, onUseInDialogue }: CoachPanelProps) {
-  const next = wordById(coach?.next_word, payload.words) ?? currentWord;
-  return (
-    <section className="coach-decision">
-      <div className="coach-decision__label"><SparkIcon /> {coach?.source === "gpt-5.6-sol" ? "GPT-5.6 coach" : "Instant local coach"}</div>
-      {coach?.observation ? <p className="coach-decision__observation">{coach.observation}</p> : null}
-      <p className="coach-decision__instruction">{coach?.coaching_sentence ?? toneById(currentWord.tone, payload.tones).physical_cue}</p>
-      <button type="button" className="next-decision" onClick={onNext}>
-        <span>Next shape</span>
-        <strong>{next.syllable}</strong>
-        <small>{coach?.rationale ?? "Repeat the closest contrast while the movement is fresh."}</small>
-        <ArrowIcon />
-      </button>
-      {onUseInDialogue ? <button type="button" className="coach-decision__dialogue" onClick={() => onUseInDialogue(currentWord.id)}>Use this tone in Dialogue Practice <ArrowIcon /></button> : null}
-    </section>
-  );
-}
-
 export function ToneLab({
   payload,
   accent,
   apiOnline,
+  aiCoaching = false,
   soundEnabled,
   initialWordId,
   onWordChange,
   onSessionUpdate,
   onUseInDialogue,
+  onRequestMicrophone = requestMicrophoneDirectly,
 }: ToneLabProps) {
   const defaultId = initialWordId && wordById(initialWordId, payload.words) ? initialWordId : MA_IDS.find((id) => wordById(id, payload.words)) ?? payload.words[0]?.id;
   const [queue, setQueue] = useState(payload.featured_queue);
   const [selectedId, setSelectedId] = useState(defaultId);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [coach, setCoach] = useState<RichCoach | null>(null);
+  const [coachRefinementStatus, setCoachRefinementStatus] = useState<CoachRefinementStatus>("local");
   const [history, setHistory] = useState<AnalysisResult[]>([]);
   const [stats, setStats] = useState<Record<string, SessionToneStat>>(loadStats);
   const [streak, setStreak] = useState(0);
@@ -317,6 +296,7 @@ export function ToneLab({
     setSelectedId(wordId);
     setResult(null);
     setCoach(null);
+    setCoachRefinementStatus("local");
     setError(null);
     onWordChange?.(wordId);
   }, [onWordChange, stopTargetAudio]);
@@ -342,16 +322,25 @@ export function ToneLab({
       }
       const localCoach = knownCoach ?? fallbackCoach(analysis, intendedWord, payload);
       setCoach(localCoach);
-      if (knownCoach) return;
+      setCoachRefinementStatus("local");
+      if (knownCoach || !aiCoaching) return;
       const requestId = coachRequestRef.current + 1;
       coachRequestRef.current = requestId;
+      setCoachRefinementStatus("refining");
       void getCoach(analysis, history, accent)
         .then((response) => {
-          if (coachRequestRef.current === requestId) setCoach({ ...response, observation: response.observation ?? localCoach.observation });
+          if (coachRequestRef.current !== requestId) return;
+          setCoach({ ...response, observation: response.observation ?? localCoach.observation });
+          const refined = response.refinement_status === "complete"
+            || response.refinement_status === "cache_hit"
+            || (!response.refinement_status && response.source === "gpt-5.6-sol");
+          setCoachRefinementStatus(refined ? "complete" : "unavailable");
         })
-        .catch(() => undefined);
+        .catch(() => {
+          if (coachRequestRef.current === requestId) setCoachRefinementStatus("unavailable");
+        });
     },
-    [accent, currentWord, history, payload, soundEnabled],
+    [accent, aiCoaching, currentWord, history, payload, soundEnabled],
   );
 
   const onRecording = useCallback(
@@ -359,6 +348,7 @@ export function ToneLab({
       coachRequestRef.current += 1;
       setResult(null);
       setCoach(null);
+      setCoachRefinementStatus("local");
       setError(null);
       try {
         acceptResult(await analyzeLocally(blob, currentWord, accent, payload));
@@ -370,6 +360,13 @@ export function ToneLab({
   );
 
   const recorder = useRecorder({ onRecording, silenceMs: 520, hardStopMs: 4_200, processingTimeoutMs: 5_000 });
+  const handleRecordToggle = () => {
+    if (recorder.state === "recording") {
+      recorder.stop();
+      return;
+    }
+    if (recorder.state === "idle") onRequestMicrophone("tone_shapes", recorder.start);
+  };
 
   const runDemo = useCallback((demoId: DemoId) => {
     const intendedId = demoId === "phuong-ward" ? "phuong-name" : "ma-mother";
@@ -475,7 +472,7 @@ export function ToneLab({
               state={recorder.state}
               level={recorder.level}
               elapsedMs={recorder.elapsedMs}
-              onToggle={recorder.toggle}
+              onToggle={handleRecordToggle}
               label="Record your tone"
               processingLabel="Grading on this device"
               processingHint="Usually under one second · no upload"
@@ -512,8 +509,8 @@ export function ToneLab({
               </section>
             ) : (
               <>
-                <VerdictPanel result={result} currentWord={currentWord} detectedWord={detectedWord} payload={payload} streak={streak} onRetry={recorder.toggle} />
-                {status !== "uncertain" ? <CoachPanel coach={coach} currentWord={currentWord} payload={payload} onNext={moveNext} onUseInDialogue={onUseInDialogue} /> : null}
+                <VerdictPanel result={result} currentWord={currentWord} detectedWord={detectedWord} payload={payload} streak={streak} onRetry={handleRecordToggle} />
+                {status !== "uncertain" ? <CoachPanel coach={coach} refinementStatus={coachRefinementStatus} currentWord={currentWord} payload={payload} onNext={moveNext} onUseInDialogue={onUseInDialogue} /> : null}
               </>
             )}
           </div>

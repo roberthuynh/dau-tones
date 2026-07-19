@@ -2,9 +2,11 @@ import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { FALLBACK_PAYLOAD } from "./fallbackData";
 import { getHealth, getWords } from "./lib/api";
 import { loadSoundPreference, saveSoundPreference } from "./lib/feedbackSound";
+import { useMicrophonePrivacy } from "./hooks/useMicrophonePrivacy";
 import type { Accent, HealthPayload, WordsPayload } from "./types";
 import { ToneLab } from "./components/ToneLab";
 import { VolumeIcon } from "./components/Icons";
+import { MicrophonePrivacyDialog } from "./components/MicrophonePrivacyDialog";
 
 const EchoMode = lazy(() => import("./components/EchoMode").then((module) => ({ default: module.EchoMode })));
 
@@ -61,6 +63,7 @@ export default function App() {
   const [apiOnline, setApiOnline] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(loadSoundPreference);
   const [session, setSession] = useState<SessionSummary>({ attempts: 0, correct: 0, accuracy: 0, streak: 0 });
+  const microphonePrivacy = useMicrophonePrivacy();
 
   useEffect(() => {
     let cancelled = false;
@@ -131,6 +134,7 @@ export default function App() {
           </button>
         </nav>
         <div className="header-tools">
+          <button type="button" className="privacy-toggle" onClick={microphonePrivacy.openDisclosure}>Privacy</button>
           <div className="accent-switch accent-switch--header" role="group" aria-label="Reference accent">
             <button type="button" className={accent === "north" ? "active" : ""} onClick={() => changeAccent("north")} aria-pressed={accent === "north"}>Bắc <span>Hà Nội</span></button>
             <button type="button" className={accent === "south" ? "active" : ""} onClick={() => changeAccent("south")} aria-pressed={accent === "south"}>Nam <span>Sài Gòn</span></button>
@@ -158,10 +162,12 @@ export default function App() {
             accent={accent}
             apiOnline={apiOnline}
             soundEnabled={soundEnabled}
+            aiCoaching={aiCoaching}
             initialWordId={selectedWordId}
             onWordChange={selectWord}
             onSessionUpdate={setSession}
             onUseInDialogue={useInDialogue}
+            onRequestMicrophone={microphonePrivacy.requestMicrophoneAccess}
           />
         ) : (
           <Suspense fallback={<div className="journey-loading" role="status"><span />Opening the dialogue…</div>}>
@@ -169,6 +175,7 @@ export default function App() {
               accent={accent}
               payload={payload}
               liveTranscription={liveTranscription}
+              onRequestMicrophone={microphonePrivacy.requestMicrophoneAccess}
               onPracticeWord={practiceWord}
               initialSceneId={location.sceneId}
               initialTurnId={location.turnId}
@@ -181,6 +188,14 @@ export default function App() {
         <span>Dấu is open source · deterministic pitch grading</span>
         <span>DSP judges. GPT-5.6 coaches.</span>
       </footer>
+
+      <MicrophonePrivacyDialog
+        open={microphonePrivacy.open}
+        intent={microphonePrivacy.intent}
+        liveTranscription={liveTranscription}
+        onAcknowledge={microphonePrivacy.acknowledgeAndContinue}
+        onClose={microphonePrivacy.close}
+      />
     </div>
   );
 }
