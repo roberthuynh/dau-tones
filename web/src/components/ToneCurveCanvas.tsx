@@ -7,9 +7,12 @@ type ToneCurveCanvasProps = {
   learner?: number[] | null;
   ghost?: number[] | null;
   toneColor: string;
+  targetColor?: string;
   ghostColor?: string;
   revealKey?: string | number;
   correct?: boolean;
+  targetPlaybackProgress?: number;
+  targetPlaying?: boolean;
   ariaLabel: string;
   targetLabel?: string;
 };
@@ -62,7 +65,20 @@ function strokeCurve(
   context.restore();
 }
 
-export function ToneCurveCanvas({ target, learner, ghost, toneColor, ghostColor = "#ffffff", revealKey = 0, correct = false, ariaLabel, targetLabel = "reference target" }: ToneCurveCanvasProps) {
+export function ToneCurveCanvas({
+  target,
+  learner,
+  ghost,
+  toneColor,
+  targetColor = toneColor,
+  ghostColor = "#ffffff",
+  revealKey = 0,
+  correct = false,
+  targetPlaybackProgress = 0,
+  targetPlaying = false,
+  ariaLabel,
+  targetLabel = "reference target",
+}: ToneCurveCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<CanvasSize>({ width: 800, height: 360 });
@@ -109,6 +125,23 @@ export function ToneCurveCanvas({ target, learner, ghost, toneColor, ghostColor 
       const targetPoints = contourPoints(target, size.width, size.height, 28, 26);
       strokeCurve(context, targetPoints, "rgba(235, 226, 207, 0.58)", 2, [8, 10]);
 
+      if (targetPlaying || targetPlaybackProgress > 0) {
+        const tracedProgress = reducedMotion ? 1 : Math.max(targetPlaying ? 0.015 : 0, targetPlaybackProgress);
+        const tracedTarget = partialPoints(targetPoints, tracedProgress);
+        strokeCurve(context, tracedTarget, targetColor, 4.5, [], 0.98, 17);
+        if (tracedTarget.length) {
+          const playhead = tracedTarget[tracedTarget.length - 1];
+          context.save();
+          context.fillStyle = "#fff8e8";
+          context.shadowColor = targetColor;
+          context.shadowBlur = 22;
+          context.beginPath();
+          context.arc(playhead.x, playhead.y, targetPlaying ? 5 : 3.5, 0, Math.PI * 2);
+          context.fill();
+          context.restore();
+        }
+      }
+
       if (ghost?.length) {
         const ghostPoints = contourPoints(ghost, size.width, size.height, 28, 26);
         strokeCurve(context, ghostPoints, ghostColor, 3, [3, 10], 0.32, 4);
@@ -132,10 +165,14 @@ export function ToneCurveCanvas({ target, learner, ghost, toneColor, ghostColor 
     };
     frame = requestAnimationFrame(render);
     return () => cancelAnimationFrame(frame);
-  }, [correct, ghost, ghostColor, learner, reducedMotion, revealKey, size, target, toneColor]);
+  }, [correct, ghost, ghostColor, learner, reducedMotion, revealKey, size, target, targetColor, targetPlaybackProgress, targetPlaying, toneColor]);
 
   return (
-    <div ref={wrapperRef} className={`curve-canvas ${correct ? "curve-canvas--correct" : ""}`}>
+    <div
+      ref={wrapperRef}
+      className={`curve-canvas ${correct ? "curve-canvas--correct" : ""} ${targetPlaying ? "curve-canvas--target-playing" : ""}`}
+      data-target-progress={targetPlaybackProgress.toFixed(3)}
+    >
       <canvas ref={canvasRef} role="img" aria-label={ariaLabel} />
       <span className="curve-label curve-label--target">{targetLabel}</span>
       {learner ? <span className="curve-label curve-label--learner">what you said</span> : null}

@@ -152,13 +152,20 @@ function VerdictPanel({ result, currentWord, detectedWord, payload, streak, onRe
   const classPercent = Math.round(result.class_confidence * 100);
 
   if (status === "uncertain") {
+    const retryGuidance = "message" in result.signal_quality
+      ? result.signal_quality.message
+      : "Hold one vowel for a comfortable beat in a quieter spot.";
     return (
       <section className="tone-verdict tone-verdict--retry">
         <span className="tone-verdict__symbol">↺</span>
-        <div>
-          <p className="eyebrow">One more clear take</p>
-          <h2>No meaning called</h2>
-          <p>{"message" in result.signal_quality ? result.signal_quality.message : "Hold one vowel for a comfortable beat in a quieter spot."}</p>
+        <div className="tone-verdict__copy">
+          <p className="eyebrow">I need one clearer take</p>
+          <h2>Try that tone once more.</h2>
+          <p>Dấu did not assign a meaning because the pitch signal was not clear enough.</p>
+          <div className="tone-verdict__retry-cue">
+            <span>Coach cue</span>
+            <strong>{retryGuidance}</strong>
+          </div>
           <button type="button" className="button button--primary" onClick={onRetry}>Record again</button>
         </div>
       </section>
@@ -287,6 +294,7 @@ export function ToneLab({
   const detectedTone = result ? toneById(result.tone_detected, payload.tones) : null;
   const detectedWord = result ? resultDetectedWord(result, currentWord, payload.words) : undefined;
   const targetAudio = useAudioPlayback();
+  const stopTargetAudio = targetAudio.stop;
   const fourFamilyMode = payload.scoring_modes[accent]?.includes("four") ?? accent === "south";
 
   const statsSummary = useMemo(() => {
@@ -305,12 +313,13 @@ export function ToneLab({
 
   const selectWord = useCallback((wordId: string) => {
     coachRequestRef.current += 1;
+    stopTargetAudio();
     setSelectedId(wordId);
     setResult(null);
     setCoach(null);
     setError(null);
     onWordChange?.(wordId);
-  }, [onWordChange]);
+  }, [onWordChange, stopTargetAudio]);
 
   const acceptResult = useCallback(
     (analysis: AnalysisResult, knownCoach?: RichCoach, intendedWord = currentWord) => {
@@ -429,16 +438,19 @@ export function ToneLab({
             </div>
           </div>
 
-          <div className={`curve-stage ${result && status ? `curve-stage--${status}` : ""}`}>
+          <div className={`curve-stage ${result && status ? `curve-stage--${status}` : ""} ${targetAudio.playing ? "curve-stage--target-playing" : ""}`}>
             <ToneCurveCanvas
               target={targetCurve}
               learner={learnerCurve}
               ghost={ghostCurve}
               toneColor={result && detectedTone ? detectedTone.color : intendedTone.color}
+              targetColor={intendedTone.color}
               ghostColor={detectedTone?.color}
               revealKey={revealKey}
               correct={Boolean(status && statusIsCorrect(status))}
-              targetLabel={target.validated ? "validated native target" : "shape preview · phone target pending"}
+              targetPlaybackProgress={targetAudio.progress}
+              targetPlaying={targetAudio.playing}
+              targetLabel={targetAudio.playing ? "follow the glowing native target" : target.validated ? "validated native target" : "shape preview · phone target pending"}
               ariaLabel={result ? `Reference ${intendedTone.name_vi} curve overlaid with your closest ${detectedTone?.name_vi} curve` : `${intendedTone.name_vi} pitch shape`}
             />
             {recorder.state === "processing" && !result ? <div className="analysis-chip" role="status"><span /><strong>Grading locally</strong><small>pitch · shape · meaning</small></div> : null}
@@ -446,7 +458,7 @@ export function ToneLab({
 
           <div className="tone-actions">
             <button
-              className="target-play"
+              className={`target-play ${targetAudio.playing ? "is-playing" : ""}`}
               type="button"
               onClick={() => target.audio_url && void targetAudio.play(target.audio_url)}
               disabled={!target.validated || !target.audio_url}
@@ -457,6 +469,7 @@ export function ToneLab({
                 <strong>{target.validated ? (targetAudio.playing ? "Mirror Cô Dấu now" : "Listen + watch") : "Phone target needed"}</strong>
                 <small>{target.validated ? `Thầy Minh · ${accent === "north" ? "Hà Nội" : "Sài Gòn"}` : "This tone remains visible, but it is not graded until validation passes."}</small>
               </span>
+              {target.validated ? <i className="target-play__progress" aria-hidden="true"><b style={{ width: `${targetAudio.progress * 100}%` }} /></i> : null}
             </button>
             <RecordControl
               state={recorder.state}

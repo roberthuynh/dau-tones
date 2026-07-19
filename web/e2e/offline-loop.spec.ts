@@ -44,6 +44,11 @@ test("offline learner closes the Tone Shapes and Dialogue Practice loops", async
   await expect(page.locator("body")).not.toContainText("Cedar");
   await expect(page.locator("body")).not.toContainText("Cô Linh");
 
+  await page.getByRole("button", { name: /Listen \+ watch/ }).click();
+  await expect(page.locator(".target-play.is-playing")).toBeVisible();
+  await expect(page.locator(".curve-canvas--target-playing")).toHaveAttribute("data-target-progress", /0\.\d{3}/);
+  await expect(page.getByText("follow the glowing native target", { exact: true })).toBeVisible();
+
   const skipLink = page.getByRole("link", { name: "Skip to practice" });
   await skipLink.focus();
   await page.keyboard.press("Enter");

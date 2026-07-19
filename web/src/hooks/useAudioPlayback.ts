@@ -38,8 +38,10 @@ export function useAudioPlayback() {
         setPlaying(false);
       }, { once: true });
       const tick = () => {
-        if (!audio.paused && Number.isFinite(audio.duration) && audio.duration > 0) {
-          setProgress(Math.min(1, audio.currentTime / audio.duration));
+        if (!audio.paused) {
+          if (Number.isFinite(audio.duration) && audio.duration > 0) {
+            setProgress(Math.min(1, audio.currentTime / audio.duration));
+          }
           frameRef.current = requestAnimationFrame(tick);
         }
       };
