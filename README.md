@@ -24,7 +24,7 @@ Start in **1 Tone Shapes**. The top rail puts `ma`, `mà`, `má`, `mả`, `mã`,
 
 Continue to **2 Dialogue Practice** for four linked scenes: **Meet the family**, **Family dinner**, **At the phở shop**, and **Around the ward**. The course contains 26 alternating turns and 13 substantial learner replies, preserves the scene, turn, and focus word in the URL, and links each changed token back to Tone Shapes. All 52 Northern and Southern scene WAVs passed lexical and signal checks, all seven story illustrations are committed, and one wrong-tone replay per scene closes the no-key feedback loop.
 
-**Cold-start receipt, 2026-07-19, commit `44c6940`:** a fresh public clone on Apple Silicon macOS with `OPENAI_API_KEY` explicitly unset printed `READY` in about 35 seconds after installing its own Python 3.11.15 runtime and locked dependencies. Health reported local DSP ready with the honest Northern and Southern four-family profiles; the check loaded all 19 words and six `ma` forms, returned four scenes with 26 turns, streamed a validated target plus a Dialogue WAV, and passed all three offline Playwright stories in 6.5 seconds across all six release viewports.
+**Cold-start receipt, 2026-07-19, commit `5e04444`:** a fresh public clone on Apple Silicon macOS with `OPENAI_API_KEY` explicitly unset printed `READY` in about 43 seconds after installing its own Python 3.11.15 runtime and locked dependencies. Health reported local DSP ready with the honest Northern and Southern four-family profiles; the check loaded all 19 words and six `ma` forms, streamed a validated target plus a Dialogue WAV, and passed all three offline Playwright stories in 8.7 seconds across all six release viewports.
 
 No OpenAI key is required for browser grading, available validated target playback, committed word and scene art, deterministic coaching, analyzer demos, all 52 correct dialogue utterances, learner replay, or the four committed wrong-tone scene fixtures. With a key, server-only AI coaching and live Dialogue transcription, explanations, and optional mistake art turn on automatically:
 
@@ -36,7 +36,9 @@ cp .env.example .env.local
 
 The same monorepo is live at [dau.huynhrobert.com](https://dau.huynhrobert.com) as one Vercel project: Vite owns `/`, FastAPI owns `/api`, and the OpenAI secret remains scoped to Python. Live learner pitch grading stays in a browser Worker. Validated target and Dialogue WAVs are copied to `web/public/audio/` and served with immutable static URLs, so practice playback never waits for a Python function. The native pYIN, SciPy, LLVM, and PyAV stack remains server-side for corpus validation, evaluation, and compatibility analyzer receipts, using [Vercel Large Functions](https://vercel.com/changelog/python-vercel-functions-bundle-size-limit-increased-to-500mb).
 
-GitHub Actions is manual-only during the build to preserve the free-plan quota. The same lint, test, build, and offline end-to-end checks run locally before each published milestone.
+GitHub Actions runs only for pull requests and manual dispatches, preserving the free-plan quota while still providing a complete release gate. The same lint, type, coverage, audit, asset-validation, build, and offline end-to-end checks run locally before each published milestone.
+
+The current gate runs Node 22 and Python 3.11, rejects secrets and unapproved model IDs, applies Ruff plus strict mypy to product and generation code, and requires 75% combined branch-aware API coverage. It also enforces web coverage floors of 65% statements, 50% branches, 65% functions, and 70% lines; audits both npm lockfiles and locked Python production dependencies; validates every inventory, classifier, evaluation, audio, image, and prompt hash; rebuilds the Vite app; and completes the offline Tone Shapes and Dialogue journeys at all six release viewports.
 
 ## 90-second demo guide
 
@@ -63,11 +65,16 @@ flowchart LR
     Static["Immutable static assets<br/>targets + Dialogue WAVs + art"] --> Shapes
     Static --> Dialogue
     Shapes --> Rules["Instant deterministic coach"]
-    Shapes -. "async keyed refinement" .-> API["FastAPI<br/>lazy keyed paths"]
-    Dialogue -. "keyed transcript + reveal" .-> API
-    API --> GPT["gpt-5.6-sol<br/>coach + next drill + explanation"]
-    API --> ASR["gpt-4o-transcribe<br/>Vietnamese token diff"]
-    API --> Images["gpt-image-2<br/>optional mistake scene"]
+    Shapes -. "async keyed refinement" .-> BotID["Vercel Basic BotID<br/>human-session verification"]
+    Dialogue -. "keyed transcript + reveal" .-> BotID
+    BotID --> API["FastAPI<br/>validation + safe errors"]
+    API --> Guard["Upstash Redis<br/>quotas + leases + kill switch + cache"]
+    Guard --> GPT
+    Guard --> ASR
+    Guard --> Images
+    GPT["gpt-5.6-sol<br/>coach + next drill + explanation"]
+    ASR["gpt-4o-transcribe<br/>Vietnamese token diff"]
+    Images["gpt-image-2<br/>optional mistake scene"]
     Speech["gpt-realtime-2.1-mini<br/>bounded Dialogue speech"] --> Static
     Realtime["gpt-realtime-2.1<br/>5 target candidates"] --> Validation["Server authority<br/>librosa pYIN + lexical gates"]
     Validation --> Profile
@@ -75,6 +82,20 @@ flowchart LR
 ```
 
 The latency boundary is deliberate. The main thread decodes the recording, transfers PCM to a Web Worker, and stays free to animate the interface while the Worker extracts pitch and grades. The verdict, first coaching instruction, and next-practice reason require no network request. FastAPI lazy-imports OpenAI and the heavy Python analysis stack only for keyed or compatibility routes. `/api/analyze` remains available for reproducible receipts, but it is not on the live microphone path.
+
+Paid model calls cross two independent production gates. Vercel Basic BotID verifies that a protected POST came from the Dấu browser, then FastAPI uses atomic Upstash counters for per-client and global budgets, short concurrency leases, sanitized caches, and the `dau:ai:enabled` emergency switch. The Redis resource uses Upstash's free plan in Singapore with automatic upgrades disabled. If BotID or Redis cannot make a safe decision in production, the paid call fails closed while browser DSP, deterministic coaching, committed art/audio, learner replay, and offline Dialogue fixtures continue to work.
+
+| Capability | Rolling limit | Client daily | Global daily | Concurrent model calls |
+| --- | ---: | ---: | ---: | ---: |
+| Coaching | 20 / 10 minutes | 60 | 300 | 1 per client, 4 total |
+| Drill selection | 5 / 10 minutes | 20 | 80 | 1 per client, 2 total |
+| Dialogue transcription | 6 / 10 minutes | 20 | 80 | 1 per client, 3 total |
+| Live meaning reveal | 2 / 10 minutes | 4 | 12 | 1 per client, 1 total |
+| Committed correct speech | 30 / 10 minutes | 200 | Not applicable | No model call |
+
+The credentialed admin script is the only kill-switch control; there is no public admin route. With the production Upstash variables present in the shell, run `uv run --project api python -m scripts.ai_admin status`, `disable`, or `enable`. The single persisted key is `dau:ai:enabled`, and model acquisition fails closed when it is disabled.
+
+Raw learner audio, transcripts, prompts, request bodies, network addresses, and OpenAI keys are never written to the cache or structured logs. Responses calls set `store=false`; GPT receives bounded acoustic or curated mismatch facts rather than learner audio. OpenAI API data is not used for training by default. Transcription has no application-state or abuse-monitoring retention; Responses and image generation can retain abuse-monitoring data for up to 30 days, while Dấu itself persists neither recordings nor transcripts. Before the first microphone permission request, a versioned disclosure explains that Tone Shapes stays in the browser and that keyed Dialogue audio is sent only to `gpt-4o-transcribe`; the Privacy control reopens that explanation at any time.
 
 1. `gpt-realtime-2.1` speaks five Thầy Minh reference candidates for every word in Northern and Southern Vietnamese. The product calls the male reference teacher **Thầy Minh**; the provider voice ID stays only in generation receipts. `gpt-4o-transcribe` checks lexical identity, then the server DSP rejects acoustically invalid candidates before one take can become ground truth.
 2. `librosa.pyin` extracts authoritative reference and evaluation F0, preserves voicing and RMS evidence, fills valid gaps, converts pitch to speaker-relative semitones, and resamples to 64 points. The production browser path removes octave spikes and computes the same contour and feature contract in a Worker.
@@ -91,6 +112,18 @@ Audio language models are poor judges of pitch shape, so the DSP judges and the 
 Dialogue Practice is a course, not a live conversation session. Partner lines start only after an explicit user gesture, each learner reply receives an NFC-aware token diff, and changed words link back to Tone Shapes. Its four scenes are **Meet the family**, **Family dinner**, **At the phở shop**, and **Around the ward**. Optional wrong-scene art appears after the text diff and is keyed by a versioned prompt hash. **Roadmap:** a live Vietnamese conversation mode can build on these single-utterance pieces later.
 
 Stage 0 is deliberately an all-or-nothing gate. Thầy Minh produced five isolated takes and up to five carrier-phrase takes per word and accent; `gpt-4o-transcribe` checked lexical identity, then the shared DSP checked signal quality and expected contour. The current receipt accepts 34 of 38 pairs and withholds `targets/manifest.json` until four phone recordings replace exhausted pairs: Northern `mả`, Northern `phở`, Southern `mả`, and Southern `phượng`. No failed take is shipped as ground truth. The transactional importer normalizes a phone recording to mono PCM WAV, reruns lexical and DSP checks, audits all 38 hashes, then writes the report and manifest together.
+
+Import all four replacements in one transaction from the repository root:
+
+```bash
+uv run --project api python -m scripts.import_phone_targets \
+  north/ma-grave=<PATH_TO_NORTHERN_MA_GRAVE_WAV> \
+  north/pho-noodle-soup=<PATH_TO_NORTHERN_PHO_WAV> \
+  south/ma-grave=<PATH_TO_SOUTHERN_MA_GRAVE_WAV> \
+  south/phuong-phoenix=<PATH_TO_SOUTHERN_PHUONG_PHOENIX_WAV>
+```
+
+If any lexical, signal, contour, hash, or inventory check fails, the importer rejects the full transaction and leaves the 34-target receipt untouched.
 
 The static browser profile is `dau-browser-dsp-2.0.0`, bound to partial-corpus SHA-256 `ae637c5a737d3dac9e6e400a98b411ef48db573c1a3ee2b43e717d8fabd13563`. It is explicitly marked `corpus_complete: false`; both accents therefore stay in four-family mode until the four imports pass and the evaluation gates promote Northern six-tone grading.
 
@@ -130,10 +163,11 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | Echo speech prototype | Sixteen cached shadowing utterances with exact ASR and contour-presence receipts | Robert required Realtime mini as the active model; Codex kept 12 mini takes and stepped up only four `phở`/`nước` utterances whose mini takes failed exact lexical validation. This receipt predates the 52-file Dialogue course. |
 | Offline demos | Three analyzer WAVs and one wrong-tone replay for every Dialogue scene, all hash-stamped and committed | Codex used validated Realtime speech where it passed and sample-accurate, DSP-verified pitch transformations for the two cases that could not be elicited reliably. |
 | Acceptance audit | Typed API contracts, history-aware fallback coaching, direct Echo art delivery, hero meaning art, vowel-aware Cô Dấu poses, and a network-blocked Playwright loop | Codex found the contract drift and serverless polling race, then made one offline browser test close the signature verdict, next-drill reasoning, Echo diff, cached speech, keyboard, reduced-motion, and PNG-summary paths. |
-| Release proof | A public fresh clone, no-key one-command launch, static target and Dialogue playback, six responsive viewports, keyed coaching, and keyed transcription | Codex measured `READY` at about 35 seconds and reran three complete offline stories from commit `44c6940`; Robert keeps final corpus promotion gated on four real phone recordings. |
+| Release proof | A public fresh clone, no-key one-command launch, static target and Dialogue playback, six responsive viewports, keyed coaching, and keyed transcription | Codex measured `READY` at about 43 seconds and reran three complete offline stories from commit `5e04444`; Robert keeps final corpus promotion gated on four real phone recordings. |
 | Evaluation receipt | Fold-partition tests, WAV/hash verification, cache invalidation, atomic benchmark progress, and a receipt-matched DSP/Realtime comparison | Robert required an in-repo proof instead of a claim; Codex bound both evaluators to the same manifest and audio hashes and still withheld every metric until the four phone fallbacks pass. |
 | Reference playback | A glowing target trace, synchronized playhead, playback progress, stronger coach hierarchy, and distinct intended/detected curve colors | Robert expected **Listen + watch** to visibly trace the reference and flagged coaching as too quiet; Codex shipped and browser-tested both changes without moving grading back onto the network. |
 | Submission pass | Same-line Dialogue retry, mutually exclusive learner/reference playback, visible API-degraded mode, refreshed screenshots, and six-viewport Dialogue result coverage | Robert asked to repeat a completed line before advancing; Codex preserved the exact scene, turn, accent, and focus while clearing only that take and its completion state. |
+| Production safety | Vercel BotID, atomic Upstash budgets and leases, persistent sanitized caches, a daily kill switch, recording disclosure, security headers, redacted request receipts, and a full PR/manual release gate | Robert required every paid model boundary to be protected without breaking the no-key lesson; Codex kept grading local, removed arbitrary generation inputs, and made each AI failure return an immediate deterministic or text-only path. |
 
 Estimated build-time OpenAI spend recorded in the ignored ledger is **$15.07**, below the $45 hard stop. The additional four-scene course, including 52 validated utterances, retries, lexical checks, and seven generated images, added about **$3.54** to the earlier $11.53 receipt.
 
