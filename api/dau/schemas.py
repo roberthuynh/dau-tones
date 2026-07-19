@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+import json
+from typing import Any, Literal, Self
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 ToneId = Literal["ngang", "huyen", "sac", "hoi", "nga", "nang"]
 ToneFamilyId = Literal["level", "falling", "rising", "dipping"]
@@ -18,10 +19,40 @@ SemanticStatus = Literal[
 ]
 
 
+def _bounded_mapping(value: dict[str, Any], *, max_keys: int, max_bytes: int) -> dict[str, Any]:
+    if len(value) > max_keys:
+        raise ValueError("Too many fields")
+    try:
+        size = len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode())
+    except (TypeError, ValueError) as error:
+        raise ValueError("Fields must be JSON values") from error
+    if size > max_bytes:
+        raise ValueError("Fields are too large")
+    return value
+
+
+def _bounded_history(value: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for item in value:
+        _bounded_mapping(item, max_keys=24, max_bytes=2_048)
+    return value
+
+
 class CoachRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     verdict: dict[str, Any]
     history: list[dict[str, Any]] = Field(default_factory=list, max_length=24)
     accent: Literal["north", "south"] = "north"
+
+    @field_validator("verdict")
+    @classmethod
+    def bounded_verdict(cls, value: dict[str, Any]) -> dict[str, Any]:
+        return _bounded_mapping(value, max_keys=48, max_bytes=16_384)
+
+    @field_validator("history")
+    @classmethod
+    def bounded_history(cls, value: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return _bounded_history(value)
 
 
 class CoachResponse(BaseModel):
@@ -30,12 +61,30 @@ class CoachResponse(BaseModel):
     next_word: str
     rationale: str = Field(min_length=4, max_length=180)
     source: Literal["gpt-5.6-sol", "rules"] = "rules"
+    refinement_status: Literal[
+        "complete",
+        "cache_hit",
+        "no_key",
+        "rate_limited",
+        "daily_paused",
+        "busy",
+        "timeout",
+        "failed",
+    ] = "no_key"
+    fallback_reason: str | None = Field(default=None, max_length=80)
 
 
 class DrillRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     theme: Literal["food", "family", "travel"] = "family"
     size: int = Field(default=6, ge=3, le=10)
     history: list[dict[str, Any]] = Field(default_factory=list, max_length=24)
+
+    @field_validator("history")
+    @classmethod
+    def bounded_history(cls, value: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return _bounded_history(value)
 
 
 class DrillSelection(BaseModel):
@@ -49,10 +98,17 @@ class DrillSelection(BaseModel):
 
 
 class EchoSpeakRequest(BaseModel):
-    turn_id: str | None = None
-    sentence_id: str | None = None
-    text: str | None = Field(default=None, max_length=220)
+    model_config = ConfigDict(extra="forbid")
+
+    turn_id: str | None = Field(default=None, min_length=1, max_length=100)
+    sentence_id: str | None = Field(default=None, min_length=1, max_length=100)
     accent: Literal["north", "south"] = "north"
+
+    @model_validator(mode="after")
+    def exactly_one_committed_id(self) -> Self:
+        if bool(self.turn_id) == bool(self.sentence_id):
+            raise ValueError("Provide exactly one committed turn_id or sentence_id")
+        return self
 
 
 class EchoFocus(BaseModel):

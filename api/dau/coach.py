@@ -54,17 +54,33 @@ def _tip_codes(verdict: dict[str, Any]) -> list[str]:
             codes.append(str(code))
     if verdict.get("needs_retry"):
         codes.insert(0, "needs_retry")
-    return codes
+    return codes[:12]
 
 
 def _numeric_differences(verdict: dict[str, Any]) -> dict[str, float]:
     tips = verdict.get("tips_features", {})
     raw = tips.get("numeric", {}) if isinstance(tips, dict) else {}
-    return {
-        str(key): float(value)
-        for key, value in raw.items()
-        if isinstance(value, int | float) and not isinstance(value, bool)
-    }
+    return dict(
+        list(
+            {
+                str(key): float(value)
+                for key, value in raw.items()
+                if isinstance(value, int | float) and not isinstance(value, bool)
+            }.items()
+        )[:16]
+    )
+
+
+def _sanitized_history(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "intended_tone": item.get("tone_intended") or item.get("intended_tone"),
+            "detected_tone": item.get("tone_detected") or item.get("detected_tone"),
+            "semantic_status": item.get("semantic_status"),
+            "correct": item.get("correct") if isinstance(item.get("correct"), bool) else None,
+        }
+        for item in history[-12:]
+    ]
 
 
 def _difference(numeric: dict[str, float], *names: str) -> float | None:
@@ -169,11 +185,13 @@ def deterministic_coach(request: CoachRequest) -> CoachResponse:
     )
 
 
-def coach(request: CoachRequest) -> CoachResponse:
+def coach(request: CoachRequest, *, safety_identifier: str | None = None) -> CoachResponse:
     fallback = deterministic_coach(request)
     key = openai_api_key()
     if not key:
-        return fallback
+        return fallback.model_copy(
+            update={"refinement_status": "no_key", "fallback_reason": "no_api_key"}
+        )
     valid_ids = [word["id"] for word in inventory_document().get("words", [])]
     meaning = request.verdict.get("meaning_verdict", {})
     meaning = meaning if isinstance(meaning, dict) else {}
@@ -189,11 +207,11 @@ def coach(request: CoachRequest) -> CoachResponse:
     ]
     try:
         client = _openai_client(key)
-        response = client.responses.parse(
-            model=TEXT_MODEL,
-            reasoning={"effort": "low"},
-            text={"verbosity": "low"},
-            input=[
+        arguments: dict[str, Any] = {
+            "model": TEXT_MODEL,
+            "reasoning": {"effort": "low"},
+            "text": {"verbosity": "low"},
+            "input": [
                 {
                     "role": "system",
                     "content": (
@@ -230,26 +248,45 @@ def coach(request: CoachRequest) -> CoachResponse:
                     ),
                 },
             ],
-            text_format=CoachResponse,
+            "text_format": CoachResponse,
             # GPT-5.6 reasoning tokens share this ceiling with the structured
             # payload. A 180-token cap can complete reasoning with no JSON.
-            max_output_tokens=600,
-        )
+            "max_output_tokens": 600,
+            "store": False,
+        }
+        if safety_identifier:
+            arguments["safety_identifier"] = safety_identifier
+        response = client.responses.parse(**arguments)
         parsed = response.output_parsed
         if (
             parsed is None
             or parsed.next_word not in valid_ids
             or word_by_id(parsed.next_word) is None
         ):
-            return fallback
+            return fallback.model_copy(
+                update={"refinement_status": "failed", "fallback_reason": "invalid_response"}
+            )
         return CoachResponse.model_validate(
-            {**parsed.model_dump(mode="json"), "source": "gpt-5.6-sol"}
+            {
+                **parsed.model_dump(mode="json"),
+                "source": "gpt-5.6-sol",
+                "refinement_status": "complete",
+                "fallback_reason": None,
+            }
         )
-    except Exception:
-        return fallback
+    except Exception as error:
+        timed_out = "timeout" in type(error).__name__.lower()
+        return fallback.model_copy(
+            update={
+                "refinement_status": "timeout" if timed_out else "failed",
+                "fallback_reason": "provider_timeout" if timed_out else "provider_unavailable",
+            }
+        )
 
 
-def generate_drill(request: DrillRequest) -> dict[str, Any]:
+def generate_drill(
+    request: DrillRequest, *, safety_identifier: str | None = None
+) -> dict[str, Any]:
     document = inventory_document()
     themed = {item["id"]: item.get("word_ids", []) for item in document.get("themed_drills", [])}
     seeded = list(themed.get(request.theme, []))
@@ -271,11 +308,11 @@ def generate_drill(request: DrillRequest) -> dict[str, Any]:
         return fallback
     try:
         client = _openai_client(key)
-        response = client.responses.parse(
-            model=TEXT_MODEL,
-            reasoning={"effort": "low"},
-            text={"verbosity": "low"},
-            input=[
+        arguments: dict[str, Any] = {
+            "model": TEXT_MODEL,
+            "reasoning": {"effort": "low"},
+            "text": {"verbosity": "low"},
+            "input": [
                 {
                     "role": "system",
                     "content": (
@@ -291,15 +328,19 @@ def generate_drill(request: DrillRequest) -> dict[str, Any]:
                             "theme": request.theme,
                             "size": request.size,
                             "valid_ids": sorted(valid_ids),
-                            "history": request.history[-12:],
+                            "history": _sanitized_history(request.history),
                         },
                         ensure_ascii=False,
                     ),
                 },
             ],
-            text_format=DrillSelection,
-            max_output_tokens=500,
-        )
+            "text_format": DrillSelection,
+            "max_output_tokens": 500,
+            "store": False,
+        }
+        if safety_identifier:
+            arguments["safety_identifier"] = safety_identifier
+        response = client.responses.parse(**arguments)
         parsed = response.output_parsed
         if parsed is None or not all(item in valid_ids for item in parsed.word_ids):
             return fallback

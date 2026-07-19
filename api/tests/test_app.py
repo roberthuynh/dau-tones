@@ -1,14 +1,27 @@
 from __future__ import annotations
 
 import io
+import json
+import logging
 import wave
+from types import SimpleNamespace
 
 import numpy as np
+import pytest
 from fastapi.testclient import TestClient
 
-from dau.app import REVEAL_CACHE, REVEAL_GENERATION_LOCKS, _reveal_cache_id, app
+from dau import app as app_module
+from dau.app import _reveal_cache_id, _validated_audio_duration, app
+from dau.guards import GuardDecision, GuardUnavailable, InMemoryGuard, fallback_guard
+from dau.schemas import CoachResponse
 
 client = TestClient(app, raise_server_exceptions=False)
+
+
+@pytest.fixture(autouse=True)
+def reset_local_guard() -> None:
+    fallback_guard().reset()
+    client.cookies.clear()
 
 
 def _wav(samples: np.ndarray, sample_rate: int = 22_050) -> bytes:
@@ -31,6 +44,13 @@ def test_health_exposes_offline_capabilities(monkeypatch) -> None:
     assert payload["capabilities"]["ai_coaching"] is False
     assert payload["banner"] == "Add an OpenAI key for AI coaching"
     assert payload["reference_corpus_validated"] is False
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
+    assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+    assert response.headers["permissions-policy"].startswith("microphone=(self)")
+    assert "default-src 'self'" in response.headers["content-security-policy"]
+    assert response.headers["x-request-id"]
+    assert response.cookies.get("dau_client")
 
 
 def test_analysis_warmup_reports_timing_and_is_idempotent(monkeypatch) -> None:
@@ -91,7 +111,9 @@ def test_analyze_requires_intended_tone_before_processing_audio() -> None:
         data={"word": "ma-mother", "accent": "north"},
     )
     assert response.status_code == 422
-    assert any(item["loc"][-1] == "intended_tone" for item in response.json()["detail"])
+    detail = response.json()["detail"]
+    assert detail["code"] == "invalid_request"
+    assert any(item["location"][-1] == "intended_tone" for item in detail["issues"])
 
 
 def test_unknown_word_is_rejected_without_analysis() -> None:
@@ -161,6 +183,25 @@ def test_offline_coach_accepts_legacy_intended_tone_history_name(monkeypatch) ->
     )
     assert response.status_code == 200
     assert response.json()["next_word"] == "ma-seedling"
+
+
+def test_coach_rejects_unbounded_history_and_verdicts(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    oversized_verdict = client.post(
+        "/coach",
+        json={"verdict": {"blob": "x" * 17_000}},
+    )
+    oversized_history = client.post(
+        "/coach",
+        json={
+            "verdict": {"word": "ma-ghost"},
+            "history": [{"blob": "x" * 2_100}],
+        },
+    )
+
+    assert oversized_verdict.status_code == 422
+    assert oversized_history.status_code == 422
+    assert oversized_verdict.json()["detail"]["code"] == "invalid_request"
 
 
 def test_offline_echo_demo_closes_transcript_loop(monkeypatch) -> None:
@@ -257,7 +298,7 @@ def test_scene_transcribe_accepts_sentence_id_alias(monkeypatch) -> None:
     assert payload["practice_word_ids"] == ["ma-code"]
 
 
-def test_keyed_echo_returns_a_reveal_id_without_background_generation(monkeypatch) -> None:
+def test_keyed_echo_demo_never_creates_a_live_reveal_permit(monkeypatch) -> None:
     explanation = "You invited a ghost to dinner instead of your mother."
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     monkeypatch.setattr("dau.app._ai_explanation", lambda *_args: explanation)
@@ -276,42 +317,172 @@ def test_keyed_echo_returns_a_reveal_id_without_background_generation(monkeypatc
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["reveal_id"] == _reveal_cache_id(payload["literal_explanation"])
+    assert payload["reveal_id"] is None
 
 
-def test_echo_reveal_returns_png_directly_and_reuses_warm_cache(monkeypatch) -> None:
-    explanation = "You invited a ghost to dinner instead of your mother."
-    reveal_id = _reveal_cache_id(explanation)
-    generated: list[str] = []
-    png = b"\x89PNG\r\n\x1a\ncommitted-test-image"
+def test_offline_echo_demo_bypasses_the_paid_guard(monkeypatch) -> None:
+    class BrokenGuard(InMemoryGuard):
+        def check_window(self, *_args, **_kwargs):
+            raise GuardUnavailable("offline")
+
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("VERCEL_ENV", "production")
+    monkeypatch.setenv("DAU_GUARD_MODE", "strict")
+    monkeypatch.setattr(app_module, "active_guard", lambda: BrokenGuard())
+
+    response = client.post(
+        "/echo/transcribe",
+        data={
+            "turn_id": "meet-family-learner-01",
+            "demo_id": "meet-family-said-ghost",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["source"] == "fixture"
+
+
+def test_live_echo_rejects_invalid_audio_before_model_quota(monkeypatch) -> None:
+    class TrackingGuard(InMemoryGuard):
+        model_acquires = 0
+
+        def acquire_model(self, policy, identity):
+            self.model_acquires += 1
+            return super().acquire_model(policy, identity)
+
+    guard = TrackingGuard()
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(app_module, "active_guard", lambda: guard)
+
+    unsupported = client.post(
+        "/echo/transcribe",
+        files={"audio": ("take.txt", b"not audio", "text/plain")},
+        data={"turn_id": "meet-family-learner-01"},
+    )
+    corrupt = client.post(
+        "/echo/transcribe",
+        files={"audio": ("take.webm", b"not audio", "audio/webm")},
+        data={"turn_id": "meet-family-learner-01"},
+    )
+
+    assert unsupported.status_code == 415
+    assert unsupported.json()["detail"]["code"] == "unsupported_audio_type"
+    assert corrupt.status_code == 422
+    assert corrupt.json()["detail"]["code"] == "invalid_audio"
+    assert guard.model_acquires == 0
+
+
+def test_echo_transcription_rejects_ambiguous_or_partner_inputs(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    both_ids = client.post(
+        "/echo/transcribe",
+        data={
+            "turn_id": "meet-family-learner-01",
+            "sentence_id": "meet-family-learner-01",
+        },
+    )
+    demo_and_audio = client.post(
+        "/echo/transcribe",
+        files={"audio": ("take.wav", _wav(np.zeros(22_050)), "audio/wav")},
+        data={
+            "turn_id": "meet-family-learner-01",
+            "demo_id": "meet-family-said-ghost",
+        },
+    )
+    partner = client.post(
+        "/echo/transcribe",
+        files={"audio": ("take.wav", _wav(np.zeros(22_050)), "audio/wav")},
+        data={"turn_id": "meet-family-minh-01"},
+    )
+
+    assert both_ids.status_code == 400
+    assert demo_and_audio.status_code == 400
+    assert partner.status_code == 400
+    assert partner.json()["detail"]["code"] == "learner_turn_required"
+
+
+def test_dialogue_audio_duration_bounds() -> None:
+    short = _wav(np.zeros(int(22_050 * 0.2)))
+    long = _wav(np.zeros(int(22_050 * 30.2)))
+
+    with pytest.raises(app_module.RouteError, match="third of a second") as too_short:
+        _validated_audio_duration(short)
+    with pytest.raises(app_module.RouteError, match="under 30 seconds") as too_long:
+        _validated_audio_duration(long)
+
+    assert too_short.value.code == "audio_too_short"
+    assert too_long.value.code == "audio_too_long"
+
+
+def test_live_echo_transcription_accepts_a_bounded_learner_take(monkeypatch) -> None:
+    target = next(
+        sentence
+        for sentence in client.get("/echo/sentences").json()["sentences"]
+        if sentence["id"] == "meet-family-learner-01"
+    )["text"]
+
+    class Transcriptions:
+        @staticmethod
+        def create(**_kwargs):
+            return target
+
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     monkeypatch.setattr(
-        "dau.app._generate_reveal",
-        lambda value: generated.append(value) or png,
+        app_module,
+        "_openai_client",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            audio=SimpleNamespace(transcriptions=Transcriptions())
+        ),
     )
-    REVEAL_CACHE.pop(reveal_id, None)
-    REVEAL_GENERATION_LOCKS.pop(reveal_id, None)
+    take = _wav(0.1 * np.sin(2 * np.pi * 180 * np.arange(22_050) / 22_050))
 
+    response = client.post(
+        "/echo/transcribe",
+        files={"audio": ("take.wav", take, "audio/wav")},
+        data={"turn_id": "meet-family-learner-01"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["meaning_status"] == "exact_match"
+    assert response.json()["reveal_id"] is None
+
+
+def test_echo_reveal_returns_webp_directly_and_reuses_persistent_cache(monkeypatch) -> None:
+    explanation = "You invited a ghost to dinner instead of your mother."
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    image_id = _reveal_cache_id(explanation)
+    reveal_id = f"{'a' * 20}.{'b' * 24}"
+    generated: list[str] = []
+    image = b"RIFFcommitted-test-imageWEBP"
+    guard = InMemoryGuard()
+    monkeypatch.setattr(app_module, "active_guard", lambda: guard)
+    monkeypatch.setattr(
+        "dau.app._read_reveal_permit",
+        lambda *_args: (image_id, explanation),
+    )
+    monkeypatch.setattr("dau.app._finish_reveal_permit", lambda *_args: None)
+    monkeypatch.setattr(
+        "dau.app._generate_reveal",
+        lambda value: generated.append(value) or image,
+    )
     first = client.post(
         f"/echo/reveals/{reveal_id}",
-        json={"explanation": explanation},
     )
     second = client.post(
         f"/echo/reveals/{reveal_id}",
-        json={"explanation": explanation},
     )
 
     assert first.status_code == second.status_code == 200
-    assert first.headers["content-type"] == "image/png"
-    assert first.headers["cache-control"] == "public, max-age=31536000, immutable"
-    assert first.content == second.content == png
+    assert first.headers["content-type"] == "image/webp"
+    assert first.headers["cache-control"] == "public, max-age=86400"
+    assert first.content == second.content == image
     assert generated == [explanation]
-    REVEAL_CACHE.pop(reveal_id, None)
-    REVEAL_GENERATION_LOCKS.pop(reveal_id, None)
 
 
 def test_echo_reveal_rejects_a_prompt_mismatch_before_generation(monkeypatch) -> None:
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr("dau.app._read_reveal_permit", lambda *_args: None)
     monkeypatch.setattr(
         "dau.app._generate_reveal",
         lambda _explanation: (_ for _ in ()).throw(AssertionError("generated mismatched art")),
@@ -319,11 +490,68 @@ def test_echo_reveal_rejects_a_prompt_mismatch_before_generation(monkeypatch) ->
 
     response = client.post(
         "/echo/reveals/not-the-prompt-hash",
-        json={"explanation": "You invited a ghost to dinner instead of your mother."},
     )
 
     assert response.status_code == 400
     assert response.json()["detail"]["code"] == "invalid_reveal"
+
+
+def test_echo_explanation_sends_only_changed_tokens_without_storage(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class Responses:
+        def parse(self, **kwargs):
+            captured.update(kwargs)
+            return SimpleNamespace(
+                output_parsed=app_module.EchoExplanation(
+                    explanation="You invited a ghost instead of your mother."
+                )
+            )
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(
+        app_module,
+        "_openai_client",
+        lambda *_args, **_kwargs: SimpleNamespace(responses=Responses()),
+    )
+    result = app_module._ai_explanation(
+        [
+            {"target": "tôi", "heard": "tôi", "kind": "match"},
+            {
+                "target": "má",
+                "heard": "ma",
+                "kind": "tone_only",
+                "target_tone": "sac",
+                "heard_tone": "ngang",
+                "semantic_status": "known_word",
+                "meaning_explanation": "ghost instead of mother",
+                "target_index": 4,
+            },
+        ],
+        "You said ghost instead of mother.",
+        "hashed-client-id",
+    )
+    evidence = json.loads(captured["input"][1]["content"])
+    assert len(evidence["changed_tokens"]) == 1
+    assert evidence["changed_tokens"][0]["heard"] == "ma"
+    assert "target_index" not in evidence["changed_tokens"][0]
+    assert captured["store"] is False
+    assert captured["safety_identifier"] == "hashed-client-id"
+    assert "ghost" in result
+
+
+def test_request_log_uses_route_template_not_reveal_token(
+    monkeypatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    token = "private-one-time-reveal-token"
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(app_module, "_read_reveal_permit", lambda *_args: None)
+    caplog.set_level(logging.INFO, logger="dau.api")
+    response = client.post(f"/echo/reveals/{token}")
+    assert response.status_code == 400
+    record = next(item.message for item in caplog.records if "http_request" in item.message)
+    assert '"endpoint":"/echo/reveals/{reveal_id}"' in record
+    assert token not in record
 
 
 def test_signature_audio_demo_runs_through_validated_partial_templates(monkeypatch) -> None:
@@ -384,3 +612,170 @@ def test_arbitrary_offline_echo_explains_requirement(monkeypatch) -> None:
     )
     assert response.status_code == 503
     assert response.json()["detail"]["code"] == "echo_live_requires_key"
+
+
+def test_echo_speech_only_serves_committed_turns() -> None:
+    seeded = client.post(
+        "/echo/speak",
+        json={"turn_id": "meet-family-learner-02", "accent": "north"},
+    )
+    assert seeded.status_code == 200
+    assert seeded.headers["content-type"] == "audio/wav"
+
+    arbitrary = client.post(
+        "/echo/speak",
+        json={"text": "Say anything a caller supplied", "accent": "north"},
+    )
+    both = client.post(
+        "/echo/speak",
+        json={
+            "turn_id": "meet-family-learner-02",
+            "sentence_id": "meet-family-learner-02",
+            "accent": "north",
+        },
+    )
+    assert arbitrary.status_code == 422
+    assert both.status_code == 422
+    assert arbitrary.json()["detail"]["code"] == "invalid_request"
+
+
+def test_production_paid_route_requires_botid_assertion(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("VERCEL_ENV", "production")
+    response = client.post(
+        "/coach",
+        json={"verdict": {"word": "ma-ghost", "correct": True}},
+    )
+    assert response.status_code == 403
+    assert response.json()["detail"]["code"] == "bot_blocked"
+
+
+def test_strict_production_fails_closed_without_persistent_guard(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("VERCEL_ENV", "production")
+    monkeypatch.setenv("DAU_GUARD_MODE", "strict")
+    monkeypatch.setenv("DAU_CLIENT_ID_SECRET", "test-client-secret")
+    response = client.post(
+        "/coach",
+        headers={"x-dau-bot-verified": "1"},
+        json={"verdict": {"word": "ma-ghost", "correct": True}},
+    )
+    assert response.status_code == 503
+    assert response.json()["detail"]["code"] == "ai_guard_unavailable"
+
+
+def test_strict_production_fails_closed_when_redis_is_unavailable(monkeypatch) -> None:
+    class BrokenGuard(InMemoryGuard):
+        def check_window(self, *_args, **_kwargs):
+            raise GuardUnavailable("offline")
+
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("VERCEL_ENV", "production")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("DAU_GUARD_MODE", "strict")
+    monkeypatch.setenv("DAU_CLIENT_ID_SECRET", "test-client-secret")
+    monkeypatch.setenv("KV_REST_API_URL", "https://redis.example")
+    monkeypatch.setenv("KV_REST_API_TOKEN", "token")
+    monkeypatch.setattr(app_module, "active_guard", lambda: BrokenGuard())
+    response = client.post(
+        "/coach",
+        headers={"x-dau-bot-verified": "1"},
+        json={"verdict": {"word": "ma-ghost", "correct": True}},
+    )
+    assert response.status_code == 503
+    assert response.json()["detail"]["code"] == "ai_guard_unavailable"
+
+
+@pytest.mark.parametrize(
+    ("reason", "expected_code"),
+    [
+        ("client_window", "ai_rate_limited"),
+        ("client_daily", "ai_daily_limit"),
+        ("global_concurrency", "ai_busy"),
+        ("disabled", "ai_paused"),
+    ],
+)
+def test_paid_guard_decisions_return_typed_errors(
+    monkeypatch, reason: str, expected_code: str
+) -> None:
+    class DenyingGuard(InMemoryGuard):
+        def check_window(self, policy, identity):
+            if reason == "client_window":
+                return GuardDecision(False, reason, policy.window_limit, 0, 9, "memory")
+            return super().check_window(policy, identity)
+
+        def acquire_model(self, policy, identity):
+            return GuardDecision(False, reason, policy.window_limit, 0, 9, "memory")
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(app_module, "active_guard", lambda: DenyingGuard())
+
+    response = client.post(
+        "/coach",
+        json={"verdict": {"word": "ma-ghost", "correct": False}},
+    )
+
+    assert response.status_code in {429, 503}
+    assert response.json()["detail"]["code"] == expected_code
+    if response.status_code == 429:
+        assert response.headers["retry-after"] == "9"
+
+
+def test_cached_coach_skips_a_second_model_quota(monkeypatch) -> None:
+    class TrackingGuard(InMemoryGuard):
+        model_acquires = 0
+
+        def acquire_model(self, policy, identity):
+            self.model_acquires += 1
+            return super().acquire_model(policy, identity)
+
+    guard = TrackingGuard()
+    generated = 0
+
+    def refined(*_args, **_kwargs):
+        nonlocal generated
+        generated += 1
+        return CoachResponse(
+            observation="Your ending landed below the target.",
+            coaching_sentence="Keep your chin level through the vowel.",
+            next_word="ma-ghost",
+            rationale="because the level shape needs another repetition",
+            source="gpt-5.6-sol",
+            refinement_status="complete",
+        )
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(app_module, "active_guard", lambda: guard)
+    monkeypatch.setattr(app_module, "coach", refined)
+    payload = {"verdict": {"word": "ma-ghost", "correct": False}}
+    first = client.post("/coach", json=payload)
+    second = client.post("/coach", json=payload)
+    assert first.status_code == second.status_code == 200
+    assert second.json()["refinement_status"] == "cache_hit"
+    assert guard.model_acquires == generated == 1
+
+
+def test_model_lease_releases_when_route_work_raises(monkeypatch) -> None:
+    class TrackingGuard(InMemoryGuard):
+        releases = 0
+
+        def release(self, policy, identity, lease_token):
+            self.releases += 1
+            super().release(policy, identity, lease_token)
+
+    guard = TrackingGuard()
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(app_module, "active_guard", lambda: guard)
+    monkeypatch.setattr(
+        app_module,
+        "coach",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("provider exploded")),
+    )
+    response = client.post(
+        "/coach",
+        json={"verdict": {"word": "ma-ghost", "correct": False}},
+    )
+    assert response.status_code == 500
+    assert guard.releases == 1

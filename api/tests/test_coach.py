@@ -6,8 +6,8 @@ from types import SimpleNamespace
 import pytest
 
 from dau import coach as coach_module
-from dau.coach import PHYSICAL_TIPS, coach, deterministic_coach
-from dau.schemas import CoachRequest, CoachResponse
+from dau.coach import PHYSICAL_TIPS, coach, deterministic_coach, generate_drill
+from dau.schemas import CoachRequest, CoachResponse, DrillRequest, DrillSelection
 
 
 def test_deterministic_coach_leads_with_a_measured_observation() -> None:
@@ -108,11 +108,14 @@ def test_gpt_coach_receives_only_structured_classifier_evidence(
                 }
             ],
             accent="north",
-        )
+        ),
+        safety_identifier="hashed-client-id",
     )
 
     assert captured["text_format"] is CoachResponse
     assert captured["max_output_tokens"] == 600
+    assert captured["store"] is False
+    assert captured["safety_identifier"] == "hashed-client-id"
     messages = captured["input"]
     assert isinstance(messages, list)
     evidence = json.loads(messages[1]["content"])
@@ -123,4 +126,51 @@ def test_gpt_coach_receives_only_structured_classifier_evidence(
     assert evidence["feature_differences"] == {"end_semitones": -2.1}
     assert evidence["confusion_pair_history"][0]["detected_tone"] == "huyen"
     assert response.source == "gpt-5.6-sol"
+    assert response.refinement_status == "complete"
     assert response.observation.startswith("Your ending")
+
+
+def test_gpt_drill_drops_unneeded_history_and_disables_storage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, object] = {}
+
+    class Responses:
+        def parse(self, **kwargs: object) -> SimpleNamespace:
+            captured.update(kwargs)
+            return SimpleNamespace(
+                output_parsed=DrillSelection(
+                    word_ids=["ma-ghost", "ma-but", "ma-mother"],
+                    rationale="Contrast three familiar shapes.",
+                )
+            )
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(
+        coach_module,
+        "_openai_client",
+        lambda _key: SimpleNamespace(responses=Responses()),
+    )
+    result = generate_drill(
+        DrillRequest(
+            theme="family",
+            size=3,
+            history=[
+                {
+                    "intended_tone": "sac",
+                    "detected_tone": "ngang",
+                    "correct": False,
+                    "raw_audio": "must-not-leave-the-server",
+                }
+            ],
+        ),
+        safety_identifier="hashed-client-id",
+    )
+
+    assert captured["store"] is False
+    assert captured["safety_identifier"] == "hashed-client-id"
+    messages = captured["input"]
+    assert isinstance(messages, list)
+    evidence = json.loads(messages[1]["content"])
+    assert "raw_audio" not in evidence["history"][0]
+    assert result["source"] == "gpt-5.6-sol"
