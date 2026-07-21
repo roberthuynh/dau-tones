@@ -8,6 +8,7 @@ import hmac
 import io
 import json
 import logging
+import os
 import re
 import time
 import wave
@@ -16,6 +17,7 @@ from pathlib import Path
 from typing import Annotated, Any, cast
 from uuid import uuid4
 
+import httpx
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -79,6 +81,12 @@ logger = logging.getLogger("dau.api")
 _REQUEST_ID_PATTERN = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 _REVEAL_ID_PATTERN = re.compile(r"^[a-f0-9]{20}\.[a-f0-9]{24}$")
 _CURRICULUM_ID_PATTERN = re.compile(r"^[a-z0-9-]{1,100}$")
+_BOTID_VERIFY_URL = "https://api.vercel.com/bot-protection/v1/is-bot?v=3"
+_BOT_PROTECTED_POST_PATHS = {
+    "/api/coach",
+    "/api/drills/generate",
+    "/api/echo/transcribe",
+}
 
 app = FastAPI(
     title="Dấu API",
@@ -97,6 +105,70 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+def _requires_botid(request: Request) -> bool:
+    if request.method != "POST":
+        return False
+    path = request.url.path
+    return path in _BOT_PROTECTED_POST_PATHS or path.startswith("/api/echo/reveals/")
+
+
+def _botid_forward_headers(request: Request) -> list[tuple[str, str]]:
+    forwarded = [
+        (key, value)
+        for key, value in request.headers.items()
+        if key.lower() not in {"authorization", "cookie"}
+    ]
+    cookies = "; ".join(
+        f"{key}={value}" for key, value in request.cookies.items() if key.startswith("KP_")
+    )
+    if cookies:
+        forwarded.append(("cookie", cookies))
+    return forwarded
+
+
+async def _verify_botid(request: Request) -> dict[str, Any]:
+    token = request.headers.get("x-vercel-oidc-token") or os.getenv("VERCEL_OIDC_TOKEN", "")
+    if not token or not request.headers.get("x-is-human"):
+        return {"verified": False}
+    payload = {
+        "url": str(request.url),
+        "method": request.headers.get("x-method", request.method),
+        "headers": _botid_forward_headers(request),
+        "vercelOidcToken": token,
+        "forceCheckLevel": "basic",
+    }
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        response = await client.post(
+            _BOTID_VERIFY_URL,
+            json=payload,
+            headers={
+                "user-agent": f"Vercel/BotId ({request.headers.get('host', 'unknown host')})",
+                "x-vercel-oidc-token": token,
+            },
+        )
+        if response.is_error:
+            logger.warning(
+                "BotID service rejected verification status=%s body=%s",
+                response.status_code,
+                response.text[:500],
+            )
+        response.raise_for_status()
+    result = response.json()
+    return {
+        "verified": not bool(result.get("isBot", True)),
+        "response_headers": result.get("responseHeadersToSet", {}),
+    }
+
+
+def _apply_botid_response_headers(response: Response, changes: dict[str, Any]) -> None:
+    for item in changes.get("addHeaders", []):
+        response.headers.append(str(item["key"]), str(item["value"]))
+    for item in changes.get("addValuesToHeaders", []):
+        response.headers.append(str(item["key"]), str(item["value"]))
+    for item in changes.get("replaceHeaders", []):
+        response.headers[str(item["key"])] = str(item["value"])
 
 
 def _error_response(
@@ -126,6 +198,15 @@ async def security_and_request_log(request: Request, call_next: Any) -> Response
     request.state.cache_status = "not_applicable"
     request.state.fallback = "none"
     request.state.model_role = "none"
+    request.state.bot_verified = False
+    botid_response_headers: dict[str, Any] = {}
+    if _requires_botid(request):
+        try:
+            result = await _verify_botid(request)
+            request.state.bot_verified = bool(result["verified"])
+            botid_response_headers = cast(dict[str, Any], result.get("response_headers", {}))
+        except (httpx.HTTPError, ValueError, TypeError, KeyError):
+            logger.warning("BotID verification failed", exc_info=True)
     cookie_value = request.cookies.get("dau_client")
     client_id = verified_client_id(cookie_value)
     new_cookie = None
@@ -157,6 +238,7 @@ async def security_and_request_log(request: Request, call_next: Any) -> Response
         "connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'"
     )
     response.headers["Cross-Origin-Resource-Policy"] = "same-site"
+    _apply_botid_response_headers(response, botid_response_headers)
     if new_cookie:
         response.set_cookie(
             "dau_client",
@@ -222,7 +304,7 @@ class _GuardLease:
 def _require_paid_boundary(request: Request) -> None:
     if not is_vercel_deployment():
         return
-    if request.headers.get("x-dau-bot-verified") != "1":
+    if not request.state.bot_verified and request.headers.get("x-dau-bot-verified") != "1":
         raise RouteError(
             403,
             "bot_blocked",
@@ -940,13 +1022,13 @@ async def echo_transcribe(
             "audio/wav",
             "audio/x-wav",
         }
-        if audio.content_type not in allowed_media_types:
+        media_type = (audio.content_type or "").partition(";")[0].strip().lower()
+        if media_type not in allowed_media_types:
             raise RouteError(
                 415,
                 "unsupported_audio_type",
                 "Record WebM, Ogg, MP4, or WAV audio.",
             )
-        media_type = audio.content_type
         await run_in_threadpool(_validated_audio_duration, payload)
         request.state.model_role = "transcription_and_explanation"
         lease = _acquire_model(request, TRANSCRIBE_POLICY)

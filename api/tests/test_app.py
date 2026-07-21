@@ -362,7 +362,7 @@ def test_live_echo_rejects_invalid_audio_before_model_quota(monkeypatch) -> None
     )
     corrupt = client.post(
         "/echo/transcribe",
-        files={"audio": ("take.webm", b"not audio", "audio/webm")},
+        files={"audio": ("take.webm", b"not audio", "audio/webm;codecs=opus")},
         data={"turn_id": "meet-family-learner-01"},
     )
 
