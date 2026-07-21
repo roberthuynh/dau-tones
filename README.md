@@ -4,7 +4,7 @@
 
 Dấu is an open-source practice lab that makes Vietnamese tones visible by drawing a learner's pitch over a DSP-validated reference target. It opens with the six meanings of `ma`, carries those tone shapes into connected dialogues, and uses deterministic signal processing to grade while a coach explains the physical correction and the meaning a wrong mark can create.
 
-**Demo video:** [Build Week submission video coming soon](https://github.com/roberthuynh/dau-tones)
+**Demo video:** [Dấu - See your Vietnamese tones | OpenAI Build Week 2026](https://youtu.be/MvwkqRmEpBg)
 
 ![Dấu Tone Shapes tracing a validated má target beside the enlarged Cô Dấu teaching and coaching rail](web/public/screenshots/tone-shapes-ma.webp)
 
