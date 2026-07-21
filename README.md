@@ -47,7 +47,7 @@ The current gate runs Node 22 and Python 3.11, rejects secrets and unapproved mo
 3. Run **Phương → phường · ward** for the signature name mistake and its level-versus-falling coaching cue.
 4. Open **Dialogue Practice**, choose **No key or no Vietnamese?**, and show the ghost-at-dinner transcript diff, literal scene art, learner/correct replay, and the link back to Tone Shapes.
 5. Press **Practice again** to prove the learner can repeat the same line without losing the scene, focus word, or accent; then use **Continue scene** to advance the story.
-6. End on the Evaluation tables: the browser DSP currently supports 90.9% held-out acoustic-family accuracy, while the complete DSP-versus-audio-model receipt remains gated on four real phone references rather than weakened synthetic targets.
+6. End on the Evaluation tables: the browser DSP currently supports 91.7% held-out acoustic-family accuracy. The native-speaker `mả`/`mã` contrast also shows the architectural point directly: transcription wrote both as `mã`, while DSP separated the dipping hỏi contour from ngã's 58 ms voicing break. The complete benchmark remains gated on two Southern phone references.
 
 ## How it works
 
@@ -57,7 +57,7 @@ The current gate runs Node 22 and Python 3.11, rejects secrets and unapproved mo
 flowchart LR
     Mic["Microphone"] --> Decode["Main thread<br/>Web Audio decode"]
     Decode -->|"transfer PCM"| Worker["Web Worker<br/>browser-yin-v2 F0 + energy"]
-    Profile["Static classifier profile<br/>34 validated templates<br/>version + corpus hash"] --> Worker
+    Profile["Static classifier profile<br/>36 validated templates<br/>version + corpus hash"] --> Worker
     Worker --> Grade["0.65 constrained DTW<br/>+ 0.35 feature distance<br/>+ close-pair cues"]
     Grade --> Shapes["1 Tone Shapes<br/>curve + semantic verdict"]
     Curriculum["Bundled curriculum<br/>six ma forms + 4 scenes"] --> Shapes
@@ -99,7 +99,7 @@ Raw learner audio, transcripts, prompts, request bodies, network addresses, and 
 
 1. `gpt-realtime-2.1` speaks five Thầy Minh reference candidates for every word in Northern and Southern Vietnamese. The product calls the male reference teacher **Thầy Minh**; the provider voice ID stays only in generation receipts. `gpt-4o-transcribe` checks lexical identity, then the server DSP rejects acoustically invalid candidates before one take can become ground truth.
 2. `librosa.pyin` extracts authoritative reference and evaluation F0, preserves voicing and RMS evidence, fills valid gaps, converts pitch to speaker-relative semitones, and resamples to 64 points. The production browser path removes octave spikes and computes the same contour and feature contract in a Worker.
-3. The browser classifier ranks accent-conditioned templates with `0.65 × constrained DTW + 0.35 × robust feature distance`. A `0.20` energy and voicing cue only breaks close hỏi/ngã, sắc/ngã, and huyền/nặng cases. Signal confidence and class confidence are separate; weak audio or a weak margin abstains instead of asserting an accidental meaning.
+3. The browser classifier ranks accent-conditioned templates with `0.65 × constrained DTW + 0.35 × robust feature distance`. Energy and voicing cues break close hỏi/ngã, sắc/ngã, and huyền/nặng cases; a bounded trajectory-plausibility cue prevents a strong late recovery from being absorbed by a falling template. Signal confidence and class confidence are separate; weak audio or a weak margin abstains instead of asserting an accidental meaning.
 4. `gpt-5.6-sol` runs only on FastAPI for structured coaching, next-drill selection, and Dialogue meaning explanations. The deterministic coach returns `observation`, one physical correction, `next_word`, and `rationale` immediately; GPT refinement can replace it asynchronously without delaying the verdict.
 5. `gpt-4o-transcribe` runs server-side for keyed Dialogue transcription. `gpt-realtime-2.1-mini` generates one bounded Thầy Minh or learner-model utterance per scene turn, and `gpt-image-2` generates committed story art plus optional live mistake art. Static generation is build-time; the browser never receives an OpenAI key.
 
@@ -107,25 +107,23 @@ Cô Dấu is the visual teacher, not the reference voice. In Tone Shapes she occ
 
 The semantic layer is independent from the acoustic score. It emits six explicit states: `exact_correct`, `family_correct`, `family_ambiguous`, `wrong_known_word`, `wrong_no_known_word`, and `uncertain`. Only a supported exact or family assertion may name an accidental meaning. A same-family ambiguity is amber; low signal or a weak class margin asks for another take.
 
-Audio language models are poor judges of pitch shape, so the DSP judges and the LLM coaches. Pitch grading is deterministic and inspectable; GPT-5.6 handles concrete instruction, drill choice, and meaning. The committed Stage 6 harness will measure the audio-model comparison after the four phone fallbacks complete the corpus by asking the sibling Realtime model to name tones in its own accepted speech and comparing it with grouped DSP evaluation.
+Audio language models are poor judges of pitch shape, so the DSP judges and the LLM coaches. Pitch grading is deterministic and inspectable; GPT-5.6 handles concrete instruction, drill choice, and meaning. The native-speaker contrast fixture already demonstrates the boundary: `gpt-4o-transcribe` preserved the syllable but normalized Northern `mả` to `mã`, while the shared pitch/voicing pipeline distinguished all three labeled hỏi/ngã pairs. The committed Stage 6 harness will measure the full audio-model comparison after the two Southern fallbacks complete the corpus.
 
 Dialogue Practice is a course, not a live conversation session. Partner lines start only after an explicit user gesture, each learner reply receives an NFC-aware token diff, and changed words link back to Tone Shapes. Its four scenes are **Meet the family**, **Family dinner**, **At the phở shop**, and **Around the ward**. Optional wrong-scene art appears after the text diff and is keyed by a versioned prompt hash. **Roadmap:** a live Vietnamese conversation mode can build on these single-utterance pieces later.
 
-Stage 0 is deliberately an all-or-nothing gate. Thầy Minh produced five isolated takes and up to five carrier-phrase takes per word and accent; `gpt-4o-transcribe` checked lexical identity, then the shared DSP checked signal quality and expected contour. The current receipt accepts 34 of 38 pairs and withholds `targets/manifest.json` until four phone recordings replace exhausted pairs: Northern `mả`, Northern `phở`, Southern `mả`, and Southern `phượng`. No failed take is shipped as ground truth. The transactional importer normalizes a phone recording to mono PCM WAV, reruns lexical and DSP checks, audits all 38 hashes, then writes the report and manifest together.
+Stage 0 is deliberately an all-or-nothing manifest gate. Thầy Minh produced five isolated takes and up to five carrier-phrase takes per word and accent; `gpt-4o-transcribe` checked lexical identity, then the shared DSP checked signal quality and expected contour. The current receipt accepts 36 of 38 pairs. A native Hà Nội speaker supplied Northern `mả`, `mã`, and `phở`: the importer promoted the best validated `mả` and `phở` takes and committed the independently validated `mả`/`mã` contrast as provenance. Only Southern `mả` and Southern `phượng` remain. No failed take is shipped as ground truth, and `targets/manifest.json` remains withheld until the complete 38-target audit passes.
 
-Import all four replacements in one transaction from the repository root:
+Import the two remaining Southern replacements from the repository root:
 
 ```bash
 uv run --project api python -m scripts.import_phone_targets \
-  north/ma-grave=<PATH_TO_NORTHERN_MA_GRAVE_WAV> \
-  north/pho-noodle-soup=<PATH_TO_NORTHERN_PHO_WAV> \
   south/ma-grave=<PATH_TO_SOUTHERN_MA_GRAVE_WAV> \
   south/phuong-phoenix=<PATH_TO_SOUTHERN_PHUONG_PHOENIX_WAV>
 ```
 
-If any lexical, signal, contour, hash, or inventory check fails, the importer rejects the full transaction and leaves the 34-target receipt untouched.
+For an ASR-ambiguous, native-speaker-labeled minimal pair, the importer also accepts an explicit contrast witness such as `--contrast north/ma-grave=ma-code=<PATH>`. Both recordings must pass their own DSP tone gate, use the same base syllable, differ in tone, and be different audio. If any lexical, signal, contour, hash, or inventory check fails, no invalid target is promoted.
 
-The static browser profile is `dau-browser-dsp-2.0.0`, bound to partial-corpus SHA-256 `ae637c5a737d3dac9e6e400a98b411ef48db573c1a3ee2b43e717d8fabd13563`. It is explicitly marked `corpus_complete: false`; both accents therefore stay in four-family mode until the four imports pass and the evaluation gates promote Northern six-tone grading.
+The static browser profile is `dau-browser-dsp-2.0.0`, bound to partial-corpus SHA-256 `ad0234e68352db66d00128d9417c5da1b6b480711f4bcf06d938cd3a60148ea0`. Northern now has all 19 references; Southern has 17. The global receipt remains `corpus_complete: false`, so both accents stay in four-family mode until the two Southern imports pass and the complete evaluation gates decide whether Northern can promote to six-tone grading.
 
 ![Median Northern reference contours for the six visible tone shapes](web/public/figures/six-tone-contours.png)
 
@@ -155,7 +153,8 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | Tone Lab | Canvas contour choreography, microphone silence-stop, meaning verdicts, session summaries, responsive layouts, and the code-native Cô Dấu coach | Robert specified the dark theatre and signature Phương moment; Codex implemented and browser-tested the full loop at desktop and mobile sizes. |
 | First-use redesign | A 96px coral recording action, readable type scale, three-step practice hierarchy, dedicated Cô Dấu teaching rail, larger mouth cues, and focused mobile order | Robert flagged the first screen as too small; Codex treated recording and physical imitation as the two primary actions across Tone Lab and Echo. |
 | Pitch latency | Cold/warm profiling, browser-local Web Audio decoding and autocorrelation grading, bounded processing, and server timing receipts | Robert reported a long “Reading your pitch” wait; Codex traced it to the hosted Python cold start, kept pYIN authoritative for references/evaluation, and removed that server round trip from the learner verdict. |
-| Target audit | Five Thầy Minh reference takes per word/accent, carrier retries, lexical checks, DSP receipts, hash validation, a hard manifest gate, and a transactional phone importer | Codex found and fixed a double voicing rejection in the pYIN pipeline, then stopped at 34/38 instead of weakening four failed gates. Robert will supply the four phone fallbacks. |
+| Target audit | Five Thầy Minh reference takes per word/accent, carrier retries, lexical checks, DSP receipts, hash validation, a hard manifest gate, and a transactional phone importer | Codex found and fixed a double voicing rejection in the pYIN pipeline, then stopped rather than weakening failed gates. Robert and a native Hà Nội speaker supplied validated `mả`, `mã`, and `phở`; only two Southern fallbacks remain. |
+| Native-speaker contrast | Human-labeled `mả`/`mã` minimal-pair import, independent contour validation, voicing-break evidence, hashes, and committed provenance audio | Robert chose to record both tones in alternating order; Codex added the strict contrast-witness path after ASR wrote the labeled `mả` takes as `mã`, preserving rather than hiding the model limitation. |
 | Six-tone lesson | A `ma`-first top rail, shared journey header, above-the-fold workbench, larger Cô Dấu teaching rail, explicit semantic verdicts, feedback sounds, and Tone Shapes to Dialogue links | Robert made all six `ma` forms the default and prioritized unmistakable right/wrong feedback; Codex translated that into the desktop hierarchy and assertion-safe state model. |
 | Browser classifier | Transferable PCM analysis in a Web Worker, browser YIN v2, octave repair, DTW and feature ranking, close-pair cues, top-three alternatives, abstention, and a hash-bound static profile | Robert required classifier correctness before stronger verdicts; Codex replaced the threshold rules and separated signal quality from class confidence. |
 | Dialogue course | Four linked scenes, 26 alternating turns, 13 learner replies, focus-word contours, URL state, token-to-Tone-Shapes links, and one offline semantic fixture per scene | Robert wrote the story arc and required useful learner-length lines; Codex encoded the schema, API compatibility aliases, validators, and linked interface. |
@@ -163,8 +162,8 @@ This task is the build log and scored Codex artifact. The repository is pushed a
 | Echo speech prototype | Sixteen cached shadowing utterances with exact ASR and contour-presence receipts | Robert required Realtime mini as the active model; Codex kept 12 mini takes and stepped up only four `phở`/`nước` utterances whose mini takes failed exact lexical validation. This receipt predates the 52-file Dialogue course. |
 | Offline demos | Three analyzer WAVs and one wrong-tone replay for every Dialogue scene, all hash-stamped and committed | Codex used validated Realtime speech where it passed and sample-accurate, DSP-verified pitch transformations for the two cases that could not be elicited reliably. |
 | Acceptance audit | Typed API contracts, history-aware fallback coaching, direct Echo art delivery, hero meaning art, vowel-aware Cô Dấu poses, and a network-blocked Playwright loop | Codex found the contract drift and serverless polling race, then made one offline browser test close the signature verdict, next-drill reasoning, Echo diff, cached speech, keyboard, reduced-motion, and PNG-summary paths. |
-| Release proof | A public fresh clone, no-key one-command launch, static target and Dialogue playback, six responsive viewports, keyed coaching, and keyed transcription | Codex measured `READY` at about 43 seconds and reran three complete offline stories from commit `5e04444`; Robert keeps final corpus promotion gated on four real phone recordings. |
-| Evaluation receipt | Fold-partition tests, WAV/hash verification, cache invalidation, atomic benchmark progress, and a receipt-matched DSP/Realtime comparison | Robert required an in-repo proof instead of a claim; Codex bound both evaluators to the same manifest and audio hashes and still withheld every metric until the four phone fallbacks pass. |
+| Release proof | A public fresh clone, no-key one-command launch, static target and Dialogue playback, six responsive viewports, keyed coaching, and keyed transcription | Codex measured `READY` at about 43 seconds and reran three complete offline stories from commit `5e04444`; Robert keeps final corpus promotion gated on the two remaining Southern recordings. |
+| Evaluation receipt | Fold-partition tests, WAV/hash verification, cache invalidation, atomic benchmark progress, and a receipt-matched DSP/Realtime comparison | Robert required an in-repo proof instead of a claim; Codex bound both evaluators to the same manifest and audio hashes and still withholds the complete benchmark until the two Southern fallbacks pass. |
 | Reference playback | A glowing target trace, synchronized playhead, playback progress, stronger coach hierarchy, and distinct intended/detected curve colors | Robert expected **Listen + watch** to visibly trace the reference and flagged coaching as too quiet; Codex shipped and browser-tested both changes without moving grading back onto the network. |
 | Submission pass | Same-line Dialogue retry, mutually exclusive learner/reference playback, visible API-degraded mode, refreshed screenshots, and six-viewport Dialogue result coverage | Robert asked to repeat a completed line before advancing; Codex preserved the exact scene, turn, accent, and focus while clearing only that take and its completion state. |
 | Production safety | Vercel BotID, atomic Upstash budgets and leases, persistent sanitized caches, a daily kill switch, recording disclosure, security headers, redacted request receipts, and a full PR/manual release gate | Robert required every paid model boundary to be protected without breaking the no-key lesson; Codex kept grading local, removed arbitrary generation inputs, and made each AI failure return an immediate deterministic or text-only path. |
@@ -173,7 +172,7 @@ Estimated build-time OpenAI spend recorded in the ignored ledger is **$15.07**, 
 
 ## Evaluation
 
-The browser-profile receipt below is a **synthetic-reference regression**, not learner-population accuracy. It uses only the 34 accepted generated references and remains provisional while the corpus is incomplete. Final product metrics still come from committed artifacts generated by `python -m api.eval` after the four phone fallbacks pass.
+The browser-profile receipt below is a **mixed-source reference regression**, not learner-population accuracy. It uses 34 accepted generated references plus two native-speaker Hà Nội references and remains provisional while the Southern corpus is incomplete. Final product metrics still come from committed artifacts generated by `python -m api.eval` after the two Southern fallbacks pass.
 
 Run the receipt after the validated target corpus is present:
 
@@ -187,31 +186,31 @@ The final evaluator fits scales, confidence temperature, and abstention inside g
 
 | Check | Result | Interpretation |
 | --- | ---: | --- |
-| Top-1 on committed references | 34 / 34 | Every accepted WAV ranks its own tone first when its template is present. This is a regression check, not held-out accuracy. |
-| Asserted after abstention | 32 / 34 | Two weak-margin references abstain instead of forcing a meaning claim. |
-| Grouped held-out exact tone | 23 / 33 (69.7%) | The held-out word is removed from its template set. One fold is unavailable because the partial corpus would remove the only example of a tone. |
-| Grouped held-out acoustic family | 30 / 33 (90.9%) | Family scoring is the honest current product mode. |
+| Top-1 on committed references | 36 / 36 | Every accepted WAV ranks its own tone first when its template is present. This is a regression check, not held-out accuracy. |
+| Asserted after abstention | 34 / 36 | Two weak-margin references abstain instead of forcing a meaning claim. |
+| Grouped held-out exact tone | 26 / 36 (72.2%) | The held-out word is removed from its template set; every fold remains evaluable. |
+| Grouped held-out acoustic family | 33 / 36 (91.7%) | Family scoring is the honest current product mode. |
 
 ### Confusion matrix
 
-Provisional grouped held-out exact-tone matrix over the 34 accepted synthetic references. Rows are intended tones; columns are top-1 detected tones. One unavailable fold is excluded.
+Provisional grouped held-out exact-tone matrix over the 36 accepted mixed-source references. Rows are intended tones; columns are top-1 detected tones.
 
 | Intended ↓ / Detected → | ngang | huyền | sắc | hỏi | ngã | nặng |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | ngang | 6 | 0 | 0 | 0 | 0 | 0 |
 | huyền | 0 | 2 | 0 | 1 | 0 | 3 |
 | sắc | 0 | 0 | 6 | 0 | 0 | 0 |
-| hỏi | 0 | 1 | 0 | 0 | 1 | 0 |
+| hỏi | 0 | 1 | 0 | 3 | 1 | 0 |
 | ngã | 1 | 0 | 0 | 2 | 3 | 0 |
 | nặng | 0 | 1 | 0 | 0 | 0 | 6 |
 
-The complete 38-target confusion matrices remain pending the four validated phone imports. No score above is presented as learner-population accuracy.
+The complete 38-target confusion matrices remain pending the two validated Southern phone imports. No score above is presented as learner-population accuracy.
 
 ### DSP versus audio-model benchmark
 
 | Evaluator | Exact-tone accuracy | Acoustic-family accuracy | Receipt |
 | --- | ---: | ---: | --- |
-| Browser DSP, grouped held-out partial corpus | 23 / 33 (69.7%) | 30 / 33 (90.9%) | `web/src/data/classifier-profile.generated.json` + regression test |
+| Browser DSP, grouped held-out partial corpus | 26 / 36 (72.2%) | 33 / 36 (91.7%) | `web/src/data/classifier-profile.generated.json` + regression test |
 | Server pYIN template classifier, complete corpus | Pending | Pending | `api/data/evaluation.json` |
 | `gpt-realtime-2.1` audio benchmark | Pending | Pending | `api/data/benchmark_llm.json` |
 

@@ -121,8 +121,6 @@ const WORD_ROWS: Array<[string, string, ToneId, string, string]> = [
 const MA_IDS = ["ma-ghost", "ma-but", "ma-mother", "ma-grave", "ma-code", "ma-seedling"];
 const PHUONG_IDS = ["phuong-name", "phuong-ward", "phuong-phoenix"];
 const MISSING_TARGETS = new Set([
-  "north:ma-grave",
-  "north:pho-noodle-soup",
   "south:ma-grave",
   "south:phuong-phoenix",
 ]);

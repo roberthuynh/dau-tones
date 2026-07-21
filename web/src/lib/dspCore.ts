@@ -511,6 +511,17 @@ function cueDistance(left: ContourFeatures, right: ContourFeatures): number {
   ) / 3;
 }
 
+function trajectoryPlausibilityPenalty(tone: ToneId, features: ContourFeatures): number {
+  // A falling huyền can finish low, but it should not recover into a strong
+  // late rise. This cue keeps a pronounced hỏi recovery from being absorbed by
+  // an otherwise nearby falling template when the practiced word is held out.
+  if (tone !== "huyen" || features.recovery <= 2 || features.final_rise <= 1) return 0;
+  return Math.min(
+    0.35,
+    0.04 * (features.recovery - 2) + 0.02 * (features.final_rise - 1),
+  );
+}
+
 export function toneFamily(tone: ToneId, accent: Accent): ToneFamilyId {
   if (tone === "ngang") return "level";
   if (tone === "huyen" || tone === "nang") return "falling";
@@ -550,7 +561,8 @@ export function classifyContour(
     template,
     score:
       0.65 * constrainedDtwDistance(contour, template.contour) +
-      0.35 * featureDistance(features, template.features, scales),
+      0.35 * featureDistance(features, template.features, scales) +
+      trajectoryPlausibilityPenalty(template.tone, features),
     cue: cueDistance(features, template.features),
   }));
   const toneScores = new Map<ToneId, number>();

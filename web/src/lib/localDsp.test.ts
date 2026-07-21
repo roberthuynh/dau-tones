@@ -151,7 +151,7 @@ describe("browser-local deterministic DSP", () => {
         abstention_threshold: 0,
         minimum_margin: 0,
       };
-      expect(profile.templates).toHaveLength(17);
+      expect(profile.templates).toHaveLength(19 - profile.missing_target_ids.length);
       for (const template of profile.templates) {
         const result = classifyContour(template.contour, template.features, 0.95, profile);
         expect(result.family, template.id).toBe(toneFamily(template.tone, accent));
@@ -185,8 +185,8 @@ describe("browser-local deterministic DSP", () => {
     const family = rows.filter(
       (row) => toneFamily(row.expected, row.accent) === toneFamily(row.detected, row.accent),
     ).length;
-    expect(exact).toBe(34);
-    expect(family).toBe(34);
+    expect(exact).toBe(rows.length);
+    expect(family).toBe(rows.length);
     expect(retryCount).toBeLessThanOrEqual(2);
   });
 
@@ -227,23 +227,17 @@ describe("browser-local deterministic DSP", () => {
     ).length;
     expect(exact / rows.length).toBeGreaterThanOrEqual(0.69);
     expect(family / rows.length).toBeGreaterThanOrEqual(0.9);
-    const corpusComplete =
-      staticClassifierProfile("north").corpus_complete &&
-      staticClassifierProfile("south").corpus_complete;
-    if (corpusComplete) expect(unavailableFolds).toBe(0);
-    else expect(unavailableFolds).toBeGreaterThan(0);
+    expect(unavailableFolds).toBe(0);
   });
 
-  it("keeps six-tone grading gated until the four phone targets validate", () => {
+  it("keeps six-tone grading gated until the two Southern phone targets validate", () => {
     const north = resolveClassifierProfile(FALLBACK_PAYLOAD, "north");
     const south = resolveClassifierProfile(FALLBACK_PAYLOAD, "south");
-    expect(north.corpus_complete).toBe(false);
+    expect(north.corpus_complete).toBe(true);
     expect(south.corpus_complete).toBe(false);
     expect(north.scoring_mode).toBe("four_family");
     expect(south.scoring_mode).toBe("four_family");
     expect([...north.missing_target_ids, ...south.missing_target_ids].sort()).toEqual([
-      "north/ma-grave",
-      "north/pho-noodle-soup",
       "south/ma-grave",
       "south/phuong-phoenix",
     ]);
