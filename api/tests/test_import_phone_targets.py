@@ -193,6 +193,46 @@ def test_passing_partial_import_replaces_only_its_failure(monkeypatch, tmp_path)
     assert not (tmp_path / "targets/manifest.json").exists()
 
 
+def test_native_speaker_contrast_can_verify_an_asr_ambiguous_tone(
+    monkeypatch, tmp_path
+) -> None:
+    _write_blocked_report(tmp_path, failed_pairs={"north/ma-grave", "south/ma-grave"})
+    target_phone = _phone_file(tmp_path / "ma-grave.m4a", b"native-hoi")
+    contrast_phone = _phone_file(tmp_path / "ma-code.m4a", b"native-nga")
+    _patch_audio_and_validation(monkeypatch)
+
+    def contrast_aware_lexical(path: Path, word: dict[str, Any]) -> tuple[bool, str]:
+        if "contrast-ma-code" in path.name:
+            return True, "mã"
+        return False, "mã"
+
+    monkeypatch.setattr(import_phone_targets, "_lexical_identity", contrast_aware_lexical)
+
+    result = import_phone_targets.import_recordings(
+        [f"north/ma-grave={target_phone}"],
+        raw_contrast_specs=[f"north/ma-grave=ma-code={contrast_phone}"],
+        targets_root=tmp_path / "targets",
+        inventory=inventory_document(),
+    )
+
+    report = json.loads((tmp_path / "targets/generation-report.json").read_text())
+    imported = next(
+        target
+        for target in report["targets"]
+        if target["accent"] == "north" and target["word_id"] == "ma-grave"
+    )
+    lexical = imported["provenance"]["lexical_validation"]
+    evidence = tmp_path / lexical["contrast_path"]
+    assert result.manifest_written is False
+    assert imported["validation"]["lexical_verified"] is True
+    assert imported["validation"]["transcript"] == "mã"
+    assert lexical["method"] == "native_speaker_labeled_minimal_pair"
+    assert lexical["target_asr_exact"] is False
+    assert lexical["contrast_word_id"] == "ma-code"
+    assert evidence.is_file()
+    assert lexical["contrast_sha256"] == _hash(evidence.read_bytes())
+
+
 def test_manifest_is_written_only_when_all_38_targets_are_hash_valid(monkeypatch, tmp_path) -> None:
     _write_blocked_report(tmp_path, failed_pairs={"south/phuong-phoenix"})
     phone = _phone_file(tmp_path / "phoenix.mov")

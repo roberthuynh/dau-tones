@@ -29,6 +29,7 @@ import soundfile as sf  # type: ignore[import-untyped]
 from scipy.signal import resample_poly  # type: ignore[import-untyped]
 
 from dau.content import clear_content_caches, inventory_document, word_surface
+from dau.echo import normalize_text, strip_tone_marks, tokens
 from dau.settings import TARGETS_ROOT
 from dau.tones import SAMPLE_RATE, decode_audio, validate_target_candidate
 
@@ -58,6 +59,13 @@ class ImportResult:
     imported_pairs: tuple[str, ...]
     remaining_failures: tuple[str, ...]
     manifest_written: bool
+
+
+@dataclass(frozen=True)
+class ContrastSpec:
+    pair_id: str
+    contrast_word_id: str
+    source_path: Path
 
 
 def _sha256(data: bytes) -> str:
@@ -108,6 +116,63 @@ def _parse_specs(
             )
         seen.add(pair_id)
         parsed.append(ImportSpec(accent=accent, word_id=word_id, source_path=source_path))
+    return parsed
+
+
+def _parse_contrast_specs(
+    raw_specs: Sequence[str],
+    words_by_id: Mapping[str, dict[str, Any]],
+    supplied_pairs: set[str],
+) -> dict[str, ContrastSpec]:
+    parsed: dict[str, ContrastSpec] = {}
+    for raw_spec in raw_specs:
+        pair, first_separator, remainder = raw_spec.partition("=")
+        contrast_word_id, second_separator, raw_path = remainder.partition("=")
+        accent, slash, word_id = pair.partition("/")
+        if (
+            not first_separator
+            or not second_separator
+            or not slash
+            or not accent
+            or not word_id
+            or not contrast_word_id
+            or not raw_path
+        ):
+            raise PhoneImportError(
+                f"Invalid contrast spec {raw_spec!r}; expected "
+                "ACCENT/WORD_ID=CONTRAST_WORD_ID=PATH."
+            )
+        pair_id = f"{accent}/{word_id}"
+        if pair_id not in supplied_pairs:
+            raise PhoneImportError(
+                f"Contrast evidence has no matching supplied target: {pair_id}."
+            )
+        if pair_id in parsed:
+            raise PhoneImportError(f"Duplicate contrast evidence for {pair_id}.")
+        if contrast_word_id not in words_by_id:
+            raise PhoneImportError(
+                f"Unknown contrast inventory word ID {contrast_word_id!r}."
+            )
+        target_surface = word_surface(words_by_id[word_id])
+        contrast_surface = word_surface(words_by_id[contrast_word_id])
+        if (
+            strip_tone_marks(normalize_text(target_surface))
+            != strip_tone_marks(normalize_text(contrast_surface))
+            or words_by_id[word_id].get("tone") == words_by_id[contrast_word_id].get("tone")
+        ):
+            raise PhoneImportError(
+                f"Contrast {contrast_word_id} must differ from {word_id} only by tone."
+            )
+        source_path = Path(raw_path).expanduser().resolve()
+        if not source_path.is_file():
+            raise PhoneImportError(
+                f"Contrast recording does not exist or is not a file: {source_path}"
+            )
+        parsed[pair_id] = ContrastSpec(
+            pair_id=pair_id,
+            contrast_word_id=contrast_word_id,
+            source_path=source_path,
+        )
     return parsed
 
 
@@ -320,6 +385,7 @@ def _apply_transaction(writes: Mapping[Path, bytes]) -> None:
 def import_recordings(
     raw_specs: Sequence[str],
     *,
+    raw_contrast_specs: Sequence[str] = (),
     targets_root: Path | None = None,
     inventory: Mapping[str, Any] | None = None,
     imported_at: datetime | None = None,
@@ -352,6 +418,11 @@ def import_recordings(
             f"found {len(expected_pairs)}."
         )
     specs = _parse_specs(raw_specs, words_by_id)
+    contrasts = _parse_contrast_specs(
+        raw_contrast_specs,
+        words_by_id,
+        {spec.pair_id for spec in specs},
+    )
     report_path = resolved_targets_root / "generation-report.json"
     manifest_path = resolved_targets_root / "manifest.json"
     report = _load_json(report_path)
@@ -391,10 +462,71 @@ def import_recordings(
         for index, spec in enumerate(specs):
             word = words_by_id[spec.word_id]
             normalized_path = temporary_root / f"{index}-{spec.accent}-{spec.word_id}.wav"
+            contrast = contrasts.get(spec.pair_id)
+            normalized_contrast_path = (
+                temporary_root
+                / f"{index}-{spec.accent}-{spec.word_id}-contrast-{contrast.contrast_word_id}.wav"
+                if contrast is not None
+                else None
+            )
             try:
                 source_bytes = spec.source_path.read_bytes()
                 _normalize_phone_audio(spec.source_path, normalized_path)
-                lexical_verified, transcript = _lexical_identity(normalized_path, word)
+                asr_matched, transcript = _lexical_identity(normalized_path, word)
+                lexical_verified = asr_matched
+                contrast_receipt: dict[str, Any] | None = None
+                if contrast is not None and normalized_contrast_path is not None:
+                    contrast_word = words_by_id[contrast.contrast_word_id]
+                    contrast_source_bytes = contrast.source_path.read_bytes()
+                    if source_bytes == contrast_source_bytes:
+                        raise PhoneImportError(
+                            f"Contrast evidence for {spec.pair_id} must be a different take."
+                        )
+                    _normalize_phone_audio(contrast.source_path, normalized_contrast_path)
+                    contrast_lexical_verified, contrast_transcript = _lexical_identity(
+                        normalized_contrast_path,
+                        contrast_word,
+                    )
+                    contrast_validation = _validation_dict(
+                        validate_target_candidate(
+                            normalized_contrast_path,
+                            expected_tone=contrast_word["tone"],
+                            accent=spec.accent,
+                            lexical_verified=contrast_lexical_verified,
+                        )
+                    )
+                    heard_tokens = tokens(transcript)
+                    heard_same_base = (
+                        len(heard_tokens) == 1
+                        and strip_tone_marks(heard_tokens[0])
+                        == strip_tone_marks(normalize_text(word_surface(word)))
+                    )
+                    if (
+                        not contrast_lexical_verified
+                        or contrast_validation.get("passed") is not True
+                    ):
+                        raise PhoneImportError(
+                            f"Contrast evidence for {spec.pair_id} failed lexical or "
+                            "tone validation."
+                        )
+                    if not heard_same_base:
+                        raise PhoneImportError(
+                            f"Target ASR for {spec.pair_id} did not preserve the "
+                            "labeled syllable base."
+                        )
+                    lexical_verified = True
+                    contrast_receipt = {
+                        "method": "native_speaker_labeled_minimal_pair",
+                        "target_asr_exact": bool(asr_matched),
+                        "target_asr_transcript": transcript,
+                        "contrast_word_id": contrast.contrast_word_id,
+                        "contrast_surface": word_surface(contrast_word),
+                        "contrast_tone": contrast_word["tone"],
+                        "contrast_asr_transcript": contrast_transcript,
+                        "contrast_source_filename": contrast.source_path.name,
+                        "contrast_source_sha256": _sha256(contrast_source_bytes),
+                        "contrast_validation": contrast_validation,
+                    }
                 validation = _validation_dict(
                     validate_target_candidate(
                         normalized_path,
@@ -409,6 +541,8 @@ def import_recordings(
                 raise PhoneImportError(f"Validation failed for {spec.pair_id}: {error}") from error
             validation["transcript"] = transcript
             validation["lexical_verified"] = bool(lexical_verified)
+            if contrast_receipt is not None:
+                validation["lexical_validation"] = contrast_receipt
             if not lexical_verified:
                 validation["passed"] = False
                 reasons = list(validation.get("reason_codes", []))
@@ -439,6 +573,25 @@ def import_recordings(
                     "sample_rate_hz": SAMPLE_RATE,
                 },
             }
+            if contrast_receipt is not None and contrast is not None and normalized_contrast_path:
+                contrast_destination = (
+                    repo_root
+                    / "fixtures"
+                    / "phone-contrast"
+                    / spec.accent
+                    / f"{spec.word_id}-vs-{contrast.contrast_word_id}.wav"
+                )
+                contrast_bytes = normalized_contrast_path.read_bytes()
+                staged_files[contrast_destination.resolve()] = contrast_bytes
+                provenance["lexical_validation"] = {
+                    "method": contrast_receipt["method"],
+                    "target_asr_exact": contrast_receipt["target_asr_exact"],
+                    "target_asr_transcript": contrast_receipt["target_asr_transcript"],
+                    "contrast_word_id": contrast.contrast_word_id,
+                    "contrast_path": str(contrast_destination.relative_to(repo_root)),
+                    "contrast_sha256": _sha256(contrast_bytes),
+                    "contrast_asr_transcript": contrast_receipt["contrast_asr_transcript"],
+                }
             staged_records.append(
                 {
                     "word_id": spec.word_id,
@@ -545,9 +698,20 @@ def main() -> None:
         metavar="ACCENT/WORD_ID=PATH",
         help="Repeat once per phone recording to import.",
     )
+    parser.add_argument(
+        "--contrast",
+        action="append",
+        default=[],
+        metavar="ACCENT/WORD_ID=CONTRAST_WORD_ID=PATH",
+        help=(
+            "Native-speaker-labeled minimal-pair evidence for an ASR-ambiguous target. "
+            "The contrast must share the syllable base, pass its own lexical and DSP gates, "
+            "and come from a different take."
+        ),
+    )
     args = parser.parse_args()
     try:
-        result = import_recordings(args.recording)
+        result = import_recordings(args.recording, raw_contrast_specs=args.contrast)
     except PhoneImportError as error:
         parser.exit(2, f"phone target import rejected: {error}\n")
     print(f"validated and imported {len(result.imported_pairs)} phone target(s)")
