@@ -205,6 +205,24 @@ export const FALLBACK_ECHO_SENTENCES: EchoSentence[] = [
   { id: "find-restroom", text: "Nhà vệ sinh ở đâu?", gloss_en: "Where is the restroom?", theme: "travel" },
 ];
 
+export function mergeCommittedTargets(remote: WordsPayload): WordsPayload {
+  const committedById = new Map(FALLBACK_WORDS.map((word) => [word.id, word]));
+  return {
+    ...remote,
+    words: remote.words.map((word) => {
+      const committed = committedById.get(word.id);
+      if (!committed) return word;
+      return {
+        ...word,
+        targets: {
+          north: word.targets.north.validated ? word.targets.north : committed.targets.north,
+          south: word.targets.south.validated ? word.targets.south : committed.targets.south,
+        },
+      };
+    }),
+  };
+}
+
 function variedContour(tone: ToneId, accent: Accent, variant: "close" | "flat" | "fall"): number[] {
   const base = pedagogicalContour(tone, accent);
   return base.map((value, index) => {

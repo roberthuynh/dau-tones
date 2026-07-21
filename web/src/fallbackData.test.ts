@@ -1,4 +1,4 @@
-import { demoAnalysis, FALLBACK_PAYLOAD, pedagogicalContour } from "./fallbackData";
+import { demoAnalysis, FALLBACK_PAYLOAD, mergeCommittedTargets, pedagogicalContour } from "./fallbackData";
 import { ECHO_SCENES } from "./lib/echoCourse";
 
 describe("committed offline experience", () => {
@@ -15,6 +15,17 @@ describe("committed offline experience", () => {
 
   it("keeps every pedagogical contour at the 64-point API contract", () => {
     for (const tone of FALLBACK_PAYLOAD.tones) expect(pedagogicalContour(tone.id)).toHaveLength(64);
+  });
+
+  it("keeps validated bundled audio when the API reports a target pending", () => {
+    const remote = structuredClone(FALLBACK_PAYLOAD);
+    const ward = remote.words.find((word) => word.id === "phuong-ward")!;
+    ward.targets.north = { audio_url: "", contour: [], validated: false };
+
+    const merged = mergeCommittedTargets(remote);
+    expect(merged.words.find((word) => word.id === "phuong-ward")!.targets.north).toEqual(
+      FALLBACK_PAYLOAD.words.find((word) => word.id === "phuong-ward")!.targets.north,
+    );
   });
 
   it("makes the signature demo a falling-tone meaning error", () => {

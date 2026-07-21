@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
-import { FALLBACK_PAYLOAD } from "./fallbackData";
+import { FALLBACK_PAYLOAD, mergeCommittedTargets } from "./fallbackData";
 import { getHealth, getWords } from "./lib/api";
 import { loadSoundPreference, saveSoundPreference } from "./lib/feedbackSound";
 import { useMicrophonePrivacy } from "./hooks/useMicrophonePrivacy";
@@ -75,7 +75,9 @@ export default function App() {
       } else {
         setApiOnline(false);
       }
-      if (wordsResult.status === "fulfilled" && wordsResult.value.words?.length) setPayload(wordsResult.value);
+      if (wordsResult.status === "fulfilled" && wordsResult.value.words?.length) {
+        setPayload(mergeCommittedTargets(wordsResult.value));
+      }
     });
     return () => {
       cancelled = true;
