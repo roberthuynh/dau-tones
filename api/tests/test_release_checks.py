@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from scripts.release_guards import model_findings, secret_findings
@@ -16,8 +17,8 @@ def test_release_validator_checks_every_committed_media_group() -> None:
         "scene_art": 7,
         "dialogue_audio": 52,
         "demos": 8,
-        "accepted_targets": 34,
-        "missing_targets": 4,
+        "accepted_targets": 36,
+        "missing_targets": 2,
     }
 
 
@@ -63,3 +64,21 @@ def test_vercel_middleware_protects_every_paid_post_and_overwrites_assertion() -
     assert 'headers.set("x-dau-bot-verified", "1")' in source
     assert 'code: "bot_blocked"' in source
     assert 'code: "ai_guard_unavailable"' in source
+
+
+def test_vercel_routes_botid_assets_before_the_web_catch_all() -> None:
+    config = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
+    rewrites = config["rewrites"]
+
+    challenge_prefix = "/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3"
+    assert rewrites[:2] == [
+        {
+            "source": f"{challenge_prefix}/a-4-a/c.js",
+            "destination": "https://api.vercel.com/bot-protection/v1/challenge",
+        },
+        {
+            "source": f"{challenge_prefix}/:path*",
+            "destination": "https://api.vercel.com/bot-protection/v1/proxy/:path*",
+        },
+    ]
+    assert rewrites[-1]["source"] == "/(.*)"

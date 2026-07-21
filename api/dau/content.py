@@ -7,9 +7,8 @@ import json
 import math
 from functools import lru_cache
 from pathlib import Path
+from statistics import median
 from typing import Any, cast
-
-import numpy as np
 
 from .settings import DATA_ROOT, REPO_ROOT, TARGETS_ROOT
 
@@ -181,29 +180,42 @@ def reference_corpus_is_complete() -> bool:
 def generic_contour(tone: str, accent: str = "north") -> list[float]:
     """Return a pedagogical contour while the validated manifest is loading."""
 
-    x = np.linspace(0.0, 1.0, 64)
+    x = [index / 63 for index in range(64)]
     if tone == "ngang":
-        y = 0.18 * np.sin(math.pi * x)
+        y = [0.18 * math.sin(math.pi * value) for value in x]
     elif tone == "huyen":
-        y = 1.9 - 4.0 * x + 0.25 * np.sin(math.pi * x)
+        y = [1.9 - 4.0 * value + 0.25 * math.sin(math.pi * value) for value in x]
     elif tone == "sac":
-        y = -2.1 + 5.2 * np.power(x, 1.65)
+        y = [-2.1 + 5.2 * value**1.65 for value in x]
     elif tone == "hoi":
-        y = 2.0 - 6.2 * np.sin(math.pi * np.minimum(x, 0.72) / 1.44)
-        y += np.where(x > 0.62, 4.1 * (x - 0.62), 0.0)
+        y = [
+            2.0
+            - 6.2 * math.sin(math.pi * min(value, 0.72) / 1.44)
+            + (4.1 * (value - 0.62) if value > 0.62 else 0.0)
+            for value in x
+        ]
     elif tone == "nga":
         if accent == "south":
-            y = 1.3 - 4.0 * np.sin(math.pi * np.minimum(x, 0.7) / 1.4)
-            y += np.where(x > 0.58, 5.0 * (x - 0.58), 0.0)
+            y = [
+                1.3
+                - 4.0 * math.sin(math.pi * min(value, 0.7) / 1.4)
+                + (5.0 * (value - 0.58) if value > 0.58 else 0.0)
+                for value in x
+            ]
         else:
-            y = -1.0 + 1.3 * x + 2.9 * np.maximum(x - 0.46, 0.0)
-            y += np.where((x > 0.43) & (x < 0.54), -0.8, 0.0)
+            y = [
+                -1.0
+                + 1.3 * value
+                + 2.9 * max(value - 0.46, 0.0)
+                + (-0.8 if 0.43 < value < 0.54 else 0.0)
+                for value in x
+            ]
     elif tone == "nang":
-        y = 1.2 - 4.2 * np.minimum(x / 0.7, 1.0)
+        y = [1.2 - 4.2 * min(value / 0.7, 1.0) for value in x]
     else:
-        y = np.zeros_like(x)
-    y = y - float(np.median(y))
-    return [round(float(value), 4) for value in y]
+        y = [0.0] * len(x)
+    center = median(y)
+    return [round(value - center, 4) for value in y]
 
 
 def target_for(word_id: str, accent: str) -> dict[str, Any] | None:

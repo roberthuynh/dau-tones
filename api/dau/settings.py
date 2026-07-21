@@ -14,7 +14,7 @@ REPO_ROOT = API_ROOT.parent
 # Vercel installs ``dau`` into ``_vendor`` before importing the checked-in
 # entrypoint. Repository assets still live beside ``api/index.py``, so resolve
 # data from the repository root instead of beside the installed package.
-DATA_ROOT = REPO_ROOT / "api" / "data"
+DATA_ROOT = API_ROOT / "data"
 TARGETS_ROOT = REPO_ROOT / "targets"
 FIXTURES_ROOT = REPO_ROOT / "fixtures"
 WEB_PUBLIC_ROOT = REPO_ROOT / "web" / "public"

@@ -1,8 +1,15 @@
 .cache/
+.claude/
 .env.local
+.mypy_cache/
+.tools/
+.vercel/
+_uv/
 api/.venv/
 api/.pytest_cache/
 api/.ruff_cache/
+node_modules/
 targets/candidates/
+tmp/
 web/node_modules/
 web/dist/

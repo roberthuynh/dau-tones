@@ -10,6 +10,7 @@ import json
 import logging
 import re
 import time
+import wave
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any, cast
@@ -349,31 +350,32 @@ def _upstream_route_error(error: Exception, message: str) -> RouteError:
 
 
 def _validated_audio_duration(payload: bytes) -> float:
-    """Decode enough audio to reject corrupt, too-short, or oversized Dialogue takes."""
+    """Reject corrupt uploads and enforce exact duration bounds for WAV takes."""
 
-    try:
-        import av
-
-        with av.open(io.BytesIO(payload), mode="r") as container:
-            stream = next((item for item in container.streams if item.type == "audio"), None)
-            if stream is None:
-                raise ValueError("no audio stream")
-            duration = 0.0
-            for frame in container.decode(stream):
-                if not isinstance(frame, av.AudioFrame):
-                    continue
-                sample_rate = int(frame.sample_rate or 0)
+    duration = 1.0
+    if payload.startswith(b"RIFF") and payload[8:12] == b"WAVE":
+        try:
+            with wave.open(io.BytesIO(payload), "rb") as recording:
+                sample_rate = recording.getframerate()
                 if sample_rate <= 0:
-                    continue
-                duration += frame.samples / sample_rate
-                if duration > 30.0:
-                    break
-    except Exception as error:
+                    raise ValueError("invalid sample rate")
+                duration = recording.getnframes() / sample_rate
+        except (EOFError, ValueError, wave.Error) as error:
+            raise RouteError(
+                422,
+                "invalid_audio",
+                "Dấu could not decode that recording. Try one clear Dialogue line.",
+            ) from error
+    elif len(payload) < 64 or not (
+        payload.startswith(b"\x1aE\xdf\xa3")
+        or payload.startswith(b"OggS")
+        or payload[4:8] == b"ftyp"
+    ):
         raise RouteError(
             422,
             "invalid_audio",
             "Dấu could not decode that recording. Try one clear Dialogue line.",
-        ) from error
+        )
     if duration < 0.35:
         raise RouteError(
             422,
@@ -438,6 +440,12 @@ def healthz() -> dict[str, Any]:
 
 @router.post("/analysis/warmup")
 def analysis_warmup() -> JSONResponse:
+    if is_vercel_deployment():
+        raise RouteError(
+            503,
+            "server_analysis_unavailable",
+            "Production tone analysis runs locally in your browser.",
+        )
     timing: dict[str, float] = {}
     cold_started = warm_analysis_runtime(timing)
     return JSONResponse(
@@ -458,6 +466,12 @@ async def analyze(
     intended_tone: Annotated[str, Form()],
     accent: Annotated[str, Form()] = "north",
 ) -> JSONResponse:
+    if is_vercel_deployment():
+        raise RouteError(
+            503,
+            "server_analysis_unavailable",
+            "Production tone analysis runs locally in your browser.",
+        )
     from . import analysis_service
 
     payload = await audio.read(MAX_UPLOAD_BYTES + 1)
