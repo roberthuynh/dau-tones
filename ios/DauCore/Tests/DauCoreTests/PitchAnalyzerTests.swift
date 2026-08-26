@@ -26,6 +26,19 @@ enum TestSignal {
         glide(from: hz, to: hz, seconds: seconds, amplitude: amplitude)
     }
 
+    /// A voiced vowel: an f0 with strong upper formants, the way real speech is shaped.
+    /// Its raw zero-crossing rate far exceeds f0, which is what broke the original gate.
+    static func vowel(f0: Double, seconds: Double, amplitude: Float = 0.3) -> [Float] {
+        let count = Int(sampleRate * seconds)
+        return (0..<count).map { index in
+            let t = Double(index) / sampleRate
+            let fundamental = sin(2 * .pi * f0 * t)
+            let formantOne = 0.8 * sin(2 * .pi * 700 * t)
+            let formantTwo = 0.6 * sin(2 * .pi * 1_400 * t)
+            return amplitude * Float((fundamental + formantOne + formantTwo) / 2.4)
+        }
+    }
+
     static func silence(seconds: Double) -> [Float] {
         [Float](repeating: 0, count: Int(sampleRate * seconds))
     }
@@ -125,6 +138,48 @@ struct PitchAnalyzerTests {
             + TestSignal.steady(140, seconds: 0.25)
         let withGap = PitchFrameAnalyzer.analyze(samples: broken, sampleRate: TestSignal.sampleRate)
         #expect(withGap.longestVoicingGapMs >= 40, "a real break must register as creak evidence")
+    }
+
+    /// The port's one real defect, and a regression guard against reintroducing it.
+    ///
+    /// Zero-crossing rate follows whichever part of the spectrum carries the energy, so a
+    /// bright vowel crosses zero far more than 440 times a second even at a 150 Hz pitch.
+    /// Measured on the raw frame, the gate discarded almost every voiced frame in the
+    /// reference corpus — three references, one of them a human recording, produced no
+    /// contour at all. Measuring it on a 500 Hz low-band probe fixes that.
+    @Test("a bright vowel is voiced despite a high raw crossing rate")
+    func brightVowelIsVoiced() {
+        let take = PitchFrameAnalyzer.analyze(
+            samples: TestSignal.vowel(f0: 150, seconds: 0.6), sampleRate: TestSignal.sampleRate
+        )
+        #expect(take.voicedFraction > 0.5, "got \(take.voicedFraction)")
+        #expect(take.contourFeatures != nil)
+        #expect(ToneShapeJudge.family(of: take.contourFeatures!) == .level)
+    }
+
+    /// ...and the defence that gate was there to provide must survive. A loud tone well
+    /// outside the voice band correlates strongly at some lag in the search range, so without
+    /// a check it would produce a confident, meaningless pitch.
+    @Test("an out-of-band tone is still rejected")
+    func outOfBandToneIsRejected() {
+        for frequency in [1_500.0, 3_000.0, 3_500.0] {
+            let take = PitchFrameAnalyzer.analyze(
+                samples: TestSignal.steady(frequency, seconds: 0.5),
+                sampleRate: TestSignal.sampleRate
+            )
+            #expect(take.voicedFraction == 0, "\(frequency) Hz was treated as voice")
+        }
+    }
+
+    @Test("in-band tones across the vocal range stay voiced")
+    func inBandTonesStayVoiced() {
+        for frequency in [110.0, 180.0, 350.0] {
+            let take = PitchFrameAnalyzer.analyze(
+                samples: TestSignal.steady(frequency, seconds: 0.5),
+                sampleRate: TestSignal.sampleRate
+            )
+            #expect(take.voicedFraction > 0.8, "\(frequency) Hz was lost")
+        }
     }
 
     @Test("octave repair pulls a doubled frame back without touching a real glissando")

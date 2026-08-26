@@ -22,7 +22,14 @@ public struct PitchTake: Equatable, Sendable {
     /// Raw 10 ms hop resolution — anything that segments syllables must read this, because
     /// resampling destroys the gap structure between them.
     public let frames: [Double?]
-    /// `frames` resampled to the 64-point analysis axis the thresholds were calibrated on.
+    /// The voiced span of `frames`, resampled to the 64-point analysis axis the thresholds
+    /// were calibrated on.
+    ///
+    /// Trimmed to the utterance first. This mirrors `isolate_primary_speech` in the Python,
+    /// and it is not cosmetic: resampling across a file's leading and trailing silence
+    /// squashes the syllable into a fraction of the axis, which moves every position feature
+    /// (`dipPosition` above all) and makes a learner contour incomparable with a reference
+    /// recorded with different padding.
     public let contour: [Double?]
     /// Per-frame energy, on the same axis as `frames`.
     public let rms: [Double]
@@ -87,6 +94,11 @@ public struct PitchFrameAnalyzer: Sendable {
     /// Decimated samples for the whole take. A hard cap of 8 s at 8 kHz is 64k values, so
     /// holding them is cheap and makes exact batch equivalence trivial.
     private var reduced: [Double] = []
+    /// The same stream through a causal 500 Hz one-pole lowpass, used for the voicing gates.
+    /// Causal on purpose: a zero-phase two-pass filter would need the whole take and could not
+    /// stream, and both gates read energy and zero crossings, which are phase-insensitive.
+    private var lowBand: [Double] = []
+    private var lowBandState = 0.0
     private var nextFrameStart = 0
     private var absoluteSampleIndex = 0
     private var frames: [PitchFrame] = []
@@ -96,6 +108,16 @@ public struct PitchFrameAnalyzer: Sendable {
     static let rmsFloor = 0.006
     static let zeroCrossingCeiling = 440.0
     static let correlationFloor = 0.52
+    /// Cutoff for the voicing probe. Vietnamese f0 lives well under this; vowel formants and
+    /// fricative noise live above it.
+    static let lowBandCutoffHz = 500.0
+    /// Share of frame energy that must survive the lowpass for the frame to be voiced speech.
+    ///
+    /// Measured over the reference corpus: real speech frames sit at 0.41 and above, while
+    /// out-of-band pure tones land near 0.20–0.34 and are then caught by the zero-crossing
+    /// ceiling. 0.20 is a floor that rejects nothing real while keeping a second line of
+    /// defence against a loud tone that is not a voice.
+    static let lowBandShareFloor = 0.20
     static let hopSeconds = 0.010
     static let frameSeconds = 0.030
 
@@ -121,9 +143,13 @@ public struct PitchFrameAnalyzer: Sendable {
             totalSamples += samples.count
             return []
         }
+        let coefficient = exp(-2 * .pi * Self.lowBandCutoffHz / reducedRate)
         for sample in samples {
             if absoluteSampleIndex % decimationStride == 0 {
-                reduced.append(Double(sample))
+                let value = Double(sample)
+                reduced.append(value)
+                lowBandState = (1 - coefficient) * value + coefficient * lowBandState
+                lowBand.append(lowBandState)
             }
             absoluteSampleIndex += 1
         }
@@ -167,12 +193,28 @@ public struct PitchFrameAnalyzer: Sendable {
         let rms = (centered.reduce(0) { $0 + $1 * $1 } / Double(centered.count)).squareRoot()
         guard rms >= Self.rmsFloor else { return PitchFrame(hz: nil, rms: rms, index: index) }
 
-        let zeroCrossings = zip(centered, centered.dropFirst()).count { first, second in
+        // Voicing is decided on the low-band probe, not the raw frame.
+        //
+        // Measuring zero crossings on the raw signal was the port's one real defect: crossing
+        // rate follows whichever part of the spectrum carries the energy, so a bright vowel
+        // crosses zero far more than 440 times a second even at a 150 Hz pitch. On the
+        // reference corpus that gate was discarding almost every voiced frame — three
+        // references, including one of only two human recordings, produced no contour at all.
+        // Lowpassing first makes the crossing rate reflect f0, which is what it was always
+        // meant to test.
+        let probe = Array(lowBand[start..<(start + frameSize)])
+        let probeMean = probe.reduce(0.0, +) / Double(probe.count)
+        let probeCentered = probe.map { $0 - probeMean }
+        let probeRMS = (probeCentered.reduce(0) { $0 + $1 * $1 } / Double(probeCentered.count)).squareRoot()
+        // Autocorrelation can mistake a subharmonic of an out-of-band pure tone for a valid
+        // pitch. A voice keeps most of its energy under the cutoff; such a tone does not.
+        guard rms > 0, probeRMS / rms >= Self.lowBandShareFloor else {
+            return PitchFrame(hz: nil, rms: rms, index: index)
+        }
+        let zeroCrossings = zip(probeCentered, probeCentered.dropFirst()).count { first, second in
             (first < 0 && second >= 0) || (first >= 0 && second < 0)
         }
-        let zeroCrossingFrequency = Double(zeroCrossings) * reducedRate / (2 * Double(centered.count))
-        // Autocorrelation can mistake a subharmonic of an out-of-band pure tone for a valid
-        // pitch. Reject that before drawing a reassuring-looking contour.
+        let zeroCrossingFrequency = Double(zeroCrossings) * reducedRate / (2 * Double(probeCentered.count))
         guard zeroCrossingFrequency <= Self.zeroCrossingCeiling else {
             return PitchFrame(hz: nil, rms: rms, index: index)
         }
@@ -219,12 +261,20 @@ public struct PitchFrameAnalyzer: Sendable {
         }
         return PitchTake(
             frames: normalized,
-            contour: resample(normalized, to: ToneNumerics.analysisPoints),
+            contour: resample(trimmedToVoicedSpan(normalized), to: ToneNumerics.analysisPoints),
             rms: frames.map(\.rms),
             durationSeconds: sampleRate > 0 ? Double(totalSamples) / sampleRate : 0,
             voicedSeconds: Double(raw.compactMap { $0 }.count) * hopSeconds,
             longestVoicingGapMs: longestInteriorGapMs(in: raw)
         )
+    }
+
+    /// Drop leading and trailing unvoiced frames, keeping the utterance and any interior
+    /// gaps inside it. Silence at the edges carries no tone and must not consume the axis.
+    static func trimmedToVoicedSpan(_ values: [Double?]) -> [Double?] {
+        let voicedIndices = values.indices.filter { values[$0] != nil }
+        guard let first = voicedIndices.first, let last = voicedIndices.last else { return values }
+        return Array(values[first...last])
     }
 
     /// Longest run of unvoiced frames with voiced frames on both sides. Leading and trailing
