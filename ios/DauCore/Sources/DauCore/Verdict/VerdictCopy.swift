@@ -53,13 +53,16 @@ public enum VerdictCopy {
         }
     }
 
-    /// The supporting sentence: what happened, in terms of the shape.
+    /// The supporting sentence: what the signal actually did.
+    ///
+    /// Deliberately an *observation*, not an instruction — the one physical fix belongs
+    /// beside the trace, and printing it twice on one screen reads as nagging.
     public static func detail(for verdict: ToneVerdict, target: Word) -> String {
         switch verdict.outcome {
         case .matched:
             return "\(matchedShapeSentence(for: verdict.target)) Exactly the word you meant."
         case .missedNaming, .missedShape:
-            return physicalCue(for: verdict.target)
+            return observation(for: verdict)
         case .inconclusive(let reason):
             switch reason {
             case .weakSignal:
@@ -82,6 +85,28 @@ public enum VerdictCopy {
         let names = candidates.map(\.surface).joined(separator: " or ")
         return "That came out \(family.shapeDescription) — the \(names) shape, "
             + "not the \(verdict.target.hint) \(verdict.target.label) needs."
+    }
+
+    /// What the take did, measured, against what the target needed. The numbers here are
+    /// read straight off the contour — they describe the signal and judge nothing.
+    public static func observation(for verdict: ToneVerdict) -> String {
+        guard let reading = verdict.reading else {
+            return "That take didn't hold a clear shape."
+        }
+        let rounded = (abs(reading.driftSemitones) * 10).rounded() / 10
+        let needed = verdict.target.hint
+        switch reading.family {
+        case .level:
+            return "Your pitch held level, where \(verdict.target.label) \(needed)."
+        case .rising:
+            return "Your pitch rose \(rounded) semitones, where \(verdict.target.label) \(needed)."
+        case .falling:
+            return "Your pitch fell \(rounded) semitones, where \(verdict.target.label) \(needed)."
+        case .dipping:
+            return "Your pitch dipped and came back, where \(verdict.target.label) \(needed)."
+        case .unclear:
+            return "That take didn't hold a clear shape."
+        }
     }
 
     /// The one physical correction. Kept to a single instruction on purpose.

@@ -58,6 +58,21 @@ public struct PitchTake: Equatable, Sendable {
         ToneContourFeatures.of(contour: contour)
     }
 
+    /// `contour` with interior gaps bridged, as a full 64-point series.
+    ///
+    /// This is what `ShapeMatch` must compare against a reference. Dropping the unvoiced
+    /// points instead (a `compactMap`) shortens the series, so it no longer aligns with the
+    /// 64-point target and the comparison silently returns nothing — the number just never
+    /// appears. Nil when there is too little voiced signal to bridge.
+    public var filledContour: [Double]? {
+        guard contour.compactMap({ $0 }).count >= ToneContourFeatures.minimumVoicedPoints else {
+            return nil
+        }
+        let interpolated = ToneNumerics.interpolatingGaps(in: contour)
+        guard interpolated.count == contour.count else { return nil }
+        return ToneNumerics.resampled(interpolated, to: ToneNumerics.analysisPoints)
+    }
+
     public var takeFeatures: ToneTakeFeatures? {
         guard let contourFeatures else { return nil }
         return ToneTakeFeatures(contour: contourFeatures, energy: energyFeatures)
