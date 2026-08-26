@@ -26,17 +26,24 @@
     {
       "asciiBase" : "ma",
       "id" : "ma-six-tones",
-      "title" : "",
+      "title" : "The six meanings of ma",
       "wordIDs" : [
-
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
       ]
     },
     {
       "asciiBase" : "phuong",
-      "id" : "phuong-name-test",
-      "title" : "",
+      "id" : "phuong-six-tones",
+      "title" : "The Phương name test",
       "wordIDs" : [
-
+        "phuong-name",
+        "phuong-ward",
+        "phuong-phoenix"
       ]
     }
   ],

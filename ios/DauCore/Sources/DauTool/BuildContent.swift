@@ -103,15 +103,33 @@ enum BuildContent {
         return (words, missing)
     }
 
+    /// Accepts either spelling of a group.
+    ///
+    /// `inventory.json` briefly carried two `minimal_pair_groups` keys with different
+    /// schemas — `label`/`word_ids` and `title`/`forms`. Python's json takes the last
+    /// duplicate and Apple's JSONSerialization takes the first, so the two consumers silently
+    /// read different data and the Swift side produced groups with no words in them. The
+    /// duplicate is gone, but reading both spellings costs nothing and means a future drift
+    /// degrades instead of emptying the six-ma grid.
     private static func pairGroups(from raw: [String: Any]) -> [DauContent.MinimalPairGroup] {
         (raw["minimal_pair_groups"] as? [[String: Any]] ?? []).compactMap { entry in
             guard let id = entry["id"] as? String else { return nil }
             let forms = entry["forms"] as? [[String: Any]] ?? []
+            let wordIDs = forms.isEmpty
+                ? (entry["word_ids"] as? [String] ?? [])
+                : forms.compactMap { $0["word_id"] as? String }
+            let title = (entry["title"] as? String) ?? (entry["label"] as? String) ?? ""
+            guard !wordIDs.isEmpty else {
+                FileHandle.standardError.write(Data(
+                    "dau-tool: minimal pair group '\(id)' has no words — schema drift?\n".utf8
+                ))
+                return nil
+            }
             return DauContent.MinimalPairGroup(
                 id: id,
                 asciiBase: entry["ascii_base"] as? String ?? "",
-                title: entry["title"] as? String ?? "",
-                wordIDs: forms.compactMap { $0["word_id"] as? String }
+                title: title,
+                wordIDs: wordIDs
             )
         }
     }

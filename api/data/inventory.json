@@ -505,33 +505,6 @@
       }
     }
   ],
-  "minimal_pair_groups": [
-    {
-      "id": "ma-six-tones",
-      "ascii_base": "ma",
-      "label": "The six meanings of ma",
-      "word_ids": [
-        "ma-ghost",
-        "ma-but",
-        "ma-mother",
-        "ma-grave",
-        "ma-code",
-        "ma-seedling"
-      ],
-      "verdict_template": "You meant {intended_syllable}, {intended_meaning}. You said {detected_syllable}, {detected_meaning}."
-    },
-    {
-      "id": "phuong-name-test",
-      "ascii_base": "phuong",
-      "label": "The Phương name test",
-      "word_ids": [
-        "phuong-name",
-        "phuong-ward",
-        "phuong-phoenix"
-      ],
-      "verdict_template": "You meant {intended_syllable}, {intended_meaning}. You said {detected_syllable}, {detected_meaning}."
-    }
-  ],
   "verdict_overrides": [
     {
       "intended_word_id": "phuong-name",

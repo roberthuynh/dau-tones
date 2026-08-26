@@ -29,7 +29,12 @@ targets:
     platform: iOS
     sources:
       - Sources
-      - Resources
+      - path: Resources
+        excludes: ["Content"]
+      # A folder reference, not a group: north/ and south/ hold same-named files, and the
+      # default flattened copy makes them collide. This preserves Content/targets/<accent>/.
+      - path: Resources/Content
+        type: folder
     dependencies:
       - package: DauCore
         product: DauCore

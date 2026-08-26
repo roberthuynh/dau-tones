@@ -1,3 +1,4 @@
+import DauCore
 import SwiftUI
 
 /// Design tokens from the Dấu iOS v1 canvas (`Dau iOS v1.dc.html`).
@@ -31,13 +32,13 @@ public enum DauTheme {
     public static let hairline = Color.white.opacity(0.08)
 }
 
-public extension ToneMarkPalette {
-    /// Per-tone colors, taken from the design canvas.
+public extension DauTheme {
+    /// Per-tone colours, taken from the design canvas.
     ///
     /// Four of the six match `api/data/inventory.json` exactly; huyền and hỏi were lightened
-    /// for the dark ground (`#4D72C9 -> #5F86DF`, `#9B7AE8 -> #A98AF4`). The canvas values win
-    /// — the app renders on the dark ground, not the web app's light one.
-    static func color(for tone: ToneMarkPalette.Tone) -> Color {
+    /// for the dark ground (`#4D72C9 -> #5F86DF`, `#9B7AE8 -> #A98AF4`). The canvas values
+    /// win — the app renders on the dark ground, not the web app's light one.
+    static func toneColor(_ tone: ToneMark) -> Color {
         switch tone {
         case .ngang: Color(hex: 0xD8C7A0)
         case .huyen: Color(hex: 0x5F86DF)
@@ -47,12 +48,6 @@ public extension ToneMarkPalette {
         case .nang: Color(hex: 0xF4A641)
         }
     }
-}
-
-/// Indirection so `Design` does not import DauCore's `ToneMark` into the color table's API
-/// surface; the app layer maps between them. Keeps the seam rule intact.
-public enum ToneMarkPalette {
-    public enum Tone: String, CaseIterable { case ngang, huyen, sac, hoi, nga, nang }
 }
 
 extension Color {

@@ -5,14 +5,14 @@ import SwiftUI
 /// Onboarding (screen 01) gates the shell until an accent is chosen; `-skipOnboarding` jumps
 /// straight to the tabs for UITests and screenshots.
 struct RootView: View {
+    @Environment(DauSettings.self) private var settings
     @State private var selection: Tab = .practice
-    @State private var hasOnboarded = LaunchArguments.skipOnboarding
 
     enum Tab: Hashable { case practice, words, you }
 
     var body: some View {
         Group {
-            if hasOnboarded {
+            if settings.hasOnboarded {
                 TabView(selection: $selection) {
                     TodayView()
                         .tabItem { Label("Practice", systemImage: "mic.fill") }
@@ -26,7 +26,7 @@ struct RootView: View {
                 }
                 .tint(DauTheme.coral)
             } else {
-                FirstRunView { hasOnboarded = true }
+                FirstRunView()
             }
         }
         .background(DauTheme.ground)
