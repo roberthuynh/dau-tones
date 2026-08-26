@@ -1,0 +1,599 @@
+{
+  "defaultAccent" : "north",
+  "featuredQueue" : [
+    "ma-ghost",
+    "ma-but",
+    "ma-mother",
+    "ma-grave",
+    "ma-code",
+    "ma-seedling",
+    "phuong-name",
+    "phuong-ward",
+    "phuong-phoenix",
+    "com-rice",
+    "nha-home",
+    "ca-fish",
+    "la-leaf",
+    "pho-noodle-soup",
+    "cua-door",
+    "sua-milk",
+    "mu-hat",
+    "me-mother",
+    "ban-friend"
+  ],
+  "locale" : "vi-VN",
+  "minimalPairGroups" : [
+    {
+      "asciiBase" : "ma",
+      "id" : "ma-six-tones",
+      "title" : "The six meanings of ma",
+      "wordIDs" : [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ]
+    },
+    {
+      "asciiBase" : "phuong",
+      "id" : "phuong-six-tones",
+      "title" : "The Phương name test",
+      "wordIDs" : [
+        "phuong-name",
+        "phuong-ward",
+        "phuong-phoenix"
+      ]
+    }
+  ],
+  "phrases" : [
+    {
+      "gloss" : "Tonight I'm going home to eat with Mom.",
+      "id" : "dinner-with-ma",
+      "text" : "Tối nay tôi về nhà ăn cơm với má.",
+      "wordIDs" : [
+        "com-rice",
+        "nha-home",
+        "ma-mother"
+      ]
+    },
+    {
+      "gloss" : "My mom's phở is delicious.",
+      "id" : "ma-cooks-pho",
+      "text" : "Má tôi nấu phở rất ngon.",
+      "wordIDs" : [
+        "ma-mother",
+        "pho-noodle-soup"
+      ]
+    },
+    {
+      "gloss" : "Have you eaten yet?",
+      "id" : "eaten-yet",
+      "text" : "Bạn ăn cơm chưa?",
+      "wordIDs" : [
+        "ban-friend",
+        "com-rice"
+      ]
+    },
+    {
+      "gloss" : "A glass of milk, please.",
+      "id" : "glass-of-milk",
+      "text" : "Cho tôi một ly sữa.",
+      "wordIDs" : [
+        "sua-milk"
+      ]
+    },
+    {
+      "gloss" : "My front door is red.",
+      "id" : "red-door",
+      "text" : "Cửa nhà tôi màu đỏ.",
+      "wordIDs" : [
+        "cua-door",
+        "nha-home"
+      ]
+    },
+    {
+      "gloss" : "Young rice seedlings grow in the field.",
+      "id" : "rice-seedling",
+      "text" : "Mạ non mọc trên đồng.",
+      "wordIDs" : [
+        "ma-seedling"
+      ]
+    },
+    {
+      "gloss" : "What is my code?",
+      "id" : "what-is-my-code",
+      "text" : "Mã số của tôi là gì?",
+      "wordIDs" : [
+        "ma-code"
+      ]
+    },
+    {
+      "gloss" : "Phương lives in this ward.",
+      "id" : "ward-name",
+      "text" : "Chị Phương sống ở phường này.",
+      "wordIDs" : [
+        "phuong-name",
+        "phuong-ward"
+      ]
+    }
+  ],
+  "schemaVersion" : 1,
+  "themedDrills" : [
+    {
+      "description" : "Practice the tones that separate family words from everyday food words.",
+      "id" : "food",
+      "title" : "At the table",
+      "wordIDs" : [
+        "com-rice",
+        "ca-fish",
+        "pho-noodle-soup",
+        "sua-milk",
+        "ma-mother",
+        "ma-ghost"
+      ]
+    },
+    {
+      "description" : "Keep Phương's name level and contrast two common words for mother.",
+      "id" : "family",
+      "title" : "Names and family",
+      "wordIDs" : [
+        "phuong-name",
+        "phuong-ward",
+        "phuong-phoenix",
+        "ma-mother",
+        "me-mother",
+        "ban-friend",
+        "nha-home"
+      ]
+    },
+    {
+      "description" : "Practice useful place, meal, and social words across the tone families.",
+      "id" : "travel",
+      "title" : "Around town",
+      "wordIDs" : [
+        "phuong-ward",
+        "nha-home",
+        "cua-door",
+        "pho-noodle-soup",
+        "com-rice",
+        "ban-friend",
+        "la-leaf"
+      ]
+    }
+  ],
+  "tones" : [
+    {
+      "color" : "#D8C7A0",
+      "id" : "ngang",
+      "markEn" : "no tone mark",
+      "nameEn" : "level",
+      "nameVi" : "ngang",
+      "physicalCue" : "Keep your chin still and carry the vowel straight across."
+    },
+    {
+      "color" : "#4D72C9",
+      "id" : "huyen",
+      "markEn" : "grave accent",
+      "nameEn" : "falling",
+      "nameVi" : "huyền",
+      "physicalCue" : "Start comfortably and let your chin settle as the pitch falls."
+    },
+    {
+      "color" : "#FF6B5E",
+      "id" : "sac",
+      "markEn" : "acute accent",
+      "nameEn" : "rising",
+      "nameVi" : "sắc",
+      "physicalCue" : "Start lower, lift your chin, and let the vowel rise cleanly."
+    },
+    {
+      "color" : "#9B7AE8",
+      "id" : "hoi",
+      "markEn" : "hook above",
+      "nameEn" : "dipping",
+      "nameVi" : "hỏi",
+      "physicalCue" : "Let your chin dip through the middle, then recover slightly."
+    },
+    {
+      "color" : "#35C1B4",
+      "id" : "nga",
+      "markEn" : "tilde",
+      "nameEn" : "broken rising",
+      "nameVi" : "ngã",
+      "physicalCue" : "Briefly catch the sound in your throat, then release it upward."
+    },
+    {
+      "color" : "#F4A641",
+      "id" : "nang",
+      "markEn" : "dot below",
+      "nameEn" : "low stopped",
+      "nameVi" : "nặng",
+      "physicalCue" : "Drop low, shorten the vowel, and stop it firmly in your throat."
+    }
+  ],
+  "words" : [
+    {
+      "alternateMeaningsEn" : [
+        "spirit",
+        "demon"
+      ],
+      "asciiBase" : "ma",
+      "id" : "ma-ghost",
+      "meaningEn" : "ghost",
+      "minimalPairGroup" : "ma-six-tones",
+      "minimalPairIDs" : [
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "ma",
+      "tone" : "ngang",
+      "usageNote" : "The ordinary noun ma refers to a ghost or spirit."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "which",
+        "yet"
+      ],
+      "asciiBase" : "ma",
+      "id" : "ma-but",
+      "meaningEn" : "but \/ that",
+      "minimalPairGroup" : "ma-six-tones",
+      "minimalPairIDs" : [
+        "ma-ghost",
+        "ma-mother",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "mà",
+      "tone" : "huyen",
+      "usageNote" : "Mà commonly links contrasting clauses as but, or introduces a relative clause as that or which."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "Mom",
+        "cheek"
+      ],
+      "asciiBase" : "ma",
+      "id" : "ma-mother",
+      "meaningEn" : "mother",
+      "minimalPairGroup" : "ma-six-tones",
+      "minimalPairIDs" : [
+        "ma-ghost",
+        "ma-but",
+        "ma-grave",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "má",
+      "tone" : "sac",
+      "usageNote" : "Má is a warm, everyday word for mother in Southern Vietnamese; it can also mean cheek in other contexts."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "tomb",
+        "burial place"
+      ],
+      "asciiBase" : "ma",
+      "id" : "ma-grave",
+      "meaningEn" : "grave",
+      "minimalPairGroup" : "ma-six-tones",
+      "minimalPairIDs" : [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-code",
+        "ma-seedling"
+      ],
+      "referenceAccents" : [
+        "north"
+      ],
+      "syllable" : "mả",
+      "tone" : "hoi",
+      "usageNote" : "Mả refers to a grave or burial place."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "identifier",
+        "appearance"
+      ],
+      "asciiBase" : "ma",
+      "id" : "ma-code",
+      "meaningEn" : "code",
+      "minimalPairGroup" : "ma-six-tones",
+      "minimalPairIDs" : [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-seedling"
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "mã",
+      "tone" : "nga",
+      "usageNote" : "Mã often means a code or identifier; it can also refer to outward appearance in compounds."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "young rice plant"
+      ],
+      "asciiBase" : "ma",
+      "id" : "ma-seedling",
+      "meaningEn" : "rice seedling",
+      "minimalPairGroup" : "ma-six-tones",
+      "minimalPairIDs" : [
+        "ma-ghost",
+        "ma-but",
+        "ma-mother",
+        "ma-grave",
+        "ma-code"
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "mạ",
+      "tone" : "nang",
+      "usageNote" : "Mạ is a young rice plant grown for transplanting into a paddy."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "direction"
+      ],
+      "asciiBase" : "phuong",
+      "id" : "phuong-name",
+      "meaningEn" : "Phương, a woman's name",
+      "minimalPairGroup" : "phuong-six-tones",
+      "minimalPairIDs" : [
+        "phuong-ward",
+        "phuong-phoenix"
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "Phương",
+      "tone" : "ngang",
+      "usageNote" : "Phương is presented here as a woman's name. The homograph phương can also mean direction; the compass art is a memory cue, not a claim about the name's etymology."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "city ward"
+      ],
+      "asciiBase" : "phuong",
+      "id" : "phuong-ward",
+      "meaningEn" : "urban ward",
+      "minimalPairGroup" : "phuong-six-tones",
+      "minimalPairIDs" : [
+        "phuong-name",
+        "phuong-phoenix"
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "phường",
+      "tone" : "huyen",
+      "usageNote" : "Phường is an urban administrative ward in Vietnam."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "royal poinciana"
+      ],
+      "asciiBase" : "phuong",
+      "id" : "phuong-phoenix",
+      "meaningEn" : "phoenix",
+      "minimalPairGroup" : "phuong-six-tones",
+      "minimalPairIDs" : [
+        "phuong-name",
+        "phuong-ward"
+      ],
+      "referenceAccents" : [
+        "north"
+      ],
+      "syllable" : "phượng",
+      "tone" : "nang",
+      "usageNote" : "Phượng means phoenix and also names the flame tree in compounds such as hoa phượng."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "meal"
+      ],
+      "asciiBase" : "com",
+      "id" : "com-rice",
+      "meaningEn" : "cooked rice \/ meal",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "cơm",
+      "tone" : "ngang",
+      "usageNote" : "Cơm means cooked rice and, by extension, a meal."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "family household"
+      ],
+      "asciiBase" : "nha",
+      "id" : "nha-home",
+      "meaningEn" : "home \/ house",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "nhà",
+      "tone" : "huyen",
+      "usageNote" : "Nhà can mean a house, a home, or one's household depending on context."
+    },
+    {
+      "alternateMeaningsEn" : [
+
+      ],
+      "asciiBase" : "ca",
+      "id" : "ca-fish",
+      "meaningEn" : "fish",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "cá",
+      "tone" : "sac",
+      "usageNote" : "Cá is the everyday noun for fish."
+    },
+    {
+      "alternateMeaningsEn" : [
+
+      ],
+      "asciiBase" : "la",
+      "id" : "la-leaf",
+      "meaningEn" : "leaf",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "lá",
+      "tone" : "sac",
+      "usageNote" : "Lá is the common word for a plant leaf."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "Vietnamese noodle soup"
+      ],
+      "asciiBase" : "pho",
+      "id" : "pho-noodle-soup",
+      "meaningEn" : "phở noodle soup",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "phở",
+      "tone" : "hoi",
+      "usageNote" : "Phở is the Vietnamese rice-noodle soup."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "entrance"
+      ],
+      "asciiBase" : "cua",
+      "id" : "cua-door",
+      "meaningEn" : "door",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "cửa",
+      "tone" : "hoi",
+      "usageNote" : "Cửa means a door, opening, or entrance depending on the compound."
+    },
+    {
+      "alternateMeaningsEn" : [
+
+      ],
+      "asciiBase" : "sua",
+      "id" : "sua-milk",
+      "meaningEn" : "milk",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "sữa",
+      "tone" : "nga",
+      "usageNote" : "Sữa is the everyday word for milk."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "cap"
+      ],
+      "asciiBase" : "mu",
+      "id" : "mu-hat",
+      "meaningEn" : "hat",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "mũ",
+      "tone" : "nga",
+      "usageNote" : "Mũ is a general word for a hat or cap."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "Mom"
+      ],
+      "asciiBase" : "me",
+      "id" : "me-mother",
+      "meaningEn" : "mother",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "mẹ",
+      "tone" : "nang",
+      "usageNote" : "Mẹ is the widely used Vietnamese word for mother."
+    },
+    {
+      "alternateMeaningsEn" : [
+        "you, among peers"
+      ],
+      "asciiBase" : "ban",
+      "id" : "ban-friend",
+      "meaningEn" : "friend",
+      "minimalPairIDs" : [
+
+      ],
+      "referenceAccents" : [
+        "north",
+        "south"
+      ],
+      "syllable" : "bạn",
+      "tone" : "nang",
+      "usageNote" : "Bạn means friend and is also a common peer-to-peer pronoun for you."
+    }
+  ]
+}
