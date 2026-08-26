@@ -42,3 +42,10 @@ tmp/imagegen/
 *.swp
 .env*
 !.env.example
+
+# Swift / Xcode (ios/)
+*.xcodeproj
+.build/
+DerivedData/
+build/
+*.xcuserstate
