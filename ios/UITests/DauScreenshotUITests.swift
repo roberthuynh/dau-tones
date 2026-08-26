@@ -91,4 +91,24 @@ final class DauScreenshotUITests: XCTestCase {
         // A usable take must carry the shape-match number.
         XCTAssertTrue(app.staticTexts["shapeMatch"].exists, "a readable take should show its shape match")
     }
+
+    /// Screen 05, prompted mode. Runs entirely on the DSP — no speech recognition is
+    /// involved, which is what lets it work on every device and need no extra permission.
+    func testLiveCaptions() {
+        let app = launch(["-skipOnboarding", "-uiTestTakeFixture", "north-ma-mother"])
+        let phrase = app.buttons["phraseOfTheDay"]
+        XCTAssertTrue(phrase.waitForExistence(timeout: 10))
+        phrase.tap()
+
+        XCTAssertTrue(app.otherElements["captionCard"].waitForExistence(timeout: 5))
+        capture(app, "05-captions-before")
+
+        let record = app.buttons["captionRecordButton"]
+        XCTAssertTrue(record.waitForExistence(timeout: 5))
+        record.tap()
+        // A take always resolves the caption into some state, even if that state is
+        // "we could not read this".
+        XCTAssertTrue(app.otherElements["captionCard"].waitForExistence(timeout: 10))
+        capture(app, "05-captions-after")
+    }
 }

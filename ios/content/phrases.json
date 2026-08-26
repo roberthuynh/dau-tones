@@ -1,0 +1,54 @@
+{
+  "_comment": "Authoring source for the captions screen. iOS-scoped for now — the web app has its own dialogue scenes. No per-word tones: Vietnamese writes them, so ToneMark.of() derives every expected tone from the spelling. Between them these cover all six tones.",
+  "schema_version": 1,
+  "phrases": [
+    {
+      "id": "dinner-with-ma",
+      "text": "Tối nay tôi về nhà ăn cơm với má.",
+      "gloss": "Tonight I'm going home to eat with Mom.",
+      "word_ids": ["com-rice", "nha-home", "ma-mother"]
+    },
+    {
+      "id": "ma-cooks-pho",
+      "text": "Má tôi nấu phở rất ngon.",
+      "gloss": "My mom's phở is delicious.",
+      "word_ids": ["ma-mother", "pho-noodle-soup"]
+    },
+    {
+      "id": "eaten-yet",
+      "text": "Bạn ăn cơm chưa?",
+      "gloss": "Have you eaten yet?",
+      "word_ids": ["ban-friend", "com-rice"]
+    },
+    {
+      "id": "glass-of-milk",
+      "text": "Cho tôi một ly sữa.",
+      "gloss": "A glass of milk, please.",
+      "word_ids": ["sua-milk"]
+    },
+    {
+      "id": "red-door",
+      "text": "Cửa nhà tôi màu đỏ.",
+      "gloss": "My front door is red.",
+      "word_ids": ["cua-door", "nha-home"]
+    },
+    {
+      "id": "rice-seedling",
+      "text": "Mạ non mọc trên đồng.",
+      "gloss": "Young rice seedlings grow in the field.",
+      "word_ids": ["ma-seedling"]
+    },
+    {
+      "id": "what-is-my-code",
+      "text": "Mã số của tôi là gì?",
+      "gloss": "What is my code?",
+      "word_ids": ["ma-code"]
+    },
+    {
+      "id": "ward-name",
+      "text": "Chị Phương sống ở phường này.",
+      "gloss": "Phương lives in this ward.",
+      "word_ids": ["phuong-name", "phuong-ward"]
+    }
+  ]
+}

@@ -47,6 +47,78 @@
       ]
     }
   ],
+  "phrases" : [
+    {
+      "gloss" : "Tonight I'm going home to eat with Mom.",
+      "id" : "dinner-with-ma",
+      "text" : "Tối nay tôi về nhà ăn cơm với má.",
+      "wordIDs" : [
+        "com-rice",
+        "nha-home",
+        "ma-mother"
+      ]
+    },
+    {
+      "gloss" : "My mom's phở is delicious.",
+      "id" : "ma-cooks-pho",
+      "text" : "Má tôi nấu phở rất ngon.",
+      "wordIDs" : [
+        "ma-mother",
+        "pho-noodle-soup"
+      ]
+    },
+    {
+      "gloss" : "Have you eaten yet?",
+      "id" : "eaten-yet",
+      "text" : "Bạn ăn cơm chưa?",
+      "wordIDs" : [
+        "ban-friend",
+        "com-rice"
+      ]
+    },
+    {
+      "gloss" : "A glass of milk, please.",
+      "id" : "glass-of-milk",
+      "text" : "Cho tôi một ly sữa.",
+      "wordIDs" : [
+        "sua-milk"
+      ]
+    },
+    {
+      "gloss" : "My front door is red.",
+      "id" : "red-door",
+      "text" : "Cửa nhà tôi màu đỏ.",
+      "wordIDs" : [
+        "cua-door",
+        "nha-home"
+      ]
+    },
+    {
+      "gloss" : "Young rice seedlings grow in the field.",
+      "id" : "rice-seedling",
+      "text" : "Mạ non mọc trên đồng.",
+      "wordIDs" : [
+        "ma-seedling"
+      ]
+    },
+    {
+      "gloss" : "What is my code?",
+      "id" : "what-is-my-code",
+      "text" : "Mã số của tôi là gì?",
+      "wordIDs" : [
+        "ma-code"
+      ]
+    },
+    {
+      "gloss" : "Phương lives in this ward.",
+      "id" : "ward-name",
+      "text" : "Chị Phương sống ở phường này.",
+      "wordIDs" : [
+        "phuong-name",
+        "phuong-ward"
+      ]
+    }
+  ],
   "schemaVersion" : 1,
   "themedDrills" : [
     {

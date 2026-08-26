@@ -16,6 +16,7 @@ struct TodayView: View {
     /// learner's weakest tones, so recording a take reorders it, and a set that reshuffles
     /// itself mid-session pulls the screen out from under you.
     @State private var session: PracticeSession?
+    @State private var captionPhrase: Phrase?
 
     /// Today's three, picked from the learner's weakest tones and stable for the day.
     ///
@@ -52,6 +53,7 @@ struct TodayView: View {
                 VStack(alignment: .leading, spacing: 22) {
                     greeting
                     todayCard
+                    phraseCard
                     maMap
                 }
                 .padding(20)
@@ -62,6 +64,9 @@ struct TodayView: View {
         }
         .fullScreenCover(item: $session) { session in
             PracticeView(words: session.words)
+        }
+        .fullScreenCover(item: $captionPhrase) { phrase in
+            CaptionsView(phrase: phrase)
         }
     }
 
@@ -163,6 +168,42 @@ struct TodayView: View {
             done ? DauTheme.verified.opacity(0.4) : (isNext ? DauTheme.coral : DauTheme.hairline),
             lineWidth: isNext ? 1.5 : 1
         ))
+    }
+
+    /// The design's phrase of the day, and the way into live captions.
+    @ViewBuilder
+    private var phraseCard: some View {
+        if let phrase = store.content.phrase(forDayKey: ProgressStore.dayKey(for: progress.now)) {
+            Button { captionPhrase = phrase } label: {
+                HStack(alignment: .center, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("PHRASE OF THE DAY")
+                            .font(.system(size: 11.5, weight: .bold))
+                            .tracking(1.4)
+                            .foregroundStyle(DauTheme.faint)
+                        Text(phrase.text)
+                            .font(.system(size: 15.5, weight: .bold))
+                            .foregroundStyle(DauTheme.cream)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text(phrase.gloss)
+                            .font(.system(size: 12.5))
+                            .foregroundStyle(DauTheme.faint)
+                            .multilineTextAlignment(.leading)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(DauTheme.coral)
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 15)
+                .background(DauTheme.card, in: RoundedRectangle(cornerRadius: 20))
+                .overlay(RoundedRectangle(cornerRadius: 20).stroke(DauTheme.hairline, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("phraseOfTheDay")
+        }
     }
 
     /// "ghost · 8/10" — a count of what actually happened, not a percentage that implies a

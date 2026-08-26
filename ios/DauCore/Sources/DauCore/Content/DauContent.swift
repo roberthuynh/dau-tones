@@ -19,11 +19,12 @@ public struct DauContent: Codable, Equatable, Sendable {
     /// Word order for the first-run queue. The cold-open leans on the head of this list, so
     /// it starts with the six-ma set where verdicts are strongest and most nameable.
     public let featuredQueue: [String]
+    public let phrases: [Phrase]
 
     public init(
         schemaVersion: Int, locale: String, defaultAccent: Accent, tones: [ToneInfo],
         words: [Word], minimalPairGroups: [MinimalPairGroup], themedDrills: [ThemedDrill],
-        featuredQueue: [String]
+        featuredQueue: [String], phrases: [Phrase] = []
     ) {
         self.schemaVersion = schemaVersion
         self.locale = locale
@@ -33,6 +34,7 @@ public struct DauContent: Codable, Equatable, Sendable {
         self.minimalPairGroups = minimalPairGroups
         self.themedDrills = themedDrills
         self.featuredQueue = featuredQueue
+        self.phrases = phrases
     }
 
     public struct ToneInfo: Codable, Equatable, Sendable {
@@ -144,6 +146,15 @@ public struct DauContent: Codable, Equatable, Sendable {
     /// This is what turns "you produced a level tone" into "you said ma — ghost".
     public func word(base: String, tone: ToneMark) -> Word? {
         words.first { $0.asciiBase == base && $0.tone == tone }
+    }
+}
+
+public extension DauContent {
+    /// Phrase for a given day, stable for that day.
+    func phrase(forDayKey key: String) -> Phrase? {
+        guard !phrases.isEmpty else { return nil }
+        let hash = key.unicodeScalars.reduce(0) { ($0 &* 31 &+ Int($1.value)) & 0xFFFFFF }
+        return phrases[hash % phrases.count]
     }
 }
 

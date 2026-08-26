@@ -26,7 +26,8 @@ enum BuildContent {
             words: words,
             minimalPairGroups: pairGroups(from: raw),
             themedDrills: drills(from: raw),
-            featuredQueue: raw["featured_queue"] as? [String] ?? []
+            featuredQueue: raw["featured_queue"] as? [String] ?? [],
+            phrases: phrases(root: root)
         )
 
         let encoder = JSONEncoder()
@@ -38,7 +39,7 @@ enum BuildContent {
         let destination = outputURL.appending(path: "dau-content-v1.json")
         try data.write(to: destination, options: Data.WritingOptions.atomic)
 
-        print("wrote \(destination.path) — \(words.count) words, \(tones.count) tones, \(data.count / 1024) KB")
+        print("wrote \(destination.path) — \(words.count) words, \(tones.count) tones, \(content.phrases.count) phrases, \(data.count / 1024) KB")
         // Missing references are expected for exactly two Southern words. Anything else is a
         // build error, because it means the audio pipeline silently lost a file.
         let expected: Set<String> = ["south/ma-grave", "south/phuong-phoenix"]
@@ -51,6 +52,24 @@ enum BuildContent {
                 "dau-tool: unexpected missing references: \(unexpected.sorted())\n".utf8
             ))
             exit(1)
+        }
+    }
+
+    /// Phrases are authored iOS-side (`ios/content/phrases.json`) because the web app has
+    /// its own dialogue scenes. Absent file means no captions content, not a build failure.
+    private static func phrases(root: URL) -> [Phrase] {
+        let url = root.appending(path: "ios/content/phrases.json")
+        guard let data = try? Data(contentsOf: url),
+              let raw = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let entries = raw["phrases"] as? [[String: Any]] else { return [] }
+        return entries.compactMap { entry in
+            guard let id = entry["id"] as? String,
+                  let text = entry["text"] as? String else { return nil }
+            return Phrase(
+                id: id, text: text,
+                gloss: entry["gloss"] as? String ?? "",
+                wordIDs: entry["word_ids"] as? [String] ?? []
+            )
         }
     }
 
