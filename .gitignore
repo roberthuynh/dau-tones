@@ -45,6 +45,7 @@ tmp/imagegen/
 
 # Swift / Xcode (ios/)
 *.xcodeproj
+.swiftpm/
 .build/
 DerivedData/
 build/
