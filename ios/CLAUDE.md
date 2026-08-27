@@ -21,6 +21,23 @@ SwiftUI tone trainer. Plan of record: `~/.claude/plans/i-just-downloaded-a-majes
   a number format. That all lives in `DauCore/Verdict/`, so honesty constraints stay
   unit-testable without a simulator.
 
+## Simulator
+
+Use the dedicated **`dau-sim`** device, never the shared generic "iPhone 17 Pro":
+
+```sh
+xcodebuild -project Dau.xcodeproj -scheme Dau -destination 'platform=iOS Simulator,name=dau-sim' \
+  -derivedDataPath build/dd test
+```
+
+Several sessions run simulators on this machine at once. Sharing a generic device is how a UI
+suite dies with `Test crashed with signal kill` and no assertion — another session drove your
+device mid-test. A dedicated name costs nothing and removes the whole failure class.
+
+Build to an explicit `-derivedDataPath` and install *that* product before any screenshot. Never
+glob DerivedData: Xcode keeps one directory per configuration hash, so `head -1` is not "latest"
+and a stale build silently no-ops launch arguments like `-uiTestTakeFixture`.
+
 ## Engine provenance
 
 `DauCore` is ported from Robert's own code — nghe's `NgheCore/ToneLab` (rule-based judge,
