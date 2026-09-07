@@ -24,6 +24,8 @@
 	<false/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>VietQuest helps you practice on this iPhone. Your voice is analyzed on-device and never uploaded — no account, no recordings leave the phone.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>VietQuest checks whether this iPhone supports on-device Vietnamese speech recognition for speaking practice. Speech audio used by this feature stays on this iPhone.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

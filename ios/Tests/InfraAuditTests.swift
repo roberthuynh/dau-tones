@@ -66,6 +66,18 @@ final class InfraAuditTests: XCTestCase {
         }
     }
 
+    func testSpeechRecognitionHasPurposeString() throws {
+        let plist = sourceRoot.deletingLastPathComponent()
+            .appending(path: "Resources/Info.plist")
+        let data = try Data(contentsOf: plist)
+        let contents = try XCTUnwrap(
+            PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
+        )
+        let purpose = try XCTUnwrap(contents["NSSpeechRecognitionUsageDescription"] as? String)
+        XCTAssertTrue(purpose.contains("on-device Vietnamese speech recognition"))
+        XCTAssertTrue(purpose.contains("stays on this iPhone"))
+    }
+
     func testNoAnalyticsSDK() throws {
         let banned = ["TelemetryDeck", "FirebaseAnalytics", "Amplitude", "Mixpanel", "AppsFlyer", "Adjust"]
         for file in try swiftFiles() {
