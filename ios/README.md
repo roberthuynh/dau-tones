@@ -1,8 +1,9 @@
-# Dấu — iOS
+# VietQuest: iOS
 
-SwiftUI app for the Vietnamese tone trainer at [dau.huynhrobert.com](https://dau.huynhrobert.com)
-(2nd place, Education — OpenAI Build Week 2026). The web app grades a take after you finish it;
-the iOS app traces your pitch **while you speak** and captions what you actually said.
+SwiftUI Vietnamese learning app built on the Dấu native tone engine. The initial course
+contains a complete Southern café mission, optional local record/replay, and review. Tone
+practice retains Northern and Southern references and live pitch visualization. Learner
+audio stays on-device. Existing Dấu progress and the Nook bundle identity are preserved.
 
 ## Layout
 
@@ -21,12 +22,13 @@ cd /Users/rhuynh/Projects/ninth-tile/dau-tones/ios
 xcodegen generate                      # after any file add/remove/rename
 swift test --package-path DauCore      # engine tests, no simulator needed
 xcodebuild -project Dau.xcodeproj -scheme Dau \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+  -destination 'platform=iOS Simulator,name=dau-sim' -derivedDataPath build/dd build
 ```
 
 ## Ship
 
 ```bash
+cd /Users/rhuynh/Projects/ninth-tile/dau-tones
 python3 /Users/rhuynh/Projects/ninth-tile/maple-hollow/launch/testflight/ship-testflight.py dau
 ```
 

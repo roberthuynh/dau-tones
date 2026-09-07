@@ -1,51 +1,41 @@
 import DauCore
 import SwiftUI
 
-/// Design tokens from the Dấu iOS v1 canvas (`Dau iOS v1.dc.html`).
-///
-/// The app is dark-only by design (`UIUserInterfaceStyle: Dark` in project.yml), so these are
-/// literal values rather than an asset-catalog light/dark pair.
+/// Warm paper, jade, and coral tokens for the illustrated Vietnam mission experience.
 public enum DauTheme {
-    /// Page ground.
-    public static let ground = Color(hex: 0x0F0D0A)
-    /// The darker ground behind the device frame / launch screen.
-    public static let groundDeep = Color(hex: 0x0B0A08)
-    /// Raised card.
-    public static let card = Color(hex: 0x1A1712)
-    /// Recessed well — the pitch-trace lane.
-    public static let well = Color(hex: 0x14110D)
+    public static let ground = Color(hex: 0xF8F1E3)
+    public static let groundDeep = Color(hex: 0xEDE1CB)
+    public static let card = Color(hex: 0xFFFDF8)
+    public static let well = Color(hex: 0xEFE5D4)
     /// Primary action + brand.
-    public static let coral = Color(hex: 0xFF6B5E)
+    public static let coral = Color(hex: 0xB9473F)
     /// Text on a coral fill.
-    public static let onCoral = Color(hex: 0x1B100D)
-    /// Primary text.
-    public static let cream = Color(hex: 0xF6EEDF)
-    /// Secondary text.
-    public static let muted = Color(hex: 0xB6AC9A)
-    /// Tertiary text and captions.
-    public static let faint = Color(hex: 0x8F8776)
+    public static let onCoral = Color.white
+    public static let cream = Color(hex: 0x2A302A)
+    public static let ink = Color(hex: 0x2A302A)
+    public static let inkSoft = Color(hex: 0x48534A)
+    public static let muted = inkSoft
+    public static let faint = Color(hex: 0x666A61)
+    public static let jade = Color(hex: 0x397D6B)
+    public static let jadeDark = Color(hex: 0x245849)
     /// Verified / matched.
-    public static let verified = Color(hex: 0x35C1B4)
+    public static let verified = Color(hex: 0x287363)
     /// Didn't match.
-    public static let missed = Color(hex: 0xFF5A4A)
+    public static let missed = Color(hex: 0xB33A31)
 
-    public static let hairline = Color.white.opacity(0.08)
+    public static let hairline = Color(hex: 0x2A302A).opacity(0.10)
 }
 
 public extension DauTheme {
-    /// Per-tone colours, taken from the design canvas.
-    ///
-    /// Four of the six match `api/data/inventory.json` exactly; huyền and hỏi were lightened
-    /// for the dark ground (`#4D72C9 -> #5F86DF`, `#9B7AE8 -> #A98AF4`). The canvas values
-    /// win — the app renders on the dark ground, not the web app's light one.
+    /// Tone accents tuned for readable contrast on the warm paper background.
     static func toneColor(_ tone: ToneMark) -> Color {
         switch tone {
-        case .ngang: Color(hex: 0xD8C7A0)
-        case .huyen: Color(hex: 0x5F86DF)
-        case .sac: Color(hex: 0xFF6B5E)
-        case .hoi: Color(hex: 0xA98AF4)
-        case .nga: Color(hex: 0x35C1B4)
-        case .nang: Color(hex: 0xF4A641)
+        case .ngang: Color(hex: 0x806636)
+        case .huyen: Color(hex: 0x375FAB)
+        case .sac: Color(hex: 0xB9473F)
+        case .hoi: Color(hex: 0x77509B)
+        case .nga: Color(hex: 0x287363)
+        case .nang: Color(hex: 0x966015)
         }
     }
 }
@@ -59,5 +49,42 @@ extension Color {
             blue: Double(hex & 0xFF) / 255,
             opacity: 1
         )
+    }
+}
+
+extension View {
+    func questEyebrow(color: Color = DauTheme.jade) -> some View {
+        self.font(.system(.caption, design: .rounded).weight(.heavy))
+            .tracking(1.4)
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(DauTheme.card.opacity(0.94), in: Capsule())
+    }
+
+    func questSectionTitle() -> some View {
+        self.font(.system(.caption, design: .rounded).weight(.heavy))
+            .tracking(1.5)
+            .foregroundStyle(DauTheme.jade)
+    }
+
+    func questBody() -> some View {
+        self.font(.system(.body, design: .rounded))
+            .foregroundStyle(.primary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    func questCaption() -> some View {
+        self.font(.system(.footnote, design: .rounded))
+            .foregroundStyle(DauTheme.inkSoft)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    func questPrimaryButton(fill: Color = DauTheme.coral) -> some View {
+        self.font(.system(.body, design: .rounded).weight(.bold))
+            .foregroundStyle(Color.white)
+            .padding(.horizontal, 19)
+            .frame(maxWidth: .infinity, minHeight: 54)
+            .background(fill, in: RoundedRectangle(cornerRadius: 17))
     }
 }

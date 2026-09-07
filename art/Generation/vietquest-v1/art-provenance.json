@@ -1,0 +1,31 @@
+{
+  "provider": "openai",
+  "surface": "codex-built-in-imagegen",
+  "model": "not exposed by built-in surface",
+  "date": "2026-09-07",
+  "scope": "Ninth Tile standalone real-world Vietnamese course; Maple Hollow characters not reused",
+  "prompts": {
+    "cafe": "Create a premium 2D editorial storybook illustration for VietQuest, an adult-friendly beginner Vietnamese language learning iPhone app. Landscape 3:2 illustration. A welcoming small contemporary Saigon sidewalk cafe, warm cream plaster, jade-green shutters and plants, restrained coral awning, honey sunlight. An older Vietnamese woman with silver-streaked dark hair tied back, wearing a jade blouse stands behind the counter smiling warmly to a young adult Vietnamese woman customer with a coral short-sleeve shirt and dark bob haircut. On the counter one clear glass of water and one small Vietnamese coffee with phin filter, simple and readable. Beautiful hand-painted gouache texture, clean confident silhouettes, sophisticated inviting colors, natural human proportions, expressive understated faces, rich but uncluttered architectural detail. Eye-level intimate composition with characters in middle-right and calm cream wall space on left. This is Ninth Tile's standalone real-world Vietnam setting, no fantasy animals. No text, letters, signage, logos, watermarks, borders, gradients pretending UI, 3D plastic rendering, or phone mockup. Image will be a wide hero cropped to 16:10 and should retain both characters and drinks.",
+    "icon": "Design a finished premium iOS app icon, square full-bleed 1024x1024, for a joyful adult-friendly Vietnamese language learning adventure app. One bold cream speech bubble shaped subtly like a folded exploration map, inside it a simple coral rising voice stroke ending in a tiny four-point golden spark. Deep jade-green flat background with very subtle tactile gouache paper texture. Exceptionally clear graphic silhouette, a confident elegant friendly symbol visible at 40 pixels. Restrained cream jade coral gold palette. Flat 2D editorial illustration, clean rounded organic edges, intentional broad negative space. Center the symbol occupying 65 percent of canvas. No text, letters, numbers, flags, microphone glyph, tiny details, border, drop shadow, 3D, phone mockup or rounded outer corners. Background fills every pixel; iOS supplies the rounded mask."
+  },
+  "rawFiles": [
+    "cafe-scene.png",
+    "icon.png"
+  ],
+  "runtimeFiles": [
+    "ios/Resources/Assets.xcassets/cafe-scene.imageset/cafe-scene.png",
+    "ios/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
+  ],
+  "postprocessing": [
+    "Copied cafe-scene original unchanged into asset catalog",
+    "sips -z 1024 1024 icon.png --out AppIcon.png"
+  ],
+  "signatureValidation": "not-run",
+  "visualReview": "Generated outputs inspected for unwanted text/watermarks and composition. Installed simulator Today screen confirmed cafe hero rendered with both characters and drinks; installed app icon appeared correctly during launch. Final screenshot review is documented separately.",
+  "localToolbenchGeneratedImage": false,
+  "sha256": {
+    "art/Generation/vietquest-v1/cafe-scene.png": "a1e5abf4f2a65ba53bab27d5f243b5c35ad3470d48812c7b042f02389ab1d676",
+    "art/Generation/vietquest-v1/icon.png": "1de3e026054de5fed993a1b0a86e9eb8aa8c95c4533b2c1dff71089dc2f30ca5",
+    "ios/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png": "d2f077379e603fde5f95e3d7e2cf50d6176558185f07499da1ef805995250e7b"
+  }
+}

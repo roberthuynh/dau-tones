@@ -6,29 +6,36 @@ import SwiftUI
 /// straight to the tabs for UITests and screenshots.
 struct RootView: View {
     @Environment(DauSettings.self) private var settings
-    @State private var selection: Tab = .practice
+    @Environment(QuestProgressStore.self) private var quest
+    @State private var selection: Tab = .today
 
-    enum Tab: Hashable { case practice, words, you }
+    enum Tab: Hashable { case today, learn, you }
 
     var body: some View {
         Group {
             if settings.hasOnboarded {
                 TabView(selection: $selection) {
-                    TodayView()
-                        .tabItem { Label("Practice", systemImage: "mic.fill") }
-                        .tag(Tab.practice)
-                    WordsView()
-                        .tabItem { Label("Words", systemImage: "square.grid.2x2.fill") }
-                        .tag(Tab.words)
+                    QuestHomeView()
+                        .tabItem { Label("Today", systemImage: "sun.max.fill") }
+                        .tag(Tab.today)
+                    LearnView()
+                        .tabItem { Label("Learn", systemImage: "book.pages.fill") }
+                        .tag(Tab.learn)
                     YouView()
                         .tabItem { Label("You", systemImage: "person.fill") }
                         .tag(Tab.you)
                 }
-                .tint(DauTheme.coral)
+                .tint(DauTheme.jade)
             } else {
                 FirstRunView()
             }
         }
         .background(DauTheme.ground)
+        .safeAreaInset(edge: .top) {
+            if let error = quest.saveError {
+                Text(error).font(.footnote).foregroundStyle(DauTheme.missed)
+                    .padding().frame(maxWidth: .infinity).background(DauTheme.card)
+            }
+        }
     }
 }

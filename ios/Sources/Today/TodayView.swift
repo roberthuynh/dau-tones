@@ -84,12 +84,12 @@ struct TodayView: View {
             if progress.progress.currentStreak > 0 {
                 HStack(spacing: 7) {
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color(hex: 0xF4A641))
+                        .fill(Color(hex: 0x966015))
                         .frame(width: 9, height: 9)
                         .rotationEffect(.degrees(45))
                     Text("\(progress.progress.currentStreak)")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Color(hex: 0xF4A641))
+                        .foregroundStyle(Color(hex: 0x966015))
                     Text("day streak")
                         .font(.system(size: 12))
                         .foregroundStyle(DauTheme.muted)
@@ -97,7 +97,7 @@ struct TodayView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
                 .background(DauTheme.card, in: Capsule())
-                .overlay(Capsule().stroke(Color(hex: 0xF4A641).opacity(0.35), lineWidth: 1))
+                .overlay(Capsule().stroke(Color(hex: 0x966015).opacity(0.35), lineWidth: 1))
             }
         }
     }
@@ -161,7 +161,7 @@ struct TodayView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
         .background(
-            done ? DauTheme.verified.opacity(0.1) : (isNext ? DauTheme.coral.opacity(0.12) : Color(hex: 0x221E17)),
+            done ? DauTheme.verified.opacity(0.1) : (isNext ? DauTheme.coral.opacity(0.12) : DauTheme.well),
             in: RoundedRectangle(cornerRadius: 16)
         )
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(

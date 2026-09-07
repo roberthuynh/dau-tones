@@ -71,7 +71,7 @@ struct CaptionsView: View {
             Spacer()
             Text(settings.accent.label)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(Color(hex: 0xCDC4B4))
+                .foregroundStyle(DauTheme.muted)
                 .padding(.horizontal, 13)
                 .padding(.vertical, 8)
                 .background(DauTheme.card, in: Capsule())
@@ -145,9 +145,9 @@ struct CaptionsView: View {
     private func textColor(_ word: CaptionWord) -> Color {
         switch word.state {
         case .matched: DauTheme.cream
-        case .missed: Color(hex: 0xFF8A7A)
+        case .missed: DauTheme.missed
         case .unread: DauTheme.faint
-        case .pending: Color(hex: 0xCDC4B4).opacity(0.55)
+        case .pending: DauTheme.faint
         }
     }
 

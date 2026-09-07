@@ -8,8 +8,8 @@ final class DauSmokeUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-skipOnboarding", "-resetProgress"]
         app.launch()
-        XCTAssertTrue(app.tabBars.buttons["Practice"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.tabBars.buttons["Words"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Today"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.tabBars.buttons["Learn"].exists)
         XCTAssertTrue(app.tabBars.buttons["You"].exists)
     }
 }

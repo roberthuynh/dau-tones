@@ -1,4 +1,15 @@
-# Dấu
+# VietQuest
+
+VietQuest is Ninth Tile's native Vietnamese learning app for English-speaking beginners and
+heritage learners. The iPhone app lives in `ios/`: a Southern Vietnamese café mission with
+offline audio, local record/replay, review, and focused tone practice. See
+[the iOS guide](ios/README.md) and [initial release scope](ios/docs/vietquest-launch.md).
+
+The original Dấu web demo remains below as the hackathon project's technical history. Its
+web/API capabilities and evaluation figures do not describe the native café course. This
+working repository is under Ninth Tile; the separate award-time hackathon checkout is untouched.
+
+## Original Dấu web demo
 
 > See your tones. Hear what you actually said.
 

@@ -9,33 +9,39 @@ struct FirstRunView: View {
     @State private var chosenAccent: Accent = .south
 
     var body: some View {
+        ScrollView {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Text("Dấu")
-                    .font(.system(size: 44, weight: .bold))
-                    .foregroundStyle(DauTheme.cream)
-                Text("SEE YOUR TONES")
-                    .font(.system(size: 13, weight: .bold))
+            VStack(alignment: .leading, spacing: 4) {
+                Text("VietQuest")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(DauTheme.ink)
+                Text("SPEAK WITH A PURPOSE")
+                    .font(.caption.bold())
                     .tracking(2)
                     .foregroundStyle(DauTheme.faint)
             }
 
-            toneStrip.padding(.top, 22)
+            Image("cafe-scene")
+                .resizable()
+                .scaledToFill()
+                .frame(height: 170)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .padding(.top, 18)
 
-            Text("One sound. Six meanings.\nYour pitch decides.")
-                .font(.system(size: 27, weight: .bold))
-                .foregroundStyle(DauTheme.cream)
+            Text("Vietnamese for the moments that matter.")
+                .font(.title.bold())
+                .foregroundStyle(DauTheme.ink)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 30)
 
-            Text("Say a word and watch your pitch trace against a native speaker's — then see the word you actually said.")
-                .font(.system(size: 15))
+            Text("Learn through short, useful missions. Your first stop is a Southern Vietnamese café.")
+                .font(.system(.subheadline))
                 .foregroundStyle(DauTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 6)
 
-            Text("WHICH VIETNAMESE DO YOU WANT?")
-                .font(.system(size: 12, weight: .bold))
+            Text("TONE STUDIO ACCENT")
+                .font(.system(.caption).weight(.bold))
                 .tracking(1.8)
                 .foregroundStyle(DauTheme.faint)
                 .padding(.top, 26)
@@ -55,24 +61,25 @@ struct FirstRunView: View {
                 settings.accent = chosenAccent
                 settings.hasOnboarded = true
             } label: {
-                Text("Say your first word")
-                    .font(.system(size: 17, weight: .bold))
+                Text("Start my first mission")
+                    .font(.system(.body).weight(.bold))
                     .foregroundStyle(DauTheme.onCoral)
                     .frame(maxWidth: .infinity, minHeight: 58)
                     .background(DauTheme.coral, in: Capsule())
             }
             .accessibilityIdentifier("startButton")
 
-            Text("Takes 30 seconds · no sign-up")
-                .font(.system(size: 12.5))
+            Text("No sign-up · works offline")
+                .font(.system(.caption))
                 .foregroundStyle(DauTheme.faint)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 10)
         }
         .padding(.horizontal, 24)
-        .padding(.top, 60)
+        .padding(.top, 24)
         .padding(.bottom, 40)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        }
         .background(DauTheme.ground.ignoresSafeArea())
         .onAppear { chosenAccent = settings.accent }
     }
@@ -83,7 +90,7 @@ struct FirstRunView: View {
                 VStack(spacing: 4) {
                     ToneContourGlyph(tone: word.tone.glyphMark(for: chosenAccent), width: 34)
                     Text(word.syllable)
-                        .font(.system(size: 12))
+                        .font(.system(.caption))
                         .foregroundStyle(DauTheme.faint)
                 }
                 .frame(maxWidth: .infinity)
@@ -101,10 +108,10 @@ struct FirstRunView: View {
         } label: {
             VStack(alignment: .leading, spacing: 2) {
                 Text(accent.label)
-                    .font(.system(size: 19, weight: .bold))
-                    .foregroundStyle(isChosen ? DauTheme.cream : Color(hex: 0xCDC4B4))
+                    .font(.system(.title3).weight(.bold))
+                    .foregroundStyle(DauTheme.ink)
                 Text("\(accent.city) · \(accent.spokenToneCount) tones")
-                    .font(.system(size: 13))
+                    .font(.system(.footnote))
                     .foregroundStyle(isChosen ? DauTheme.muted : DauTheme.faint)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -127,14 +134,14 @@ struct FirstRunView: View {
     private var privacyCard: some View {
         HStack(spacing: 12) {
             Image(systemName: "mic.fill")
-                .font(.system(size: 17))
+                .font(.system(.body))
                 .foregroundStyle(DauTheme.verified)
                 .frame(width: 38, height: 38)
                 .background(DauTheme.verified.opacity(0.14), in: RoundedRectangle(cornerRadius: 12))
             // The claim is the product, so it leads. Everything in the app is built to keep
             // it true — there is no network client to turn off.
-            Text("**Your voice never leaves this iPhone.** Pitch grading runs on-device — no audio uploads, no account.")
-                .font(.system(size: 13))
+            Text("**Your voice stays on this iPhone.** Mission recordings are local and temporary — no audio uploads, no account.")
+                .font(.system(.footnote))
                 .foregroundStyle(DauTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
         }

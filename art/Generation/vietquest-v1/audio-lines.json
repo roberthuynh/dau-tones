@@ -1,0 +1,22 @@
+[
+  {
+    "id": "C04",
+    "text": "Cà phê hết rồi con. Con uống nước được không?",
+    "persona": "southern-elder-anchor"
+  },
+  {
+    "id": "C06",
+    "text": "Một ly nước, đúng không con?",
+    "persona": "southern-elder-anchor"
+  },
+  {
+    "id": "C07",
+    "text": "Một ly cà phê, đúng không con?",
+    "persona": "southern-elder-anchor"
+  },
+  {
+    "id": "C08",
+    "text": "Dạ, đúng rồi.",
+    "persona": "maple-model"
+  }
+]

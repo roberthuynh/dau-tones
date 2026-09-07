@@ -16,7 +16,7 @@ settings:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: minimal
     TARGETED_DEVICE_FAMILY: "1"
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "0.2.0"
     CURRENT_PROJECT_VERSION: "1"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: 6FX3LZM86V
@@ -47,17 +47,17 @@ targets:
     info:
       path: Resources/Info.plist
       properties:
-        CFBundleDisplayName: Dấu
+        CFBundleDisplayName: VietQuest
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen:
           UIColorName: LaunchBackground
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-        UIUserInterfaceStyle: Dark
+        UIUserInterfaceStyle: Light
         ITSAppUsesNonExemptEncryption: false
         NSMicrophoneUsageDescription: >-
-          Dấu grades your tones on this iPhone. Your voice is analyzed on-device and never
+          VietQuest helps you practice on this iPhone. Your voice is analyzed on-device and never
           uploaded — no account, no recordings leave the phone.
     scheme:
       testTargets: [DauTests, DauUITests]

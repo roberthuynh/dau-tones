@@ -1,8 +1,8 @@
-# Dấu — privacy
+# VietQuest — privacy
 
 ## The product rule
 
-Dấu analyzes your voice **on this iPhone** and never sends it anywhere. There is no account, no
+VietQuest analyzes your voice **on this iPhone** and never sends it anywhere. There is no account, no
 analytics SDK, and no network client in the app at all. This is not a policy the app tries to
 honour — it is a property of the binary, checked by a build gate (`InfraAuditTests`).
 
@@ -10,18 +10,21 @@ The simplest proof: **the whole app works in airplane mode.**
 
 ## What is stored, and where
 
-On device only, in `Application Support/dau-progress-v1.json` and `UserDefaults`:
+On device only, in `Application Support/dau-progress-v1.json`,
+`Application Support/vietquest-progress-v1.json`, and `UserDefaults`:
 
 - which words you practised, when, and whether each take passed its tone rule
 - the shape-match percentage for a take, and the acoustic feature block behind it
 - your accent choice, streak, and reminder preference
+- café lesson position, assistance used, meaning-choice attempts, completion and review dates
 
 That record **must not** contain a name, an email address, a contact, a location, an advertising
 identifier, a device fingerprint, free-form text you typed, or any cross-app identifier. Neither
 record is ever uploaded.
 
 Recordings are written to the system temporary directory so a take can be replayed ("hear
-yours") and are not backed up or transmitted.
+yours") and are not backed up or transmitted. Café recordings stop within 15 seconds and
+are deleted when leaving the lesson, changing prompts, or backgrounding the app.
 
 ## Network behaviour
 
