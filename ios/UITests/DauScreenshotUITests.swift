@@ -35,12 +35,14 @@ final class DauScreenshotUITests: XCTestCase {
         XCTAssertTrue(app.buttons["continueButton"].waitForExistence(timeout: 10))
         capture(app, "02-today")
 
-        app.tabBars.buttons["Words"].tap()
+        app.tabBars.buttons["Learn"].tap()
+        app.buttons.containing(NSPredicate(format: "label CONTAINS %@", "Words")).firstMatch.tap()
         XCTAssertTrue(app.otherElements["maGrid"].waitForExistence(timeout: 5))
         capture(app, "07-words")
 
+        app.navigationBars.buttons.element(boundBy: 0).tap()
         app.tabBars.buttons["You"].tap()
-        XCTAssertTrue(app.staticTexts["Your tones"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Your journey"].waitForExistence(timeout: 5))
         capture(app, "06-you")
     }
 
@@ -53,6 +55,8 @@ final class DauScreenshotUITests: XCTestCase {
     func testPracticeProducesAVerdict() {
         let app = launch(["-skipOnboarding", "-uiTestTakeFixture", "north-ma-mother"])
         XCTAssertTrue(app.buttons["continueButton"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Learn"].tap()
+        app.buttons.containing(NSPredicate(format: "label CONTAINS %@", "Tone studio")).firstMatch.tap()
         app.buttons["continueButton"].tap()
 
         XCTAssertTrue(app.otherElements["practiceWord"].waitForExistence(timeout: 5))
@@ -96,6 +100,8 @@ final class DauScreenshotUITests: XCTestCase {
     /// involved, which is what lets it work on every device and need no extra permission.
     func testLiveCaptions() {
         let app = launch(["-skipOnboarding", "-uiTestTakeFixture", "north-ma-mother"])
+        app.tabBars.buttons["Learn"].tap()
+        app.buttons.containing(NSPredicate(format: "label CONTAINS %@", "Tone studio")).firstMatch.tap()
         let phrase = app.buttons["phraseOfTheDay"]
         XCTAssertTrue(phrase.waitForExistence(timeout: 10))
         phrase.tap()

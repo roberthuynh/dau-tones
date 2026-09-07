@@ -113,7 +113,7 @@ private struct PracticeSessionView: View {
             if store.referenceAudioURL(word: word.id, accent: settings.accent) != nil {
                 Button { ReferencePlayer.shared.play(url: store.referenceAudioURL(word: word.id, accent: settings.accent)!) } label: {
                     Image(systemName: "speaker.wave.2.fill")
-                        .foregroundStyle(Color(hex: 0xCDC4B4))
+                        .foregroundStyle(DauTheme.muted)
                         .frame(width: 44, height: 44)
                         .background(DauTheme.card, in: Circle())
                 }

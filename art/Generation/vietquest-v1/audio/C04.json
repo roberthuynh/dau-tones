@@ -1,0 +1,34 @@
+{
+  "id": "C04",
+  "text": "Cà phê hết rồi con. Con uống nước được không?",
+  "persona": "southern-elder-anchor",
+  "provider": "openai",
+  "model": "gpt-realtime-2.1",
+  "voice": "coral",
+  "prompt": "Always speak natural Vietnamese with a modern Southern Vietnamese (Sài Gòn) accent. Use clear, casual everyday vocabulary. Speak warmly at a moderate pace. Avoid sounding like a foreigner reading Vietnamese. Pronounce Vietnamese names, tones, numbers, and place names carefully.\n\nBạn là một bà ngoại người Sài Gòn, giọng miền Nam lớn tuổi, ấm và thương cháu. Bạn đang nói với đứa cháu từ Mỹ mới về. Nói tự nhiên như trong nhà, không diễn. Nói đúng nguyên văn một lần.\n\nSpeak the supplied Vietnamese line exactly once with no additions, omissions, paraphrase, greeting, sound effects, or music. Do not announce punctuation.",
+  "transcript": "Cà phê hết rồi con. Con uống nước được không?",
+  "usage": {
+    "total_tokens": 257,
+    "input_tokens": 166,
+    "output_tokens": 91,
+    "input_token_details": {
+      "text_tokens": 166,
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "cached_tokens": 0,
+      "cached_tokens_details": {
+        "text_tokens": 0,
+        "audio_tokens": 0,
+        "image_tokens": 0
+      }
+    },
+    "output_token_details": {
+      "text_tokens": 28,
+      "audio_tokens": 63
+    }
+  },
+  "date": "2026-09-07T14:38:07.313539+00:00",
+  "raw_sha256": "4ff9613aee2205e0466566abcf2ce59ceeb13b731739f23482158ac9e81b83e9",
+  "runtime_sha256": "f9f455de6898b723ac438b99e7266ddc082c5a5595a4112e632a97cb645da61f",
+  "validation": "Normalized returned transcript matched; CAF conversion passed. Independent listening review separate."
+}

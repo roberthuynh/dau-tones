@@ -32,7 +32,7 @@ struct VerdictView: View {
     private var accent: Color {
         switch verdict.outcome {
         case .matched: DauTheme.verified
-        case .inconclusive: Color(hex: 0xF4A641)
+        case .inconclusive: Color(hex: 0x966015)
         case .missedNaming, .missedShape: DauTheme.coral
         }
     }
@@ -217,7 +217,7 @@ struct VerdictView: View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(Color(hex: 0xCDC4B4))
+                .foregroundStyle(DauTheme.muted)
                 .frame(maxWidth: .infinity, minHeight: 48)
                 .overlay(Capsule().stroke(DauTheme.cream.opacity(0.14), lineWidth: 1))
         }

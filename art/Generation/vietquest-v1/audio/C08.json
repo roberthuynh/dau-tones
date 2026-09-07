@@ -1,0 +1,35 @@
+{
+  "id": "C08",
+  "text": "Dạ, đúng rồi.",
+  "persona": "maple-model",
+  "provider": "openai",
+  "model": "gpt-realtime-2.1",
+  "voice": "marin",
+  "prompt": "Always speak natural Vietnamese with a modern Southern Vietnamese (Sài Gòn) accent. Use clear, casual everyday vocabulary. Speak warmly at a moderate pace. Avoid sounding like a foreigner reading Vietnamese. Pronounce Vietnamese names, tones, numbers, and place names carefully.\n\nBạn là một cô gái trẻ người Mỹ gốc Việt, nói tiếng Việt giọng Sài Gòn tự nhiên và lễ phép. Bạn là giọng mẫu cho người học lặp lại, nên nói rõ ràng, chậm hơn bình thường một chút nhưng vẫn tự nhiên, không đọc kiểu máy. Nói đúng nguyên văn một lần.\n\nSpeak the supplied Vietnamese line exactly once with no additions, omissions, paraphrase, greeting, sound effects, or music. Do not announce punctuation.",
+  "transcript": "Dạ, đúng rồi.",
+  "usage": {
+    "total_tokens": 230,
+    "input_tokens": 171,
+    "output_tokens": 59,
+    "input_token_details": {
+      "text_tokens": 171,
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "cached_tokens": 0,
+      "cached_tokens_details": {
+        "text_tokens": 0,
+        "audio_tokens": 0,
+        "image_tokens": 0
+      }
+    },
+    "output_token_details": {
+      "text_tokens": 31,
+      "audio_tokens": 28,
+      "reasoning_tokens": 15
+    }
+  },
+  "date": "2026-09-07T14:38:13.257022+00:00",
+  "raw_sha256": "a2e1f6ebd4497cf71226e56b4ccbcad717cf7ae10fb0127dc60126a76dca4ca4",
+  "runtime_sha256": "e23744fa9ccda6441fa24865b2aac7c5521520908ef12ba7f17a66c950c118df",
+  "validation": "Normalized returned transcript matched; CAF conversion passed. Independent listening review separate."
+}

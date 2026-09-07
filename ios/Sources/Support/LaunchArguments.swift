@@ -25,6 +25,7 @@ enum LaunchArguments {
     }
 
     static var resetProgress: Bool { has("-resetProgress") }
+    static var resetQuestProgress: Bool { has("-resetQuestProgress") || resetProgress }
     static var skipOnboarding: Bool { has("-skipOnboarding") }
     /// Seed deterministic sample content for screenshots + UITests.
     static var seedContent: Bool { has("-seedContent") }

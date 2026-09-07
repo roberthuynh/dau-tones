@@ -7,6 +7,7 @@ struct YouView: View {
     @Environment(ContentStore.self) private var store
     @Environment(DauSettings.self) private var settings
     @Environment(ProgressStore.self) private var progress
+    @Environment(QuestProgressStore.self) private var quest
 
     private var takesGraded: Int { progress.progress.takes.count }
     private var recentPassRate: (passed: Int, total: Int)? {
@@ -19,9 +20,10 @@ struct YouView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Your tones")
+                    Text("Your journey")
                         .font(.system(size: 26, weight: .bold))
                         .foregroundStyle(DauTheme.cream)
+                    missionProgress
                     statRow
                     byToneCard
                     settingsCard
@@ -36,12 +38,32 @@ struct YouView: View {
         }
     }
 
+    private var missionProgress: some View {
+        HStack(spacing: 14) {
+            Image(systemName: quest.isCompleted ? "checkmark.seal.fill" : "map.fill")
+                .font(.system(size: 24))
+                .foregroundStyle(quest.isCompleted ? DauTheme.jade : DauTheme.coral)
+                .frame(width: 48, height: 48)
+                .background((quest.isCompleted ? DauTheme.jade : DauTheme.coral).opacity(0.11), in: RoundedRectangle(cornerRadius: 15))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(quest.isCompleted ? "Café mission completed" : "Café mission in progress")
+                    .font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(DauTheme.ink)
+                Text(quest.isCompleted ? "A short revisit will appear when it’s due." : "Your place is saved on this iPhone.")
+                    .font(.system(size: 13, design: .rounded)).foregroundStyle(DauTheme.inkSoft)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(DauTheme.card, in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(DauTheme.hairline))
+    }
+
     private var statRow: some View {
         HStack(spacing: 8) {
             statTile(
                 value: "\(progress.progress.currentStreak)",
                 label: "day streak",
-                tint: Color(hex: 0xF4A641)
+                tint: Color(hex: 0x966015)
             )
             statTile(value: "\(takesGraded)", label: "takes graded", tint: DauTheme.cream)
             statTile(
@@ -158,7 +180,7 @@ struct YouView: View {
     private var privacyNote: some View {
         // Restated where someone who cares will go looking, in the same words as the claim on
         // first run. The app has no network client; this is a description, not a promise.
-        Text("Every take is analyzed on this iPhone and never uploaded. Dấu has no account, no analytics, and makes no network requests — it works with the radio off.")
+        Text("Mission recordings and tone takes stay on this iPhone and are never uploaded. VietQuest has no account, no analytics, and makes no network requests — it works with the radio off.")
             .font(.system(size: 12.5))
             .foregroundStyle(DauTheme.faint)
             .fixedSize(horizontal: false, vertical: true)

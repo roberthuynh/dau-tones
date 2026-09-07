@@ -1,0 +1,479 @@
+{
+  "audio": {
+    "C01": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 2.2,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -12.615092,
+      "sample_rate": 24000
+    },
+    "C02": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 3.1,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -4.944197,
+      "sample_rate": 24000
+    },
+    "C03": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 2.8,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -4.893294,
+      "sample_rate": 24000
+    },
+    "C04": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 3.15,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -10.646135,
+      "sample_rate": 24000
+    },
+    "C05": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 1.8,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -8.851976,
+      "sample_rate": 24000
+    },
+    "C06": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 2.55,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -9.034562,
+      "sample_rate": 24000
+    },
+    "C07": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 3.0,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -7.070598,
+      "sample_rate": 24000
+    },
+    "C08": {
+      "channels": 1,
+      "codec": "pcm_s16le",
+      "decodes": true,
+      "duration_seconds": 1.4,
+      "long_silence_seconds": [],
+      "no_long_silence": true,
+      "not_clipped": true,
+      "peak_db": -9.118223,
+      "sample_rate": 24000
+    }
+  },
+  "checks": {
+    "app_icon": {
+      "detail": {
+        "catalog_filename": "AppIcon.png",
+        "has_alpha": false,
+        "height": 1024,
+        "width": 1024
+      },
+      "passed": true
+    },
+    "audio_C01": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 2.2,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -12.615092,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "audio_C02": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 3.1,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -4.944197,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "audio_C03": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 2.8,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -4.893294,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "audio_C04": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 3.15,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -10.646135,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "audio_C05": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 1.8,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -8.851976,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "audio_C06": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 2.55,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -9.034562,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "audio_C07": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 3.0,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -7.070598,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "audio_C08": {
+      "detail": {
+        "channels": 1,
+        "codec": "pcm_s16le",
+        "decodes": true,
+        "duration_seconds": 1.4,
+        "long_silence_seconds": [],
+        "no_long_silence": true,
+        "not_clipped": true,
+        "peak_db": -9.118223,
+        "sample_rate": 24000
+      },
+      "passed": true
+    },
+    "cafe_scene_catalog": {
+      "detail": {
+        "catalog_filename": "cafe-scene.png",
+        "has_alpha": false,
+        "height": 992,
+        "width": 1586
+      },
+      "passed": true
+    },
+    "generated_C04": {
+      "detail": {
+        "manifest_text": "Cà phê hết rồi con. Con uống nước được không?",
+        "raw_sha256_actual": "4ff9613aee2205e0466566abcf2ce59ceeb13b731739f23482158ac9e81b83e9",
+        "raw_sha256_expected": "4ff9613aee2205e0466566abcf2ce59ceeb13b731739f23482158ac9e81b83e9",
+        "returned_transcript": "Cà phê hết rồi con. Con uống nước được không?",
+        "runtime_sha256_actual": "f9f455de6898b723ac438b99e7266ddc082c5a5595a4112e632a97cb645da61f",
+        "runtime_sha256_expected": "f9f455de6898b723ac438b99e7266ddc082c5a5595a4112e632a97cb645da61f",
+        "swift_text": "Cà phê hết rồi con. Con uống nước được không?"
+      },
+      "passed": true
+    },
+    "generated_C06": {
+      "detail": {
+        "manifest_text": "Một ly nước, đúng không con?",
+        "raw_sha256_actual": "26c21d698a678444d7cb51efb015aa3ff868a0e5117a64a094b60c621e513437",
+        "raw_sha256_expected": "26c21d698a678444d7cb51efb015aa3ff868a0e5117a64a094b60c621e513437",
+        "returned_transcript": "Một ly nước, đúng không con?",
+        "runtime_sha256_actual": "6b74bde90bc930d56955e02cc10ad7ea2e2bef7efb4b8d13774440d401843963",
+        "runtime_sha256_expected": "6b74bde90bc930d56955e02cc10ad7ea2e2bef7efb4b8d13774440d401843963",
+        "swift_text": "Một ly nước, đúng không con?"
+      },
+      "passed": true
+    },
+    "generated_C07": {
+      "detail": {
+        "manifest_text": "Một ly cà phê, đúng không con?",
+        "raw_sha256_actual": "5cfb3aea9c22bc7c088ae9748efbea6b0b925bedecb41574b2c483cd53a19b35",
+        "raw_sha256_expected": "5cfb3aea9c22bc7c088ae9748efbea6b0b925bedecb41574b2c483cd53a19b35",
+        "returned_transcript": "Một ly cà phê, đúng không con?",
+        "runtime_sha256_actual": "15fe64c9508a676388204c72a2aec6aa10ff2e377b24a32d64eb578f60465cbf",
+        "runtime_sha256_expected": "15fe64c9508a676388204c72a2aec6aa10ff2e377b24a32d64eb578f60465cbf",
+        "swift_text": "Một ly cà phê, đúng không con?"
+      },
+      "passed": true
+    },
+    "generated_C08": {
+      "detail": {
+        "manifest_text": "Dạ, đúng rồi.",
+        "raw_sha256_actual": "a2e1f6ebd4497cf71226e56b4ccbcad717cf7ae10fb0127dc60126a76dca4ca4",
+        "raw_sha256_expected": "a2e1f6ebd4497cf71226e56b4ccbcad717cf7ae10fb0127dc60126a76dca4ca4",
+        "returned_transcript": "Dạ, đúng rồi.",
+        "runtime_sha256_actual": "e23744fa9ccda6441fa24865b2aac7c5521520908ef12ba7f17a66c950c118df",
+        "runtime_sha256_expected": "e23744fa9ccda6441fa24865b2aac7c5521520908ef12ba7f17a66c950c118df",
+        "swift_text": "Dạ, đúng rồi."
+      },
+      "passed": true
+    },
+    "generated_manifest_inventory": {
+      "detail": {
+        "actual": [
+          "C04",
+          "C06",
+          "C07",
+          "C08"
+        ],
+        "expected": [
+          "C04",
+          "C06",
+          "C07",
+          "C08"
+        ]
+      },
+      "passed": true
+    },
+    "reuse_C01": {
+      "detail": {
+        "actual_bytes": 109696,
+        "actual_sha256": "fcec0b86d4e7b9277db013d1838cae219059a4433c868cfb9c2e1476f1612055",
+        "expected_bytes": 109696,
+        "expected_sha256": "fcec0b86d4e7b9277db013d1838cae219059a4433c868cfb9c2e1476f1612055",
+        "runtime_path": "ios/Resources/Content/quest/audio/C01.caf",
+        "transcript_matches_swift": true
+      },
+      "passed": true
+    },
+    "reuse_C02": {
+      "detail": {
+        "actual_bytes": 152896,
+        "actual_sha256": "ecccbfb5f35aa1d06d6575dc1aba54e6eb2c3c0d1d916e0bddbbc3b3c405ce2b",
+        "expected_bytes": 152896,
+        "expected_sha256": "ecccbfb5f35aa1d06d6575dc1aba54e6eb2c3c0d1d916e0bddbbc3b3c405ce2b",
+        "runtime_path": "ios/Resources/Content/quest/audio/C02.caf",
+        "transcript_matches_swift": true
+      },
+      "passed": true
+    },
+    "reuse_C03": {
+      "detail": {
+        "actual_bytes": 138496,
+        "actual_sha256": "3197d6fa32ab56b15c9220ac51f12ba041245b8e64ff1a0dfaa2b5c7880e36c3",
+        "expected_bytes": 138496,
+        "expected_sha256": "3197d6fa32ab56b15c9220ac51f12ba041245b8e64ff1a0dfaa2b5c7880e36c3",
+        "runtime_path": "ios/Resources/Content/quest/audio/C03.caf",
+        "transcript_matches_swift": true
+      },
+      "passed": true
+    },
+    "reuse_C05": {
+      "detail": {
+        "actual_bytes": 90496,
+        "actual_sha256": "09c9183d5474109feb3b05b66318141b962337cfc65d07b2aff61833288566f9",
+        "expected_bytes": 90496,
+        "expected_sha256": "09c9183d5474109feb3b05b66318141b962337cfc65d07b2aff61833288566f9",
+        "runtime_path": "ios/Resources/Content/quest/audio/C05.caf",
+        "transcript_matches_swift": true
+      },
+      "passed": true
+    },
+    "reuse_manifest_inventory": {
+      "detail": {
+        "actual": [
+          "C01",
+          "C02",
+          "C03",
+          "C05"
+        ],
+        "expected": [
+          "C01",
+          "C02",
+          "C03",
+          "C05"
+        ]
+      },
+      "passed": true
+    },
+    "runtime_inventory": {
+      "detail": {
+        "actual": [
+          "C01",
+          "C02",
+          "C03",
+          "C04",
+          "C05",
+          "C06",
+          "C07",
+          "C08"
+        ],
+        "expected": [
+          "C01",
+          "C02",
+          "C03",
+          "C04",
+          "C05",
+          "C06",
+          "C07",
+          "C08"
+        ]
+      },
+      "passed": true
+    },
+    "swift_inventory": {
+      "detail": {
+        "actual": [
+          "C01",
+          "C02",
+          "C03",
+          "C04",
+          "C05",
+          "C06",
+          "C07",
+          "C08"
+        ],
+        "expected": [
+          "C01",
+          "C02",
+          "C03",
+          "C04",
+          "C05",
+          "C06",
+          "C07",
+          "C08"
+        ]
+      },
+      "passed": true
+    }
+  },
+  "generated_transcripts": {
+    "C04": {
+      "manifest_text": "Cà phê hết rồi con. Con uống nước được không?",
+      "raw_sha256_actual": "4ff9613aee2205e0466566abcf2ce59ceeb13b731739f23482158ac9e81b83e9",
+      "raw_sha256_expected": "4ff9613aee2205e0466566abcf2ce59ceeb13b731739f23482158ac9e81b83e9",
+      "returned_transcript": "Cà phê hết rồi con. Con uống nước được không?",
+      "runtime_sha256_actual": "f9f455de6898b723ac438b99e7266ddc082c5a5595a4112e632a97cb645da61f",
+      "runtime_sha256_expected": "f9f455de6898b723ac438b99e7266ddc082c5a5595a4112e632a97cb645da61f",
+      "swift_text": "Cà phê hết rồi con. Con uống nước được không?"
+    },
+    "C06": {
+      "manifest_text": "Một ly nước, đúng không con?",
+      "raw_sha256_actual": "26c21d698a678444d7cb51efb015aa3ff868a0e5117a64a094b60c621e513437",
+      "raw_sha256_expected": "26c21d698a678444d7cb51efb015aa3ff868a0e5117a64a094b60c621e513437",
+      "returned_transcript": "Một ly nước, đúng không con?",
+      "runtime_sha256_actual": "6b74bde90bc930d56955e02cc10ad7ea2e2bef7efb4b8d13774440d401843963",
+      "runtime_sha256_expected": "6b74bde90bc930d56955e02cc10ad7ea2e2bef7efb4b8d13774440d401843963",
+      "swift_text": "Một ly nước, đúng không con?"
+    },
+    "C07": {
+      "manifest_text": "Một ly cà phê, đúng không con?",
+      "raw_sha256_actual": "5cfb3aea9c22bc7c088ae9748efbea6b0b925bedecb41574b2c483cd53a19b35",
+      "raw_sha256_expected": "5cfb3aea9c22bc7c088ae9748efbea6b0b925bedecb41574b2c483cd53a19b35",
+      "returned_transcript": "Một ly cà phê, đúng không con?",
+      "runtime_sha256_actual": "15fe64c9508a676388204c72a2aec6aa10ff2e377b24a32d64eb578f60465cbf",
+      "runtime_sha256_expected": "15fe64c9508a676388204c72a2aec6aa10ff2e377b24a32d64eb578f60465cbf",
+      "swift_text": "Một ly cà phê, đúng không con?"
+    },
+    "C08": {
+      "manifest_text": "Dạ, đúng rồi.",
+      "raw_sha256_actual": "a2e1f6ebd4497cf71226e56b4ccbcad717cf7ae10fb0127dc60126a76dca4ca4",
+      "raw_sha256_expected": "a2e1f6ebd4497cf71226e56b4ccbcad717cf7ae10fb0127dc60126a76dca4ca4",
+      "returned_transcript": "Dạ, đúng rồi.",
+      "runtime_sha256_actual": "e23744fa9ccda6441fa24865b2aac7c5521520908ef12ba7f17a66c950c118df",
+      "runtime_sha256_expected": "e23744fa9ccda6441fa24865b2aac7c5521520908ef12ba7f17a66c950c118df",
+      "swift_text": "Dạ, đúng rồi."
+    }
+  },
+  "limitations": [
+    "No listening review was performed.",
+    "No accent, dialect, speaker-identity, intelligibility, or semantic-audio assurance is claimed."
+  ],
+  "passed": true,
+  "schema": "vietquest-asset-validation/v1",
+  "scope": "offline deterministic file, metadata, decode, and signal checks",
+  "source_hashes": {
+    "C01": {
+      "actual_bytes": 109696,
+      "actual_sha256": "fcec0b86d4e7b9277db013d1838cae219059a4433c868cfb9c2e1476f1612055",
+      "expected_bytes": 109696,
+      "expected_sha256": "fcec0b86d4e7b9277db013d1838cae219059a4433c868cfb9c2e1476f1612055",
+      "runtime_path": "ios/Resources/Content/quest/audio/C01.caf",
+      "transcript_matches_swift": true
+    },
+    "C02": {
+      "actual_bytes": 152896,
+      "actual_sha256": "ecccbfb5f35aa1d06d6575dc1aba54e6eb2c3c0d1d916e0bddbbc3b3c405ce2b",
+      "expected_bytes": 152896,
+      "expected_sha256": "ecccbfb5f35aa1d06d6575dc1aba54e6eb2c3c0d1d916e0bddbbc3b3c405ce2b",
+      "runtime_path": "ios/Resources/Content/quest/audio/C02.caf",
+      "transcript_matches_swift": true
+    },
+    "C03": {
+      "actual_bytes": 138496,
+      "actual_sha256": "3197d6fa32ab56b15c9220ac51f12ba041245b8e64ff1a0dfaa2b5c7880e36c3",
+      "expected_bytes": 138496,
+      "expected_sha256": "3197d6fa32ab56b15c9220ac51f12ba041245b8e64ff1a0dfaa2b5c7880e36c3",
+      "runtime_path": "ios/Resources/Content/quest/audio/C03.caf",
+      "transcript_matches_swift": true
+    },
+    "C05": {
+      "actual_bytes": 90496,
+      "actual_sha256": "09c9183d5474109feb3b05b66318141b962337cfc65d07b2aff61833288566f9",
+      "expected_bytes": 90496,
+      "expected_sha256": "09c9183d5474109feb3b05b66318141b962337cfc65d07b2aff61833288566f9",
+      "runtime_path": "ios/Resources/Content/quest/audio/C05.caf",
+      "transcript_matches_swift": true
+    }
+  }
+}

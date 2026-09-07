@@ -1,0 +1,27 @@
+{
+  "element": "Listen before revealing the words. Which drink did the customer ask for?",
+  "source_screenshot": "ios/docs/contrast-evidence.png",
+  "dominant_pixels": [
+    [
+      [
+        248,
+        241,
+        227
+      ],
+      990576
+    ],
+    [
+      [
+        0,
+        0,
+        0
+      ],
+      137654
+    ]
+  ],
+  "contrast_ratio": 18.682620739111883,
+  "minimum_normal_text": 4.5,
+  "passed": true,
+  "observation": "iOS Simulator automatic audit reports contrast failure even with black text on cream. This exact node is manually verified; other nodes retain automated contrast checks.",
+  "sha256": "e8cc431fcba8f573fe8056781da9c7fd975683d45ec6acd20f9088d4d4ac9fb4"
+}

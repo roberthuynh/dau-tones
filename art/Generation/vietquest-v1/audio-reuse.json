@@ -1,0 +1,62 @@
+[
+  {
+    "source_key": "zero-l10-choice",
+    "source_path": "Resources/Sounds/Lessons/zero-l10-choice.caf",
+    "transcript": "Con muốn nước hay cà phê?",
+    "planned_use": "core",
+    "voice": "coral / Southern elder",
+    "provenance": "OpenAI gpt-realtime-2.1",
+    "episode_line": "C01",
+    "unit": "whole_utterance",
+    "exists": true,
+    "bytes": 109696,
+    "sha256": "fcec0b86d4e7b9277db013d1838cae219059a4433c868cfb9c2e1476f1612055",
+    "runtime_path": "ios/Resources/Content/quest/audio/C01.caf",
+    "source_commit": "979a1ee2de0bfe36c9c525c41e8c48b1c1d9fb15"
+  },
+  {
+    "source_key": "zero-l12-check3-detail-retest",
+    "source_path": "Resources/Sounds/Lessons/zero-l12-check3-detail-retest.caf",
+    "transcript": "Dạ, cho con cà phê. Cảm ơn cô.",
+    "planned_use": "core",
+    "voice": "marin / Southern learner model",
+    "provenance": "OpenAI gpt-realtime-2.1",
+    "episode_line": "C02",
+    "unit": "whole_utterance",
+    "exists": true,
+    "bytes": 152896,
+    "sha256": "ecccbfb5f35aa1d06d6575dc1aba54e6eb2c3c0d1d916e0bddbbc3b3c405ce2b",
+    "runtime_path": "ios/Resources/Content/quest/audio/C02.caf",
+    "source_commit": "979a1ee2de0bfe36c9c525c41e8c48b1c1d9fb15"
+  },
+  {
+    "source_key": "zero-l12-check3-detail-initial",
+    "source_path": "Resources/Sounds/Lessons/zero-l12-check3-detail-initial.caf",
+    "transcript": "Dạ, cho con nước. Cảm ơn cô.",
+    "planned_use": "core",
+    "voice": "marin / Southern learner model",
+    "provenance": "OpenAI gpt-realtime-2.1",
+    "episode_line": "C03",
+    "unit": "whole_utterance",
+    "exists": true,
+    "bytes": 138496,
+    "sha256": "3197d6fa32ab56b15c9220ac51f12ba041245b8e64ff1a0dfaa2b5c7880e36c3",
+    "runtime_path": "ios/Resources/Content/quest/audio/C03.caf",
+    "source_commit": "979a1ee2de0bfe36c9c525c41e8c48b1c1d9fb15"
+  },
+  {
+    "source_key": "zero-l11-repeat-please",
+    "source_path": "Resources/Sounds/Lessons/zero-l11-repeat-please.caf",
+    "transcript": "Cô nói lại giùm con.",
+    "planned_use": "core",
+    "voice": "marin / Southern learner model",
+    "provenance": "OpenAI gpt-realtime-2.1",
+    "episode_line": "C05",
+    "unit": "whole_utterance",
+    "exists": true,
+    "bytes": 90496,
+    "sha256": "09c9183d5474109feb3b05b66318141b962337cfc65d07b2aff61833288566f9",
+    "runtime_path": "ios/Resources/Content/quest/audio/C05.caf",
+    "source_commit": "979a1ee2de0bfe36c9c525c41e8c48b1c1d9fb15"
+  }
+]
