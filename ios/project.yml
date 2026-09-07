@@ -59,6 +59,9 @@ targets:
         NSMicrophoneUsageDescription: >-
           VietQuest helps you practice on this iPhone. Your voice is analyzed on-device and never
           uploaded — no account, no recordings leave the phone.
+        NSSpeechRecognitionUsageDescription: >-
+          VietQuest checks whether this iPhone supports on-device Vietnamese speech recognition
+          for speaking practice. Speech audio used by this feature stays on this iPhone.
     scheme:
       testTargets: [DauTests, DauUITests]
   DauTests:
