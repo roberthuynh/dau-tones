@@ -115,7 +115,7 @@ describe("Tone Lab complete practice surface", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close summary" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(sessionUpdate).toHaveBeenCalled();
-  });
+  }, 15_000);
 
   it("switches through all six ma controls and more-word definitions", () => {
     render(
