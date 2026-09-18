@@ -17,7 +17,7 @@ the iOS app traces your pitch **while you speak** and captions what you actually
 ## Build
 
 ```bash
-cd /Users/rhuynh/Projects/ninth-tile/dau-tones/ios
+cd /Users/rhuynh/Projects/Personal/dau-tones/ios
 xcodegen generate                      # after any file add/remove/rename
 swift test --package-path DauCore      # engine tests, no simulator needed
 xcodebuild -project Dau.xcodeproj -scheme Dau \
@@ -27,7 +27,7 @@ xcodebuild -project Dau.xcodeproj -scheme Dau \
 ## Ship
 
 ```bash
-python3 /Users/rhuynh/Projects/ninth-tile/maple-hollow/launch/testflight/ship-testflight.py dau
+python3 /Users/rhuynh/Projects/ninth-tile/tools/maple-hollow/launch/testflight/ship-testflight.py dau
 ```
 
 Always **by slug** (`dau`), never by path. Registered in
